@@ -1,0 +1,716 @@
+import 'dart:ui';
+
+import 'package:basup_ver2/component/blankgap.dart';
+import 'package:basup_ver2/component/button.dart';
+import 'package:basup_ver2/component/container.dart';
+import 'package:basup_ver2/component/surveytitle.dart';
+import 'package:basup_ver2/controller/httpscontroller.dart';
+import 'package:basup_ver2/controller/resultcontroller.dart';
+import 'package:basup_ver2/controller/sizecontroller.dart';
+import 'package:basup_ver2/data/customer.dart';
+import 'package:basup_ver2/design/textstyle.dart';
+import 'package:basup_ver2/design/value.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import 'dart:html' as html;
+import 'package:flutter_widget_to_image/flutter_widget_to_image.dart';
+import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+class SkinResult extends StatefulWidget{
+
+  SkinResult({Key? key}) : super(key: key);
+
+  @override
+  _SkinResultState createState() => _SkinResultState();
+}
+
+class _SkinResultState extends State<SkinResult> {
+
+  // Initial selected survey (you can set a default or leave it null)
+  SurveyItem? selectedSurvey;
+  @override
+  Widget build(BuildContext context) {
+    var controller = Get.find<SizeController>(tag: "size");
+    var resultcontroller = Get.find<ResultController>(tag: "result");
+    return Scaffold(
+        body: Stack(
+      children: [
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: ListView(children: [
+            BlankTopGap(controller),
+            title(resultcontroller),
+            BlankBetweenTitleContent(controller),
+            skintitle(resultcontroller),
+            resultContent(resultcontroller),
+            resultData(controller, resultcontroller),
+            // careRoutine(controller, resultcontroller),
+            matchIngredient(resultcontroller),
+            recommendProduct(resultcontroller),
+          ]),
+        ),
+      ],
+    ));
+  }
+
+  Widget title(resultcontroller) {
+
+    List<DropdownMenuItem<SurveyItem>> dropdownItems =resultcontroller.surveylist
+        .map<DropdownMenuItem<SurveyItem>>((survey) {
+      DateTime dateTime = DateTime.parse(survey.date);
+      String formattedDate = '${dateTime.year}년 ${dateTime.month}월 ${dateTime
+          .day}일 ${dateTime.hour}시 ${dateTime.minute}분 진단 결과';
+      return DropdownMenuItem<SurveyItem>(
+        value: survey,
+        child: Text(formattedDate,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+          color: Colors.black,
+          fontSize: 14,
+          fontFamily: 'Pretendard',
+          fontWeight: FontWeight.w600,
+      ),), // Use the formatted date here
+      );
+    }).toList();
+    DateTime dateTime = DateTime.parse(resultcontroller.survey_date.value);
+    // Formats to Year-Month-Day
+    int year = dateTime.year;
+    int month = dateTime.month;
+    int day = dateTime.day;
+
+    return Column(children: [
+      Row( children:[
+
+
+      Container(
+      margin: EdgeInsets.fromLTRB(0, 0, 100, 0),
+      child: backKey(),),
+
+        if (dropdownItems.isNotEmpty) ...[
+          DropdownButton<SurveyItem>(
+            value: selectedSurvey,
+            hint: Text(
+              '${year}년 ${month}월 ${day}일  ${dateTime.hour}시 ${dateTime.minute}분 진단 결과',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 14,
+                fontFamily: 'Pretendard',
+                fontWeight: FontWeight.w600,
+              ),),
+            items: dropdownItems,
+            onChanged: (newValue) async {
+              selectedSurvey = newValue;
+              await fetchSurveyResult(selectedSurvey!.surveyId);
+              setState(() {
+                // Optionally, immediately fetch survey results after selection
+                print("setstate");
+              });
+            },
+          ),
+        ] else ...[
+          Text('피부 결과가 없습니다.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 14,
+              fontFamily: 'Pretendard',
+              fontWeight: FontWeight.w600,
+            ),),
+        ],],),
+      Container(
+        padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
+        child: Text.rich(
+          TextSpan(
+            children: [
+              TextSpan(
+                text: resultcontroller.survey_id.value,
+                style: TextStyle(
+                  color: Color(0xFF49A85E),
+                  fontSize: 20,
+                  fontFamily: 'Pretendard',
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    ]);
+  }
+}
+
+Widget _buildImage(String assetName, [double width = 300]) {
+  return Image.asset('assets/$assetName', width: width);
+}
+
+
+Widget skintitle(resultcontroller) {
+  return Column(
+    children: [
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
+        child: Text(
+          resultcontroller.name.value + '님의 피부 타입은',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 18,
+            fontFamily: 'Pretendard',
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+        child: Container(
+          width: 300,
+          height: 33,
+          clipBehavior: Clip.antiAlias,
+          decoration: ShapeDecoration(
+            color: Color(0xFF49A85E),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(17),
+            ),
+          ),
+          child: Center(
+            child: Text(
+              resultcontroller.type.value,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontFamily: 'Pretendard',
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+      ),
+      Container(
+        padding: const EdgeInsets.fromLTRB(0, 30, 0, 10),
+        child: _buildImage("img.png"),
+      ),
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+        width: 340,
+        height: 46,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            tagContainer(resultcontroller.tag[0], resultcontroller.tag_flag[0]),
+            tagContainer(resultcontroller.tag[1], resultcontroller.tag_flag[1]),
+            if (resultcontroller.tag.length > 2)
+              tagContainer(
+                  resultcontroller.tag[2], resultcontroller.tag_flag[2]),
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
+Widget resultContent(resultcontroller) {
+  return Container(
+    // padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 20),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          child: Text(
+            resultcontroller.skinResultContent[0],
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Color(0xFF7D7D7D),
+              fontSize: 16,
+              fontFamily: 'Pretendard',
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+        const SizedBox(height: 32),
+        Container(
+          child: Text(
+            resultcontroller.skinResultContent[1],
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Color(0xFF7D7D7D),
+              fontSize: 16,
+              fontFamily: 'Pretendard',
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+        const SizedBox(height: 32),Container(
+                  child: Text(
+                    resultcontroller.skinResultContent[2],
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color(0xFF7D7D7D),
+                      fontSize: 16,
+                      fontFamily: 'Pretendard',
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ),
+      ],
+    ),
+  );
+}
+
+Widget resultData(controller, resultcontroller) {
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 50),
+    child: Column(
+      children: [
+        ResultTitle("피부 타입"),
+        resultSubtitle(resultcontroller),
+        resultGraph(resultcontroller),
+      ],
+    ),
+  );
+}
+
+resultSubtitle(resultcontroller) {
+  return Column(
+    children: [
+      Container(
+        padding: const EdgeInsets.fromLTRB(5, 15, 5, 5),
+        child: Text(
+          resultcontroller.name.value + '님의 피부 분석 결과',
+          style: TextStyle(
+            color: Color(0xFF979797),
+            fontSize: 14,
+            fontFamily: 'Pretendard',
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        child: Text.rich(
+          TextSpan(
+            children: [
+              TextSpan(
+                text: '288가지의 피부 타입 중\n',
+                style: TextStyle(
+                  color: Color(0xFF49A85E),
+                  fontSize: 20,
+                  fontFamily: 'Pretendard',
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              TextSpan(
+                text: resultcontroller.name.value + '님의 피부를 분석했어요',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 20,
+                  fontFamily: 'Pretendard',
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    ],
+  );
+}
+
+resultGraph(controller) {
+  return Column(
+    children: [
+      graphItem(controller, DataType.SENS),
+      graphItem(controller, DataType.TIGHT),
+      graphItem(controller, DataType.PIG),
+      graphItem(controller, DataType.WATER),
+      graphItem(controller, DataType.OIL),
+    ],
+  );
+}
+
+graphItem(controller, type) {
+  return Column(
+    children: [
+      Container(
+        width: 303,
+        padding: const EdgeInsets.fromLTRB(3, 15, 3, 5),
+        child: Row(
+          children: [
+            Expanded(
+              flex: 4,
+              child: Row(children: [
+                Container(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                  child: Text(
+                    controller.getDataName(type),
+                    style: percent_name,
+                  ),
+                ),
+                Container(
+                  width: 32,
+                  clipBehavior: Clip.antiAlias,
+                  decoration: ShapeDecoration(
+                    color: controller.getColorFlag(type)
+                        ? Color(0xFFE7F4EA)
+                        : Color(0xFFFBDFDF),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(46),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        controller.getFlag(type),
+                        style: TextStyle(
+                          color: controller.getColorFlag(type)
+                              ? Color(0xFF49A85E)
+                              : Color(0xFFEF6363),
+                          fontSize: 10,
+                          fontFamily: 'Pretendard',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ]),
+            ),
+            Expanded(
+              flex: 4,
+              child: Container(),
+            ),
+            Expanded(
+              flex: 2,
+              child: Text(
+                // '비저항성',
+                "",
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                  color: Color(0xFFCECECE),
+                  fontSize: 14,
+                  fontFamily: 'Pretendard',
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      Container(
+        width: 303,
+        height: 40,
+        child: Stack(
+          children: [
+            Positioned(
+              left: 0,
+              top: 10,
+              child: Container(
+                width: 303,
+                height: 20,
+                decoration: ShapeDecoration(
+                  color: Color(0xFFF2F2F2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              left: 0,
+              top: 10,
+              child: Container(
+                width: controller.getPer(type, 303),
+                height: 20,
+                padding: const EdgeInsets.only(top: 3.0),
+                decoration: ShapeDecoration(
+                  color: Color(0xFF49A85E),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                ),
+                child: Text(
+                  controller.getPerValue(type, 100).toString() + '%',
+                  textAlign: TextAlign.center,
+                  style: percent_graph,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
+careRoutine(controller, resultcontroller) {
+  return Container(
+      child: Column(children: [
+    Container(
+      height: 25,
+    ),
+    ResultTitle("관리 방법"),
+    careSubtitle('맞춤 관리 진단', "RNTD3De1타입", "RNTD3De1타입은 \n이렇게 관리하면 좋아요"),
+    Container(
+      height: 40,
+    ),
+    careRoutineRecommend(
+        resultcontroller.routinekeyword[0], resultcontroller.routinecontent[0]),
+    careRoutineRecommend(
+        resultcontroller.routinekeyword[1], resultcontroller.routinecontent[1]),
+    careRoutineRecommend(
+        resultcontroller.routinekeyword[2], resultcontroller.routinecontent[2]),
+    Container(
+      height: 40,
+    ),
+  ]));
+}
+
+careSubtitle(title, keyword, content) {
+  var wordTostyle = keyword;
+  var spans = _getSpans(content, wordTostyle, careroutinesubtitle_title);
+  return Column(
+    children: [
+      Container(
+        padding: const EdgeInsets.fromLTRB(5, 15, 5, 5),
+        child: Text(
+          title,
+          style: subtitle_title,
+        ),
+      ),
+      Container(
+        padding: const EdgeInsets.fromLTRB(15, 3, 15, 10),
+        child: Text.rich(
+          TextSpan(style: careroutinesubtitle_content, children: spans),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    ],
+  );
+}
+
+List<TextSpan> _getSpans(String text, String matchWord, TextStyle style) {
+  List<TextSpan> spans = [];
+  int spanBoundary = 0;
+
+  do {
+    // 전체 String 에서 키워드 검색
+    final startIndex = text.indexOf(matchWord, spanBoundary);
+
+    // 전체 String 에서 해당 키워드가 더 이상 없을때 마지막 KeyWord부터 끝까지의 TextSpan 추가
+    if (startIndex == -1) {
+      spans.add(TextSpan(text: text.substring(spanBoundary)));
+      return spans;
+    }
+
+    // 전체 String 사이에서 발견한 키워드들 사이의 text에 대한 textSpan 추가
+    if (startIndex > spanBoundary) {
+      print(text.substring(spanBoundary, startIndex));
+      spans.add(TextSpan(text: text.substring(spanBoundary, startIndex)));
+    }
+
+    // 검색하고자 했던 키워드에 대한 textSpan 추가
+    final endIndex = startIndex + matchWord.length;
+    final spanText = text.substring(startIndex, endIndex);
+    spans.add(TextSpan(text: spanText, style: style));
+
+    // mark the boundary to start the next search from
+    spanBoundary = endIndex;
+
+    // continue until there are no more matches
+  }
+  //String 전체 검사
+  while (spanBoundary < text.length);
+
+  return spans;
+}
+
+careRoutineRecommend(keyword, content) {
+  var wordTostyle = keyword;
+
+  var spans = _getSpans(content, wordTostyle, careroutine_title);
+
+  return Container(
+    padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+    child: Column(
+      children: [
+        Container(
+          width: 302,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 19),
+          clipBehavior: Clip.antiAlias,
+          decoration: ShapeDecoration(
+            color: Color(0xFFF5F5F5),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(11),
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text.rich(
+                TextSpan(style: careroutine_content, children: spans),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+matchIngredient(resultcontroller) {
+
+  // Initialize an empty list of widgets that will contain all our dynamic widgets
+  List<Widget> listWidgets = [];
+
+  // Start with adding a top spacer and titles
+  listWidgets.addAll([
+    Container(height: 25),
+    ResultTitle("성분 매칭"),
+    careSubtitle("피부 타입에 맞는 성분을 찾았어요!", " ", "이런 성분이 잘 맞아요"),
+    Container(height: 25),
+  ]);
+
+  // Dynamically add matchIngredientComment widgets based on ingredient list
+  for (int i = 0; i < resultcontroller.ingredient.length; i++) {
+    // Make sure not to exceed the detail list's bounds
+    if (i < resultcontroller.detail.length) {
+      listWidgets.add(matchIngredientComment(resultcontroller.ingredient[i], resultcontroller.detail[i]));
+    }
+  }
+
+  // Add a bottom spacer
+  listWidgets.add(Container(height: 25));
+
+  // Return the whole structure wrapped in a Container and Column
+  return Container(
+    child: Column(
+      children: listWidgets,
+    ),
+  );
+}
+
+matchIngredientComment(ingredient, content) {
+  return Container(
+    padding: const EdgeInsets.fromLTRB(20, 5, 20, 5),
+    child: Column(
+      children: [
+        Container(
+          width: 302,
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+          clipBehavior: Clip.antiAlias,
+          decoration: ShapeDecoration(
+            color: Color(0xFFF5F5F5),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(11),
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text.rich(
+                TextSpan(
+                    style: ingredient_title, text: ingredient.split("/")[0]),
+              ),
+            ],
+          ),
+        ),
+        Container(
+            width: 302,
+            padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+            child: Text(
+              content,
+              style: ingredient_content,
+            ))
+      ],
+    ),
+  );
+}
+
+recommendProduct(resultcontroller) {
+  return Container(
+      child: Column(children: [
+    Container(
+      height: 25,
+    ),
+    ResultTitle("재품 추천"),
+    careSubtitle(" ", "위 성분을 모두 담은", "위 성분을 모두 담은\n제품을 추천해드려요"),
+    Container(
+      height: 25,
+    ),
+    packageImage(),
+    packageDescription(),
+    Container(
+      height: 100,
+    ),
+  ]));
+}
+
+packageImage() {
+  return Container(
+    padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+    child: _buildImage("totalitem.jpg"),
+  );
+}
+
+packageDescription() {
+  var wordTostyle = "맞춤 제작";
+  var spans = _getSpans("피부 타입 분석 결과를 바탕으로\n기성품이 아닌 맞춤 제작해드려요", wordTostyle,
+      skinrecommend_highlight);
+  return Container(
+      child: Column(
+    children: [
+      Container(
+        padding: const EdgeInsets.fromLTRB(0, 30, 0, 10),
+        child: Text.rich(
+          textAlign: TextAlign.center,
+          TextSpan(style: skinrecommend_content, children: spans),
+        ),
+      ),
+      Container(
+        padding: const EdgeInsets.fromLTRB(0, 30, 0, 10),
+        child: Text.rich(
+          textAlign: TextAlign.center,
+          TextSpan(
+              style: skinrecommend_highlight,
+              text: "더 자세하고 많은 정보들을\n앱에서 확인할 수 있어요!"),
+        ),
+      ),
+      Container(
+        padding: const EdgeInsets.fromLTRB(0, 30, 0, 10),
+        child: Text.rich(
+          textAlign: TextAlign.center,
+          TextSpan(
+              style: skinrecommend_highlight,
+              text: "베이스업 프로젝트를 구독하고\n4주 동안 특별 "
+                  "케어 받아보세요!"),
+        ),
+      ),
+    ],
+  ));
+}
+
+String detectDeviceType() {
+  var userAgent = html.window.navigator.userAgent.toString();
+
+  if (userAgent.contains('Android')) {
+    return 'Android';
+  } else if (userAgent.contains('iPhone')) {
+    return 'iOS';
+  } else {
+    return 'Unknown';
+  }
+}
