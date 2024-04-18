@@ -47,14 +47,14 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
-        initialRoute: '/',
+        // initialRoute: '/',
         getPages: [
           GetPage(name: '/', page: () =>  LoginScreen()),
           GetPage(name: '/index', page: () => AuthGuard(child: Index())),
           GetPage(name: '/survey', page: () =>  UserInfo()),
           GetPage(name: '/machine', page: () => AuthGuard(child:  SkinMachine
             ())),
-          GetPage(name: '/scope', page: () => AuthGuard(child:  SkinScope())),
+          GetPage(name: '/scope', page: () => SkinScope()),
           GetPage(name: '/result', page: () => AuthGuard(child: SkinResult())),
           GetPage(name: '/shortform', page : ()=> AuthGuard(child: ShortForm
             ())),

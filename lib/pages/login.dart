@@ -3,7 +3,7 @@ import 'package:basup_ver2/controller/sessionmanager.dart';
 import 'package:basup_ver2/pages/customerslistpage.dart';
 import 'package:basup_ver2/pages/dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'as fs;
+import 'package:cloud_firestore/cloud_firestore.dart' as fs;
 import 'package:basup_ver2/pages/index.dart';
 import 'package:get/get.dart';
 
@@ -28,7 +28,9 @@ class _LoginScreenState extends State<LoginScreen> {
     if (isLoggedIn) {
       // Assuming Index() is your main page after login
       var id = await SessionManager.getLoginaestheticId();
-      Future.microtask(() => Get.offAll(CustomersListPage(aestheticId: id,))); // Replace with correct navigation if necessary
+      Future.microtask(() => Get.offAll(CustomersListPage(
+            aestheticId: id,
+          ))); // Replace with correct navigation if necessary
     }
   }
 
@@ -42,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final querySnapshot = await fs.FirebaseFirestore.instance
         .collection('aesthetic')
         .where('id', isEqualTo: shopId)
-    // .where('password', isEqualTo: hash(password)) // You should hash the password
+        // .where('password', isEqualTo: hash(password)) // You should hash the password
         .get();
 
     // Check if at least one document was found
@@ -57,9 +59,8 @@ class _LoginScreenState extends State<LoginScreen> {
           print(document);
 
           // Access the document's data
-          Map<String, dynamic> documentData = document.data() as Map<
-              String,
-              dynamic>;
+          Map<String, dynamic> documentData =
+              document.data() as Map<String, dynamic>;
 
           // Now, you can access individual fields using the field names
           var pw = documentData['pw'];
@@ -91,9 +92,8 @@ class _LoginScreenState extends State<LoginScreen> {
         // 예외 발생 여부와 관계없이 실행되는 코드
         print('This block is always executed');
       }
-    }
-    else{
-      setState(){
+    } else {
+      setState() {
         Get.dialog(faillogindialog());
       }
     }
@@ -102,102 +102,106 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text(
-            'BASUP \nfor Aesthetic',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 48,
-              fontWeight: FontWeight.bold,
-              shadows: [
-                Shadow(
-                  blurRadius: 10.0,
-                  color: Colors.black.withOpacity(0.5),
-                  offset: Offset(5.0, 5.0),
-                ),
-              ],
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              'BASUP \nfor Aesthetic',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 48,
+                fontWeight: FontWeight.bold,
+                shadows: [
+                  Shadow(
+                    blurRadius: 10.0,
+                    color: Colors.black.withOpacity(0.5),
+                    offset: Offset(5.0, 5.0),
+                  ),
+                ],
+              ),
             ),
-          ),
 
-          Text(
-            'BASUP에 연락하여 사전 회원가입을 하고 로그인해주세요',
-            style: TextStyle(
-              color: Colors.black54,
-              fontSize: 17,
-              fontWeight: FontWeight.w300,
-              shadows: [
-              ],
+            Text(
+              'BASUP에 연락하여 사전 회원가입을 하고 로그인해주세요',
+              style: TextStyle(
+                color: Colors.black54,
+                fontSize: 17,
+                fontWeight: FontWeight.w300,
+                shadows: [],
+              ),
             ),
-          ),
-          SizedBox(height: 80), // Adjust the spacing
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40),
-            child: TextField(
-              controller: _idController,
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: Colors.white,
-                hintText: '아이디',
-                contentPadding: const EdgeInsets.all(15),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white),
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white),
-                  borderRadius: BorderRadius.circular(5),
+            SizedBox(height: 80), // Adjust the spacing
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: Container(
+                width: 400,
+                child: TextField(
+                  controller: _idController,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    hintText: '아이디',
+                    contentPadding: const EdgeInsets.all(15),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-          SizedBox(height: 20), // Adjust the spacing
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40),
-            child: TextField(
-              controller: _passwordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: Colors.white,
-                hintText: '비밀번호',
-                contentPadding: const EdgeInsets.all(15),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white),
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white),
-                  borderRadius: BorderRadius.circular(5),
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: 40), // Adjust the spacing
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 40),
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                primary: Colors.green, // Button color
-                onPrimary: Colors.white, // Text color
-              ),
-              onPressed:_login,
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Text(
-                  '로그인',
-                  style: TextStyle(fontSize: 20),
+            SizedBox(height: 20), // Adjust the spacing
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: Container(
+                width: 400,
+                child: TextField(
+                  controller: _passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    hintText: '비밀번호',
+                    contentPadding: const EdgeInsets.all(15),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+            SizedBox(height: 40), // Adjust the spacing
+            Container(
+              width: 440,
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.green, // Button color
+                  onPrimary: Colors.white, // Text color
+                ),
+                onPressed: _login,
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Text(
+                    '로그인',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
-
-
-
     );
   }
 }

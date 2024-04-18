@@ -10,6 +10,7 @@ class AuthGuard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("~~~~~~~~~");
     return FutureBuilder<bool>(
       future: SessionManager.getLoginStatus(),
       builder: (context, snapshot) {

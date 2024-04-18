@@ -80,6 +80,13 @@ class ResultController extends GetxController {
   var right_uv_flag= false.obs;
   var head_uv_flag= false.obs;
 
+  var a = 0.obs;
+  var b = 0.obs;
+  var c = 0.obs;
+  var d = 0.obs;
+  var e = 0.obs;
+  var f = 0.obs;
+
   inituser(){
 
      name.value = "주영";
@@ -106,6 +113,12 @@ class ResultController extends GetxController {
     left_uv = "";
     right_uv = "";
     head_uv = "";
+    left_led_flag.value= false;
+    right_led_flag.value= false;
+    head_led_flag.value= false;
+    left_uv_flag.value= false;
+    right_uv_flag.value= false;
+    head_uv_flag.value= false;
 
   }
 

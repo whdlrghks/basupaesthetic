@@ -40,9 +40,6 @@ class _SkinScopeState extends State<SkinScope> {
 
     resultcontroller.initscope();
 
-
-
-    // fetchSurveyResultNo();
   }
   // Function to open the camera and set the file
   void openCamera(void Function(html.File) setFile, _flag) {
@@ -59,28 +56,31 @@ class _SkinScopeState extends State<SkinScope> {
       }
     });
   }
-  // void openCamera(_file, _flag) {
-  //   // Create an HTML file input element
-  //   var input = html.FileUploadInputElement();
-  //   input.accept = 'image/*';
-  //   input.setAttribute('capture', 'environment'); // Set the capture attribute
-  //   input.click(); // Trigger the input element to open the camera or photo library
+
+  // Function to handle taking pictures
+  // void takePicture() {
+  //   html.FileUploadInputElement input = html.FileUploadInputElement()
+  //     ..accept = 'image/*'
+  //     ..capture = true;
+  //   input.click();
   //
-  //   // Listen for file selection
   //   input.onChange.listen((event) {
-  //     // Get the selected file
-  //     final files = input.files;
-  //     if (files != null && files.isNotEmpty) {
-  //       final file = files.first;
-  //       // Here, you can use the file, e.g., upload it or display a preview
-  //       print("File selected: ${file.name}");
-  //       _file = file;
-  //       _flag.value = true;
-  //     }
+  //     final file = input.files!.first;
+  //     final reader = html.FileReader();
+  //     reader.readAsDataUrl(file);
+  //     reader.onLoadEnd.listen((event) {
+  //       setState(() {
+  //         imageUrl = reader.result as String?;
+  //       });
+  //     });
   //   });
-  //
-  //   // Prevent the input from being added to the document tree to avoid showing it
   // }
+
+  // Function to detect if the user is on a mobile device
+  bool isMobileDevice() {
+    var userAgent = html.window.navigator.userAgent.toString().toLowerCase();
+    return userAgent.contains("iphone") || userAgent.contains("android");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,23 +127,26 @@ class _SkinScopeState extends State<SkinScope> {
       )),
     );
   }
-  Future<String> uploadFileAndRetrieveURL(html.File file, String uploadPath) {
+  Future<String> uploadFileAndRetrieveURL(html.File file, String uploadPath,
+  ) {
     var completer = Completer<String>();
 
     js.context.callMethod('uploadFileToStorage', [
       uploadPath,
       file,
-          (result) {
+         js.allowInterop( (result,error) {
         if (result != null) {
           completer.complete(result);
         } else {
-          completer.completeError("Failed to upload file and retrieve URL");
+          completer.completeError("Failed to upload file and retrieve URL "
+              "${error}");
         }
-      }
+      }),
     ]);
 
     return completer.future;
   }
+
   onPressedButton() async {
 
     _showLoadingDialog(context); // Show the loading dialog
@@ -168,13 +171,15 @@ class _SkinScopeState extends State<SkinScope> {
     addUploadTask(leftUvFile, 'left_uv', 'leftUv');
     addUploadTask(rightUvFile, 'right_uv', 'rightUv');
     addUploadTask(headUvFile, 'head_uv', 'headUv');
-
+    print("a");
     try {
+      print("try");
       List<String> urls = await Future.wait(uploadTasks);
-
       for (int i = 0; i < urls.length; i++) {
         String type = uploadTypes[i];
         String url = urls[i];
+        print("url : ${url}");
+
         // Using reflection or a conditional approach to assign URLs to their corresponding variable in resultcontroller
         switch (type) {
           case 'left_led':
@@ -197,13 +202,17 @@ class _SkinScopeState extends State<SkinScope> {
             break;
         }
       }
+      print("finish");
 
       resultcontroller.scope_id = user_id+"_"+now.toString();
+
+      print("resultcontroller.scope_id");
       await createSkinScope(resultcontroller);
       // At this point, all URLs have been assigned to their respective variables in resultcontroller.
       // Proceed with any additional logic, now that all uploads are complete and URLs are saved.
     } catch (e) {
       print("An error occurred during file uploads: $e");
+      Get.dialog(Test("An error occurred during file uploads: $e"));
       // Handle any errors that occurred during the uploads
     }finally {
       Get.back(); // Dismiss the loading dialog
@@ -233,5 +242,34 @@ void _showLoadingDialog(BuildContext context) {
         ),
       );
     },
+  );
+}
+
+
+Test(index) {
+  return Dialog(
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(
+        Radius.circular(16.0),
+      ),
+    ),
+    child: Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.all(
+          Radius.circular(40.0),
+        ),
+      ),
+      padding: EdgeInsets.fromLTRB(24, 18, 24, 5),
+      width: 400,
+      child:
+          Container(
+            padding: EdgeInsets.all(5.0),
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Text("test"+index, ),
+            ),
+          ),
+      ),
   );
 }

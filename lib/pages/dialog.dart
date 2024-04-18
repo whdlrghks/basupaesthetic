@@ -387,7 +387,7 @@ ShowQRdialog(qr_url, routeurl) {
         ),
       ),
       padding: EdgeInsets.fromLTRB(24, 18, 24, 5),
-      // width: 275.w,
+      width: 400,
       child:  Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -474,4 +474,6 @@ ShowQRdialog(qr_url, routeurl) {
     ),
   );
 }
+
+
 

@@ -519,6 +519,7 @@ Future<void> createSkinScope(resultController) async {
   var date = DateTime.now().toString();
 
   // Append random number to 'user_name'
+  print(scope_id);
 
   await firestore.collection('skin_microscope_images').doc(scope_id).set({
     'user_id': user_id,
