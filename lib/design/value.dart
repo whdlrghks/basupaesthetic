@@ -5,6 +5,9 @@ var Dev_URL = "https://dev-web.basup-server.com";
 var access_Token = "basup2022!!";
 var access_Dev_Token = "skinlab2021!";
 
+var web_skin_result= "https://4gqaleeyx2.execute-api.ap-northeast-2.amazonaws"
+    ".com/default/GET_BASUP_RESULT";
+
 
 enum Gender { M, W, None }
 

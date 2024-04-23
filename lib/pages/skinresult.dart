@@ -8,6 +8,7 @@ import 'package:basup_ver2/controller/httpscontroller.dart';
 import 'package:basup_ver2/controller/resultcontroller.dart';
 import 'package:basup_ver2/controller/sizecontroller.dart';
 import 'package:basup_ver2/data/customer.dart';
+import 'package:basup_ver2/design/analyzeloading.dart';
 import 'package:basup_ver2/design/textstyle.dart';
 import 'package:basup_ver2/design/value.dart';
 import 'package:flutter/material.dart';
@@ -18,8 +19,7 @@ import 'package:flutter_widget_to_image/flutter_widget_to_image.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class SkinResult extends StatefulWidget{
-
+class SkinResult extends StatefulWidget {
   SkinResult({Key? key}) : super(key: key);
 
   @override
@@ -27,54 +27,67 @@ class SkinResult extends StatefulWidget{
 }
 
 class _SkinResultState extends State<SkinResult> {
-
   // Initial selected survey (you can set a default or leave it null)
   SurveyItem? selectedSurvey;
+
+  var isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     var controller = Get.find<SizeController>(tag: "size");
     var resultcontroller = Get.find<ResultController>(tag: "result");
     return Scaffold(
-        body: Stack(
-      children: [
-        Positioned(
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          child: ListView(children: [
-            BlankTopGap(controller),
-            title(resultcontroller),
-            BlankBetweenTitleContent(controller),
-            skintitle(resultcontroller),
-            resultContent(resultcontroller),
-            resultData(controller, resultcontroller),
-            // careRoutine(controller, resultcontroller),
-            matchIngredient(resultcontroller),
-            recommendProduct(resultcontroller),
-          ]),
-        ),
-      ],
-    ));
+        body: isLoading
+            ? AnalyzeLoading() // 로딩 중 인디케이터 표시
+            : Stack(
+                children: [
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: ListView(children: [
+                      BlankTopGap(controller),
+                      title(resultcontroller),
+                      BlankBetweenTitleContent(controller),
+                      skintitle(resultcontroller),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: resultData(controller, resultcontroller),
+                          ),
+                          Expanded(
+                            child: resultContent(resultcontroller),
+                          ),
+                        ],
+                      ),
+                      // careRoutine(controller, resultcontroller),
+                      matchIngredient(resultcontroller),
+                      // recommendProduct(resultcontroller),
+                    ]),
+                  ),
+                ],
+              ));
   }
 
   Widget title(resultcontroller) {
-
-    List<DropdownMenuItem<SurveyItem>> dropdownItems =resultcontroller.surveylist
-        .map<DropdownMenuItem<SurveyItem>>((survey) {
+    List<DropdownMenuItem<SurveyItem>> dropdownItems =
+        resultcontroller.surveylist.map<DropdownMenuItem<SurveyItem>>((survey) {
       DateTime dateTime = DateTime.parse(survey.date);
-      String formattedDate = '${dateTime.year}년 ${dateTime.month}월 ${dateTime
-          .day}일 ${dateTime.hour}시 ${dateTime.minute}분 진단 결과';
+      String formattedDate =
+          '${dateTime.year}년 ${dateTime.month}월 ${dateTime.day}일 ${dateTime.hour}시 ${dateTime.minute}분 진단 결과';
       return DropdownMenuItem<SurveyItem>(
         value: survey,
-        child: Text(formattedDate,
+        child: Text(
+          formattedDate,
           textAlign: TextAlign.center,
           style: TextStyle(
-          color: Colors.black,
-          fontSize: 14,
-          fontFamily: 'Pretendard',
-          fontWeight: FontWeight.w600,
-      ),), // Use the formatted date here
+            color: Colors.black,
+            fontSize: 14,
+            fontFamily: 'Pretendard',
+            fontWeight: FontWeight.w600,
+          ),
+        ), // Use the formatted date here
       );
     }).toList();
     DateTime dateTime = DateTime.parse(resultcontroller.survey_date.value);
@@ -84,45 +97,53 @@ class _SkinResultState extends State<SkinResult> {
     int day = dateTime.day;
 
     return Column(children: [
-      Row( children:[
-
-
-      Container(
-      margin: EdgeInsets.fromLTRB(0, 0, 100, 0),
-      child: backKey(),),
-
-        if (dropdownItems.isNotEmpty) ...[
-          DropdownButton<SurveyItem>(
-            value: selectedSurvey,
-            hint: Text(
-              '${year}년 ${month}월 ${day}일  ${dateTime.hour}시 ${dateTime.minute}분 진단 결과',
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            margin: EdgeInsets.fromLTRB(0, 0, 100, 0),
+            child: backKey(),
+          ),
+          if (dropdownItems.isNotEmpty) ...[
+            DropdownButton<SurveyItem>(
+              value: selectedSurvey,
+              hint: Text(
+                '${year}년 ${month}월 ${day}일  ${dateTime.hour}시 ${dateTime.minute}분 진단 결과',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 14,
+                  fontFamily: 'Pretendard',
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              items: dropdownItems,
+              onChanged: (newValue) async {
+                setState(() {
+                  isLoading = true; // 로딩 시작
+                });
+                selectedSurvey = newValue;
+                await fetchSurveyResult(selectedSurvey!.surveyId);
+                setState(() {
+                  isLoading = false; // 로딩 종료
+                  print("setstate");
+                });
+              },
+            ),
+          ] else ...[
+            Text(
+              '피부 결과가 없습니다.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 14,
                 fontFamily: 'Pretendard',
                 fontWeight: FontWeight.w600,
-              ),),
-            items: dropdownItems,
-            onChanged: (newValue) async {
-              selectedSurvey = newValue;
-              await fetchSurveyResult(selectedSurvey!.surveyId);
-              setState(() {
-                // Optionally, immediately fetch survey results after selection
-                print("setstate");
-              });
-            },
-          ),
-        ] else ...[
-          Text('피부 결과가 없습니다.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 14,
-              fontFamily: 'Pretendard',
-              fontWeight: FontWeight.w600,
-            ),),
-        ],],),
+              ),
+            ),
+          ],
+        ],
+      ),
       Container(
         padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
         child: Text.rich(
@@ -149,7 +170,6 @@ class _SkinResultState extends State<SkinResult> {
 Widget _buildImage(String assetName, [double width = 300]) {
   return Image.asset('assets/$assetName', width: width);
 }
-
 
 Widget skintitle(resultcontroller) {
   return Column(
@@ -193,10 +213,6 @@ Widget skintitle(resultcontroller) {
         ),
       ),
       Container(
-        padding: const EdgeInsets.fromLTRB(0, 30, 0, 10),
-        child: _buildImage("img.png"),
-      ),
-      Container(
         padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
         width: 340,
         height: 46,
@@ -216,15 +232,72 @@ Widget skintitle(resultcontroller) {
 }
 
 Widget resultContent(resultcontroller) {
+  print(resultcontroller.skinResultWebContent);
   return Container(
-    // padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 20),
+    margin: EdgeInsets.fromLTRB(0, 0, 30, 0),
     child: Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+
+        Container(
+          margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
+          child: Text(
+            "전문가 의견 :",
+            textAlign: TextAlign.left,
+            style: TextStyle(
+              color: Color(0xFF7D7D7D),
+              fontSize: 18,
+              fontFamily: 'Pretendard',
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        Container(
+          height: 300,
+          child:
+          ListView.builder(
+            itemCount: resultcontroller.skinResultWebContent.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                title: Text(resultcontroller.skinResultWebContent[index],
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    color: Color(0xFF7D7D7D),
+                    fontSize: 16,
+                    fontFamily: 'Pretendard',
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              );
+            },
+          ),
+
+          decoration: BoxDecoration(
+            color: Colors.white, // 배경색 설정
+            border: Border.all(
+              color: Colors.black12, // 테두리 색상 설정
+              width: 3, // 테두리 두께 설정
+            ),
+          ),
+        ),
+        const SizedBox(height: 32),
+        Container(
+          margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
+          child: Text(
+            "피부 타입 설명 :",
+            textAlign: TextAlign.left,
+            style: TextStyle(
+              color: Color(0xFF7D7D7D),
+              fontSize: 18,
+              fontFamily: 'Pretendard',
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
         Container(
           child: Text(
             resultcontroller.skinResultContent[0],
-            textAlign: TextAlign.center,
+            textAlign: TextAlign.left,
             style: TextStyle(
               color: Color(0xFF7D7D7D),
               fontSize: 16,
@@ -237,7 +310,7 @@ Widget resultContent(resultcontroller) {
         Container(
           child: Text(
             resultcontroller.skinResultContent[1],
-            textAlign: TextAlign.center,
+            textAlign: TextAlign.left,
             style: TextStyle(
               color: Color(0xFF7D7D7D),
               fontSize: 16,
@@ -246,18 +319,20 @@ Widget resultContent(resultcontroller) {
             ),
           ),
         ),
-        const SizedBox(height: 32),Container(
-                  child: Text(
-                    resultcontroller.skinResultContent[2],
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Color(0xFF7D7D7D),
-                      fontSize: 16,
-                      fontFamily: 'Pretendard',
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
+        const SizedBox(height: 32),
+        Container(
+          child: Text(
+            resultcontroller.skinResultContent[2],
+            textAlign: TextAlign.left,
+            style: TextStyle(
+              color: Color(0xFF7D7D7D),
+              fontSize: 16,
+              fontFamily: 'Pretendard',
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+
       ],
     ),
   );
@@ -570,23 +645,39 @@ careRoutineRecommend(keyword, content) {
 }
 
 matchIngredient(resultcontroller) {
-
   // Initialize an empty list of widgets that will contain all our dynamic widgets
   List<Widget> listWidgets = [];
 
   // Start with adding a top spacer and titles
   listWidgets.addAll([
     Container(height: 25),
-    ResultTitle("성분 매칭"),
-    careSubtitle("피부 타입에 맞는 성분을 찾았어요!", " ", "이런 성분이 잘 맞아요"),
+    ResultTitle("처방 성분"),
+    careSubtitle("피부 타입에 맞는 성분 처방!", " ", "이런 성분이 잘 맞아요"),
     Container(height: 25),
   ]);
 
   // Dynamically add matchIngredientComment widgets based on ingredient list
   for (int i = 0; i < resultcontroller.ingredient.length; i++) {
     // Make sure not to exceed the detail list's bounds
-    if (i < resultcontroller.detail.length) {
-      listWidgets.add(matchIngredientComment(resultcontroller.ingredient[i], resultcontroller.detail[i]));
+    if (i + 1 < resultcontroller.detail.length) {
+      listWidgets.add(
+        Row(children: [
+          Expanded(
+            child: matchIngredientComment(
+                resultcontroller.ingredient[i], resultcontroller.detail[i]),
+          ),
+          Expanded(
+            child: matchIngredientComment(resultcontroller.ingredient[i + 1],
+                resultcontroller.detail[i + 1]),
+          ),
+        ]),
+      );
+      i = i + 1;
+    } else if (i < resultcontroller.detail.length) {
+      listWidgets.add(
+        matchIngredientComment(
+            resultcontroller.ingredient[i], resultcontroller.detail[i]),
+      );
     }
   }
 

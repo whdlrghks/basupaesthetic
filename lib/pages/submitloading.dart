@@ -39,7 +39,7 @@ class _SubmitLoadingState extends State<SubmitLoading>
             Container(
               padding: EdgeInsets.fromLTRB(30, 30, 30, 5),
               child: Text(
-                'BASUP 288로 ' + '\n데이터를 분석하고 있습니다.',
+                '피부 진단 데이터를 BASUP 서버로 전송중입니다.',
                 style: submitloading_title,
                 textAlign: TextAlign.center,
               ),

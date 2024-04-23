@@ -78,6 +78,10 @@ class _LoginScreenState extends State<LoginScreen> {
               Get.dialog(faillogindialog());
             });
           }
+          else{
+
+            Get.dialog(faillogindialog());
+          }
         } else {
           // Handle the case where no documents match the shopId
           print("No matching document found for shopId: $shopId");
@@ -93,9 +97,9 @@ class _LoginScreenState extends State<LoginScreen> {
         print('This block is always executed');
       }
     } else {
-      setState() {
+
         Get.dialog(faillogindialog());
-      }
+
     }
   }
 

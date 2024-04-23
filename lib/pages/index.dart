@@ -1,6 +1,7 @@
 import 'package:basup_ver2/controller/httpscontroller.dart';
 import 'package:basup_ver2/controller/resultcontroller.dart';
 import 'package:basup_ver2/controller/sessionmanager.dart';
+import 'package:basup_ver2/design/analyzeloading.dart';
 import 'package:basup_ver2/design/color.dart';
 import 'package:basup_ver2/design/textstyle.dart';
 import 'package:basup_ver2/pages/dialog.dart';
@@ -48,6 +49,7 @@ class _IndexState extends State<Index> {
           Get.dialog(NoDatadialog());
           return;
         } else {
+          Get.to(AnalyzeLoading() );
           await fetchSurveyResult(resultcontroller.survey_id.value);
           nextroute = "/result";
         }

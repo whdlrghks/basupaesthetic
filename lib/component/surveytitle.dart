@@ -6,19 +6,19 @@ import 'package:get/get.dart';
 import 'button.dart';
 
 Widget Subtitle(title, controller) {
-  return Row(
+  return
+  Container(width: 450,
+
+    child:
+    Row(
+
+        mainAxisAlignment: MainAxisAlignment.start,
     // width: present_width,
     children: [
 
       backKey(),
-      Obx(
-        () => Container(
-          width: figma_width > controller.present_width.value
-              ? 25
-              : (controller.present_width.value - figma_width) / 2 - 20,
-        ),
-      ),
       Container(
+        margin: EdgeInsets.fromLTRB(40, 0, 0, 0),
         decoration: BoxDecoration(
           color: survey_subtitle,
           borderRadius: BorderRadius.all(
@@ -40,7 +40,7 @@ Widget Subtitle(title, controller) {
         ),
       ),
     ],
-  );
+  ),);
 }
 
 Widget SubMultititle(title, controller, surveycontroller) {
@@ -182,14 +182,14 @@ Widget ResultTitle(title) {
             Radius.circular(24.0),
           ),
         ),
-        height: 22,
-        width: 88,
+        height: 40,
+        width: 120,
         child: Center(
           child: Text(
             title,
             style: TextStyle(
                 color: Colors.white,
-                fontSize: 12,
+                fontSize: 25,
                 fontFamily: "Pretendard",
                 fontWeight: FontWeight.w600,
                 height: 1.0),

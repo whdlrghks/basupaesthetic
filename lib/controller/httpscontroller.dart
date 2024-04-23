@@ -212,6 +212,7 @@ Future<String> fetchSurveySubmit() async {
 
 
 fetchSurveyResult(surveyCode) async {
+
   print("fetchSurveyResult ");
 
   var resultController = Get.find<ResultController>(tag: "result");
@@ -320,7 +321,7 @@ fetchSurveyResult(surveyCode) async {
 
     }
 
-
+    await fetchWebSkinResult(resultController.type.value);
 
     return CODE_OK;
   } else {
@@ -436,7 +437,7 @@ fetchSurveyResultNo() async {
 
     }
 
-
+    await fetchWebSkinResult(resultController.type.value);
     Get.offAll(SkinResult(), transition: Transition.rightToLeftWithFade);
     return CODE_OK;
   } else {
@@ -533,4 +534,59 @@ Future<void> createSkinScope(resultController) async {
   });
   print('Document created with name: $scope_id');
   return;
+}
+
+
+fetchWebSkinResult(skincode) async {
+  // return;
+  print("fetchWebSkinResult ");
+
+  var resultController = Get.find<ResultController>(tag: "result");
+
+  String temp = web_skin_result;
+  var url = Uri.parse(temp);
+  //var surveyCode = j6lfDzst;
+  var _query = <String, String>{
+    'skintype': skincode,
+  };
+
+  url = url.replace(queryParameters: _query);
+
+  print(url);
+
+  http.Response response = await http.get(
+    url,
+
+    headers: <String, String>{
+      "Access-Control-Allow-Origin": "*",
+      'Content-Type': 'application/json',
+      'Accept': '*/*',
+      'Access-Control-Allow-Headers': '*',
+    },
+  );
+
+  final decodeData = utf8.decode(response.bodyBytes);
+  final parsed = json.decode(decodeData).cast<String, dynamic>();
+
+  var result_status = parsed["resCode"];
+  print(parsed);
+  print(result_status);
+
+  if (result_status == CODE_OK) {
+
+    // 'comment'와 'ingre' 데이터 저장
+    resultController.skinResultWebContent = List<String>.from
+      (parsed["comment"]);
+    resultController.skinResultWebIngre = List<List<String>>.from
+      (parsed["ingre"].map((ingre) =>
+    List<String>.from(ingre)));
+
+    print('Skin Result Web Content: ${resultController.skinResultWebContent}');
+    print('Skin Result Web Ingredients: ${resultController
+        .skinResultWebIngre}');
+
+    return CODE_OK;
+  } else {
+    return "FAIL";
+  }
 }

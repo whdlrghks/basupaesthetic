@@ -18,7 +18,7 @@ backKey(){
         fit: BoxFit.fill,
       ),
       onTap: (){
-        Get.back();
+        Get.offAllNamed('/index');
       },
     ),
   );

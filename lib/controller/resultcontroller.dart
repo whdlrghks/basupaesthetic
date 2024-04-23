@@ -32,6 +32,9 @@ class ResultController extends GetxController {
     '지속적인 관리를 통해 주름 예방과 해결을 돕고\n수분 보유력을 채워주는 성분으로\n유수분 밸런스를 맞추는 것을 추천해요'
   ];
 
+  var skinResultWebContent =[];
+  var skinResultWebIngre = [];
+
   var cos_ingredients = [].obs;
   var ingredient = [].obs;
   var detail = [].obs;
