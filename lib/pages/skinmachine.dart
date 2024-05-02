@@ -44,37 +44,37 @@ class _SkinMachineState extends State<SkinMachine> {
 
     switch (factornum) {
       case 1:
-        factorname = "수분";
+        factorname = "moisture".tr;
         factor = resultcontroller.water_machine;
         factor_flag = resultcontroller.water_machine_flag;
         break;
       case 2:
-        factorname = "유분";
+        factorname = "oil".tr;
         factor = resultcontroller.oil_machine;
         factor_flag = resultcontroller.oil_machine_flag;
         break;
       case 3:
-        factorname = "주름";
+        factorname = "wrinkle".tr;
         factor = resultcontroller.wrinkle_machine;
         factor_flag = resultcontroller.wrinkle_machine_flag;
         break;
       case 4:
-        factorname = "모공";
+        factorname = "pore".tr;
         factor = resultcontroller.pore_machine;
         factor_flag = resultcontroller.pore_machine_flag;
         break;
       case 5:
-        factorname = "각질";
+        factorname = "corneous".tr;
         factor = resultcontroller.corneous_machine;
         factor_flag = resultcontroller.corneous_machine_flag;
         break;
       case 6:
-        factorname = "잡티";
+        factorname = "blemishes".tr;
         factor = resultcontroller.blemishes_machine;
         factor_flag = resultcontroller.blemishes_machine_flag;
         break;
       case 7:
-        factorname = "피지";
+        factorname = "sebum".tr;
         factor = resultcontroller.sebum_machine;
         factor_flag = resultcontroller.sebum_machine_flag;
         break;
@@ -96,8 +96,8 @@ class _SkinMachineState extends State<SkinMachine> {
         children: [
           BlankTopProGressMulti(controller),
           BlankTopGap(controller),
-          Subtitle("피부 측정기", controller),
-          QuestionTitle("피부 세안후 BASUP 피부 측정기로 \n측정하여 나온 값을 적어주세요.", controller),
+          Subtitle('skin_measure_machine'.tr, controller),
+          QuestionTitle('enter_skin_values'.tr, controller),
           machineUserIdField(_textcontroller, resultcontroller ),
           inputformMachine(1),
           inputformMachine(2),
@@ -106,7 +106,7 @@ class _SkinMachineState extends State<SkinMachine> {
           inputformMachine(5),
           inputformMachine(6),
           inputformMachine(7),
-          MachineSubmitButton("제출하기", resultcontroller, onPressedButton)
+          MachineSubmitButton("submit".tr, resultcontroller, onPressedButton)
         ],
       )),
     );

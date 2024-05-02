@@ -82,6 +82,8 @@ class _SkinScopeState extends State<SkinScope> {
     return userAgent.contains("iphone") || userAgent.contains("android");
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     controller.width(MediaQuery.of(context).size.width.toInt());
@@ -97,32 +99,34 @@ class _SkinScopeState extends State<SkinScope> {
         children: [
           BlankTopProGressMulti(controller),
           BlankTopGap(controller),
-          Subtitle("피부 현미경", controller),
-          QuestionTitle("스마트폰으로 현재 창을 켜주세요. \n현미경을 연결하여 BASUP 피부 현미경로 \n측정하여 "
-              "나온 "
-              "값을 "
-              "적어주세요"
-              ".",
+          Subtitle("skin_microscope".tr, controller),
+          QuestionTitle("open_camera".tr,
               controller),
-          scopeButton("Left LED 촬영", "Left LED 재촬영", resultcontroller
+          scopeButton("capture_left_led".tr, "recapture_left_led".tr,
+              resultcontroller
               .left_led_flag,resultcontroller.left_led,
               openCamera, (file) => setState(() => leftLedFile = file)),
-          scopeButton("Right LED 촬영", "Right LED 재촬영", resultcontroller
+          scopeButton("capture_right_led".tr, "recapture_right_led".tr,
+              resultcontroller
               .right_led_flag, resultcontroller.right_led,
               openCamera, (file) => setState(() => rightLedFile = file)),
-          scopeButton("Head LED 촬영", "Head LED 재촬영", resultcontroller
+          scopeButton("capture_head_led".tr, "recapture_head_led".tr,
+              resultcontroller
               .head_led_flag,resultcontroller.head_led,
               openCamera, (file) => setState(() => headLedFile = file)),
-          scopeButton("Left UV 촬영", "Left UV 재촬영", resultcontroller
+          scopeButton("capture_left_uv".tr, "recapture_left_uv".tr,
+              resultcontroller
               .left_uv_flag,resultcontroller.left_uv,
               openCamera, (file) => setState(() => leftUvFile = file)),
-          scopeButton("Right UV 촬영", "Right UV 재촬영", resultcontroller
+          scopeButton("capture_right_uv".tr, "recapture_right_uv".tr,
+              resultcontroller
               .right_uv_flag,resultcontroller.right_uv,
               openCamera, (file) => setState(() => rightUvFile = file)),
-          scopeButton("Head UV 촬영", "Head UV 재촬영", resultcontroller
+          scopeButton("capture_head_uv".tr, "recapture_head_uv".tr,
+              resultcontroller
               .head_uv_flag,resultcontroller.head_uv,
               openCamera, (file) => setState(() => headUvFile = file)),
-          SubmitScopeButton("제출하기", resultcontroller, onPressedButton)
+          SubmitScopeButton("submit".tr, resultcontroller, onPressedButton)
         ],
       )),
     );
@@ -236,7 +240,7 @@ void _showLoadingDialog(BuildContext context) {
             children: [
               CircularProgressIndicator(),
               SizedBox(width: 20),
-              Text("데이터 업로드중"),
+              Text('uploading_data'.tr),
             ],
           ),
         ),

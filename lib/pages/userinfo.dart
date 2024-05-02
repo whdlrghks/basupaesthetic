@@ -10,6 +10,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserInfo extends StatefulWidget {
   @override
@@ -29,6 +30,11 @@ class _UserInfoState extends State<UserInfo> {
 
   TextEditingController textcontroller = TextEditingController();
   TextEditingController textcontroller_center = TextEditingController();
+  // Function to retrieve the login ID from SharedPreferences
+  Future<String?> getLoginId() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('loginId'); // This will return null if no loginId is set
+  }
 
   @override
   void initState() {
@@ -56,6 +62,9 @@ class _UserInfoState extends State<UserInfo> {
         resultcontroller.name_check.value = false;
       }
     });
+
+    resultcontroller.aestheticId.value == "" ? getLoginId() : "";
+
 
     // fetchSurveyResultNo();
   }

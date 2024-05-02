@@ -1,6 +1,8 @@
+import 'package:basup_ver2/controller/localecontroller.dart';
 import 'package:basup_ver2/controller/resultcontroller.dart';
 import 'package:basup_ver2/controller/sizecontroller.dart';
 import 'package:basup_ver2/controller/surveycontroller.dart';
+import 'package:basup_ver2/design/apptranslations.dart';
 import 'package:basup_ver2/design/value.dart';
 import 'package:basup_ver2/pages/authguard.dart';
 import 'package:basup_ver2/pages/customerslistpage.dart';
@@ -27,6 +29,8 @@ Future<void> main() async {
   var surveyController = Get.put(SurveyController(), tag: "survey");
   var sizeController = Get.put(SizeController(), tag: "size");
   var resultController = Get.put(ResultController(), tag: "result");
+
+  Get.put(LocaleController());
   var type = "initial";
   surveyController.readyforSheet(type);
 
@@ -43,6 +47,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'BASUP 피부 진단',
+      translations: AppTranslations(),
+      locale: Locale('ko', 'KR'), // 기본 로케일 설정
+      fallbackLocale: Locale('en', 'US'),
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),

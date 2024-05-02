@@ -61,19 +61,19 @@ var surveycontroller = Get.find<SurveyController>(tag: "survey");
       children: [
         BlankTopProGressMulti(controller),
         BlankTopGap(controller),
-        Subtitle("피부 상태 진단", controller),
+        Subtitle("skin_diagnosis_title".tr, controller),
         QuestionTitle(currentItem.getQuestionTitle() ,
             controller),
         QuestionDescrption(
-            "자세한 처방을 목적으로 수집하며,\n그 외 어떠한 용도로도 사용하지 않아요!", controller),
+            "detailed_prescription_collect_info".tr, controller),
         BlankDescAnser(controller),
-        ShortFormAnswer(surveycontroller.current_idx == 0? "화장품 정보를 입력해주세요\n예)"+
-        "닥터지 - 레드 블레미쉬 수딩 토너" : "피부 고민을 적어주세요\n예) 아침에 화장품을 발라도 점심만 되어도 땡겨요" ,
+        ShortFormAnswer(surveycontroller.current_idx == 0? "enter_cosmetic_in"
+            "fo".tr : "enter_skin_concerns".tr ,
             controller,
             surveycontroller, textcontroller),
         // EnrollPicture("사진 등록", controller),
         BlankAnswerSubmit(controller),
-        NextButton("다음", surveycontroller, onPressedButton)
+        NextButton("next".tr, surveycontroller, onPressedButton)
       ],
     )),);
   }

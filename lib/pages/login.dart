@@ -1,3 +1,5 @@
+import 'package:basup_ver2/component/languagepickerwidget.dart';
+import 'package:basup_ver2/controller/localecontroller.dart';
 import 'package:basup_ver2/controller/resultcontroller.dart';
 import 'package:basup_ver2/controller/sessionmanager.dart';
 import 'package:basup_ver2/pages/customerslistpage.dart';
@@ -6,6 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' as fs;
 import 'package:basup_ver2/pages/index.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -16,7 +21,11 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _idController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   var resultcontroller = Get.find<ResultController>(tag: "result");
-
+// Function to save the login ID to SharedPreferences
+  Future<void> saveLoginId(String loginId) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('loginId', loginId);
+  }
   @override
   void initState() {
     super.initState();
@@ -70,6 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
             SessionManager.setLoginStatus(true, shopId).then((_) {
               resultcontroller.aestheticId.value = shopId;
               Get.offAll(CustomersListPage(aestheticId: shopId));
+              saveLoginId(shopId);
               // Get.toNamed("/index");
             }).catchError((error) {
               // Handle errors, for example:
@@ -105,11 +115,21 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+ // LocaleController 인스턴스 등록
     return Scaffold(
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Row( children : [
+              Expanded(flex:9, child: Container()),
+              Expanded(child: Container(
+                width: 100,
+                 child:
+              LanguagePickerWidget(),),),
+              Expanded(flex:2,child: Container())
+              ]),
+
             Text(
               'BASUP \nfor Aesthetic',
               style: TextStyle(
@@ -125,9 +145,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
             ),
-
+            Container(height: 60,),
             Text(
-              'BASUP에 연락하여 사전 회원가입을 하고 로그인해주세요',
+              'contact_basup'.tr,
               style: TextStyle(
                 color: Colors.black54,
                 fontSize: 17,
@@ -145,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.white,
-                    hintText: '아이디',
+                    hintText: 'user_id'.tr,
                     contentPadding: const EdgeInsets.all(15),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white),
@@ -170,7 +190,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.white,
-                    hintText: '비밀번호',
+                    hintText: 'password'.tr,
                     contentPadding: const EdgeInsets.all(15),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white),
@@ -197,7 +217,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Text(
-                    '로그인',
+                    'login'.tr,
                     style: TextStyle(fontSize: 20),
                   ),
                 ),

@@ -1,5 +1,6 @@
 import 'package:basup_ver2/design/value.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class ResultController extends GetxController {
 
@@ -51,7 +52,8 @@ class ResultController extends GetxController {
   var oilper = 65;
   var pigper = 66;
 
-  var graphName =["저항성", "탄력성", "색소침착", "수분보유력", "유분보유력" ];
+  var graphName =['resistance'.tr, 'elasticity'.tr, 'pigmentation'.tr, 'moisture_retention'.tr,
+  'oil_retention'.tr ];
 
   var machineid = "".obs;
   var water_machine = "0".obs;
@@ -153,29 +155,29 @@ class ResultController extends GetxController {
     var temp = [];
     var temp_flag = [];
     if(sensper > 50 ){
-      temp.add("피부장벽");
+      temp.add("skin_barrier".tr);
       temp_flag.add(true);
     }
     else{
-      temp.add("민감성피부");
+      temp.add("sensitive_skin".tr);
       temp_flag.add(false);
     }
 
     if(waterper > 50 ){
-      temp.add("수분 충분");
+      temp.add("sufficient_moisture".tr);
       temp_flag.add(true);
     }
     else{
-      temp.add("수분 부족");
+      temp.add("lacking_moisture".tr);
       temp_flag.add(false);
     }
 
     if(tightper > 50 ){
-      temp.add("탄력");
+      temp.add("elasticity".tr);
       temp_flag.add(true);
     }
     if(pigper > 50){
-      temp.add("색소 취약");
+      temp.add("pigmentation_vulnerability".tr);
       temp_flag.add(true);
     }
     tag = List.from(temp);
@@ -187,24 +189,24 @@ class ResultController extends GetxController {
     var comment ="";
     switch (type){
       case DataType.SENS:
-        if (sensper < 50) comment ="부족";
-        else comment ="좋음";
+        if (sensper < 50) comment ="insufficient".tr;
+        else comment ="good".tr;
         return comment;
       case DataType.TIGHT:
-        if (tightper < 50) comment ="부족";
-        else comment ="좋음";
+        if (tightper < 50) comment ="insufficient".tr;
+        else comment ="good".tr;
         return comment;
       case DataType.PIG:
-        if (pigper < 50) comment ="심함";
-        else comment ="좋음";
+        if (pigper < 50) comment ="severe".tr;
+        else comment ="good".tr;
         return comment;
       case DataType.WATER:
-        if (waterper < 50) comment ="부족";
-        else comment ="좋음";
+        if (waterper < 50) comment ="insufficient".tr;
+        else comment ="good".tr;
         return comment;
       case DataType.OIL:
-        if (oilper < 50) comment ="부족";
-        else comment ="좋음";
+        if (oilper < 50) comment ="insufficient".tr;
+        else comment ="good".tr;
         return comment;
       default:
         return "";
@@ -238,19 +240,20 @@ class ResultController extends GetxController {
         return "";
     }
   }
-
+  // ['resistance'.tr, 'elasticity'.tr, 'pigmentation'.tr, 'moisture_retention'.tr,
+  // 'oil_retention'.tr ];
   getDataName(type){
     switch(type){
       case DataType.SENS:
-        return graphName[0];
+        return 'resistance'.tr;
       case DataType.TIGHT:
-        return graphName[1];
+        return 'elasticity'.tr;
       case DataType.PIG:
-        return graphName[2];
+        return 'pigmentation'.tr;
       case DataType.WATER:
-        return graphName[3];
+        return 'moisture_retention'.tr;
       case DataType.OIL:
-        return graphName[4];
+        return  'oil_retention'.tr;
       default:
         return "";
     }
@@ -311,5 +314,60 @@ class ResultController extends GetxController {
     }
     age.value = _age.toString();
   }
+  Map<String, Map<String, String>> factorDefinitions = {
+    'R': {'en': 'R - Resistive', 'ko': 'R - Resistive / 저항'},
+    'S': {'en': 'S - Sensitive', 'ko': 'S - Sensitive / 민감'},
+    'P': {'en': 'P - Pigment', 'ko': 'P - Pigment /색소'},
+    'N': {'en': 'N - NonPigment', 'ko': 'N - NonPigment / 비색소'},
+    'W': {'en': 'W - Wrinkled', 'ko': 'W - Wrinkled / 주름'},
+    'T': {'en': 'T - Tighted', 'ko': 'T - Tighted / 탄력'},
+    'D3': {'en': 'D3 - Very Dry', 'ko': 'D3 - Very Dry / 악건성'},
+    'D2': {'en': 'D2 - Dry', 'ko': 'D2 - Dry / 건성'},
+    'D1': {'en': 'D1 - Moderately dry', 'ko': 'D1 - Moderately dry / 중건성'},
+    'O1': {'en': 'O1 - Slightly oily', 'ko': 'O1 - Slightly oily / 중지성'},
+    'O2': {'en': 'O2 - Oily', 'ko': 'O2 - Oily / 지성'},
+    'O3': {'en': 'O3 - Very oily', 'ko': 'O3 - Very oily / 악지성'},
+    'De3': {'en': 'De3 - Very dehydrated skin, extreme lack of moisture', 'ko':
+    'De3 - Very dehydrated / 탈수분성-매우수분부족'},
+    'De2': {'en': 'De2 - Dehydrated skin, lacking moisture', 'ko': 'De2 - '
+        'Dehydrated / 탈수분성-수분부족'},
+    'De1': {'en': 'De1 - Slightly dehydrated skin', 'ko': 'De1 - Slightly '
+        'dehydrated / 탈수분성-수분보통'},
+    'Hy1': {'en': 'Hy1 - Adequately hydrated', 'ko': 'Hy1 - Adequately '
+        'hydrated / 수분성-수분적당'},
+    'Hy2': {'en': 'Hy2 - Well hydrated', 'ko': 'Hy2 - Hydrated / '
+        '수분성-수분풍족'},
+    'Hy3': {'en': 'Hy3 - Very well hydrated', 'ko': 'Hy3 - Very hydrated / '
+        '수분성-수분매우풍족'},
+  };
 
+  List<String> decodeSkinType(String code) {
+    String lang = Get.locale!.languageCode;
+    if (code.length != 8) {
+      return ["Invalid code"]; // Check for correct code length
+    }
+
+    // Split the code into individual factors
+    List<String> factors = [
+      code.substring(0, 1), // First factor: R/S
+      code.substring(1, 2), // Second factor: P/N
+      code.substring(2, 3), // Third factor: W/T
+      code.substring(3, 5), // Fourth factor: D3/D2/D1/O1/O2/O3
+      code.substring(5, 8)  // Fifth factor: De3/De2/De1/Hy1/Hy2/Hy3
+    ];
+
+    print(factors);
+
+    List<String> descriptions = factors.map((f) {
+      // Get the appropriate factor key for multi-character codes
+      String key = f;
+      if ('DODH'.contains(f)) { // For D, O, De, Hy types which are followed by numbers
+        int index = factors.indexOf(f);
+        key = code.substring(index, index + 3); // Include the number in the key
+      }
+      return factorDefinitions[key]?[lang] ?? "Unknown factor"; // Return localized description
+    }).toList();
+
+    return descriptions;
+  }
 }

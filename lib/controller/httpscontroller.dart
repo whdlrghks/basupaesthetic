@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:basup_ver2/controller/localecontroller.dart';
 import 'package:basup_ver2/controller/surveycontroller.dart';
 import 'package:basup_ver2/data/cosmeticdata.dart';
 import 'package:basup_ver2/design/value.dart';
@@ -11,18 +12,34 @@ import 'dart:convert';
 import 'dart:math' as math;
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
 import 'resultcontroller.dart';
 
 Future<String> fetchGetSurvey(type) async {
   print("fetchGetSurvey ");
-  String temp = (dev_hidden_tap ? Dev_URL : URL) + '/survey';
+  String baseUrl = dev_hidden_tap ? Dev_URL : URL; // URL 설정
+  final LocaleController localeController = Get.find();
+  await localeController.loadLocale();
+
+  String languageParam;
+  // LocaleController에서 현재 설정된 Locale에 따라 언어 문자열 결정
+  if (localeController.locale.value == Locale('ko', 'KR')) {
+    languageParam = 'Korean';
+  } else if (localeController.locale.value == Locale('en', 'US')) {
+    languageParam = 'English';
+  } else {
+    languageParam = 'Korean'; // 기본값 설정
+  }
+
+  String temp = '$baseUrl/survey';
   var url = Uri.parse(temp);
 
+  // 쿼리 파라미터에 언어 설정 추가
   var _query = <String, String>{
-//    'version': "0.2",
-    'type': type.toString(),
+    'type': type,
     'version': "0.1",
+    'language': languageParam, // 언어 파라미터 추가
   };
 
   url = url.replace(queryParameters: _query);
@@ -44,6 +61,7 @@ Future<String> fetchGetSurvey(type) async {
   final parsed = json.decode(decodeData).cast<String, dynamic>();
 
   var result_status = parsed["resCode"];
+  print(decodeData);
 
   if (result_status == CODE_OK) {
     return decodeData;
@@ -216,12 +234,38 @@ fetchSurveyResult(surveyCode) async {
   print("fetchSurveyResult ");
 
   var resultController = Get.find<ResultController>(tag: "result");
+  //
+  // String temp = (dev_hidden_tap ? Dev_URL : URL) + '/survey/result';
+  // var url = Uri.parse(temp);
+  // //var surveyCode = j6lfDzst;
+  // var _query = <String, String>{
+  //   'surveyCode': surveyCode,
+  // };
+  //
+  // url = url.replace(queryParameters: _query);
 
-  String temp = (dev_hidden_tap ? Dev_URL : URL) + '/survey/result';
+
+  String baseUrl = dev_hidden_tap ? Dev_URL : URL; // URL 설정
+  final LocaleController localeController = Get.find();
+  await localeController.loadLocale();
+
+  String languageParam;
+  // LocaleController에서 현재 설정된 Locale에 따라 언어 문자열 결정
+  if (localeController.locale.value == Locale('ko', 'KR')) {
+    languageParam = 'Korean';
+  } else if (localeController.locale.value == Locale('en', 'US')) {
+    languageParam = 'English';
+  } else {
+    languageParam = 'Korean'; // 기본값 설정
+  }
+
+  String temp = '$baseUrl/survey/result';
   var url = Uri.parse(temp);
-  //var surveyCode = j6lfDzst;
+
+  // 쿼리 파라미터에 언어 설정 추가
   var _query = <String, String>{
     'surveyCode': surveyCode,
+    'language': languageParam, // 언어 파라미터 추가
   };
 
   url = url.replace(queryParameters: _query);
@@ -544,10 +588,27 @@ fetchWebSkinResult(skincode) async {
   var resultController = Get.find<ResultController>(tag: "result");
 
   String temp = web_skin_result;
-  var url = Uri.parse(temp);
-  //var surveyCode = j6lfDzst;
+
+  String baseUrl = web_skin_result; // URL 설정
+  final LocaleController localeController = Get.find();
+  await localeController.loadLocale();
+
+  String languageParam;
+  // LocaleController에서 현재 설정된 Locale에 따라 언어 문자열 결정
+  if (localeController.locale.value == Locale('ko', 'KR')) {
+    languageParam = 'Korean';
+  } else if (localeController.locale.value == Locale('en', 'US')) {
+    languageParam = 'English';
+  } else {
+    languageParam = 'Korean'; // 기본값 설정
+  }
+
+  var url = Uri.parse(baseUrl);
+
+  // 쿼리 파라미터에 언어 설정 추가
   var _query = <String, String>{
     'skintype': skincode,
+    'language': languageParam, // 언어 파라미터 추가
   };
 
   url = url.replace(queryParameters: _query);

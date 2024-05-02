@@ -1,4 +1,6 @@
+import 'package:basup_ver2/controller/localecontroller.dart';
 import 'package:basup_ver2/controller/resultcontroller.dart';
+import 'package:basup_ver2/controller/surveycontroller.dart';
 import 'package:basup_ver2/data/customer.dart';
 import 'package:basup_ver2/design/color.dart';
 import 'package:basup_ver2/design/value.dart';
@@ -49,11 +51,21 @@ class CustomersListPage extends StatelessWidget {
   var resultcontroller = Get.find<ResultController>(tag: "result");
   CustomersListPage({required this.aestheticId});
 
+  var surveyController = Get.find<SurveyController>(tag: "survey");
+
+  var type = "initial";
+
+
   @override
   Widget build(BuildContext context) {
+    surveyController.readyforSheet(type);
+
+
+    resultcontroller.initmachine();
+    resultcontroller.initscope();
     return Scaffold(
       appBar: AppBar(
-        title: Text('고객 리스트'),
+        title: Text('customers_list'.tr),
         backgroundColor: Color(0xFF49A85E),
       ),
       body: FutureBuilder<List<Customer>>(
@@ -64,16 +76,13 @@ class CustomersListPage extends StatelessWidget {
           }
           if (snapshot.error != null) {
             // Handle errors.
-            return Center(child: Text('에러가 발생했습니다. 뒤로가주세요'));
+            return Center(child: Text('error_occurred'.tr));
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(child: ElevatedButton( onPressed: () {
               Get.toNamed("/survey");
             },
-            child : Text('고객이 없습니다. 여기를 '
-            '클릭해서 첫번째'
-                ' 고객을 '
-                '등록하세요')));
+            child : Text('no_customers'.tr)));
           }
 
           final customers = snapshot.data!;
@@ -83,7 +92,9 @@ class CustomersListPage extends StatelessWidget {
               final customer = customers[index];
               return ListTile(
                 title: Text(customer.name),
-                subtitle: Text('나이: ${customer.age}, 최근검사일: ${customer.getMostRecentSurveyDate()}'),
+                subtitle: Text('age_recent_test'.trParams({'age': customer
+                    .age.toString(), 'recent_test': customer
+                    .getMostRecentSurveyDate().toString()})),
                 // Add other customer details here.
                 trailing: IconButton(
                   icon: Icon(Icons.arrow_forward),

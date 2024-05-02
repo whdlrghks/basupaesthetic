@@ -32,10 +32,14 @@ class _SkinResultState extends State<SkinResult> {
 
   var isLoading = false;
 
+  var descript = [];
+
   @override
   Widget build(BuildContext context) {
     var controller = Get.find<SizeController>(tag: "size");
     var resultcontroller = Get.find<ResultController>(tag: "result");
+
+    descript = (resultcontroller.decodeSkinType(resultcontroller.type.value));
     return Scaffold(
         body: isLoading
             ? AnalyzeLoading() // 로딩 중 인디케이터 표시
@@ -50,17 +54,18 @@ class _SkinResultState extends State<SkinResult> {
                       BlankTopGap(controller),
                       title(resultcontroller),
                       BlankBetweenTitleContent(controller),
-                      skintitle(resultcontroller),
+
                       Row(
                         children: [
                           Expanded(
-                            child: resultData(controller, resultcontroller),
+                            child: skintitle(resultcontroller, descript),
                           ),
                           Expanded(
-                            child: resultContent(resultcontroller),
+                            child: resultData(controller, resultcontroller),
                           ),
                         ],
                       ),
+                      resultContent(resultcontroller),
                       // careRoutine(controller, resultcontroller),
                       matchIngredient(resultcontroller),
                       // recommendProduct(resultcontroller),
@@ -74,8 +79,8 @@ class _SkinResultState extends State<SkinResult> {
     List<DropdownMenuItem<SurveyItem>> dropdownItems =
         resultcontroller.surveylist.map<DropdownMenuItem<SurveyItem>>((survey) {
       DateTime dateTime = DateTime.parse(survey.date);
-      String formattedDate =
-          '${dateTime.year}년 ${dateTime.month}월 ${dateTime.day}일 ${dateTime.hour}시 ${dateTime.minute}분 진단 결과';
+      String formattedDate = DateFormat.yMMMMd(Localizations.localeOf(context).toString()).add_jm().format(dateTime);
+
       return DropdownMenuItem<SurveyItem>(
         value: survey,
         child: Text(
@@ -108,7 +113,8 @@ class _SkinResultState extends State<SkinResult> {
             DropdownButton<SurveyItem>(
               value: selectedSurvey,
               hint: Text(
-                '${year}년 ${month}월 ${day}일  ${dateTime.hour}시 ${dateTime.minute}분 진단 결과',
+                DateFormat.yMMMMd(Localizations.localeOf(context).toString())
+                    .add_jm().format(dateTime)+" "+ 'result_time'.tr,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.black,
@@ -132,7 +138,7 @@ class _SkinResultState extends State<SkinResult> {
             ),
           ] else ...[
             Text(
-              '피부 결과가 없습니다.',
+              'no_results'.tr,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.black,
@@ -171,13 +177,13 @@ Widget _buildImage(String assetName, [double width = 300]) {
   return Image.asset('assets/$assetName', width: width);
 }
 
-Widget skintitle(resultcontroller) {
+Widget skintitle(resultcontroller, descript) {
   return Column(
     children: [
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
         child: Text(
-          resultcontroller.name.value + '님의 피부 타입은',
+          resultcontroller.name.value + 'your_skin_type_is'.tr,
           textAlign: TextAlign.center,
           style: TextStyle(
             color: Colors.black,
@@ -214,7 +220,7 @@ Widget skintitle(resultcontroller) {
       ),
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
-        width: 340,
+        width: 450,
         height: 46,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -227,22 +233,57 @@ Widget skintitle(resultcontroller) {
           ],
         ),
       ),
+      skinDescription(descript)
     ],
+  );
+}
+
+Widget skinDescription(descript) {
+  TextStyle wordTostyle = TextStyle(
+    color: Color(0xFF49A85E),
+    fontSize: 16,
+    fontFamily: 'Pretendard',
+    fontWeight: FontWeight.w600,
+  );
+  print(descript);
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    mainAxisAlignment: MainAxisAlignment.start,
+    // Align children to the start of the Row
+    children: descript
+        .map((text) => Container(
+              padding: EdgeInsets.all(8),
+              margin: EdgeInsets.fromLTRB(0, 10, 0, 5),
+              child: Text.rich(
+                TextSpan(
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontFamily: 'Pretendard',
+                    fontWeight: FontWeight.w600,
+                  ),
+                  children: _getSpans(text, text.split("-")[0], wordTostyle),
+                ),
+              ),
+            ))
+        .toList()
+        .cast<
+            Widget>(), // Convert the map result to a list for the children property
   );
 }
 
 Widget resultContent(resultcontroller) {
   print(resultcontroller.skinResultWebContent);
   return Container(
-    margin: EdgeInsets.fromLTRB(0, 0, 30, 0),
+
+    margin: EdgeInsets.fromLTRB(150, 50, 150, 0),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
         Container(
           margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
           child: Text(
-            "전문가 의견 :",
+            "expert_opinion".tr,
             textAlign: TextAlign.left,
             style: TextStyle(
               color: Color(0xFF7D7D7D),
@@ -254,12 +295,12 @@ Widget resultContent(resultcontroller) {
         ),
         Container(
           height: 300,
-          child:
-          ListView.builder(
+          child: ListView.builder(
             itemCount: resultcontroller.skinResultWebContent.length,
             itemBuilder: (context, index) {
               return ListTile(
-                title: Text(resultcontroller.skinResultWebContent[index],
+                title: Text(
+                  resultcontroller.skinResultWebContent[index],
                   textAlign: TextAlign.left,
                   style: TextStyle(
                     color: Color(0xFF7D7D7D),
@@ -271,7 +312,6 @@ Widget resultContent(resultcontroller) {
               );
             },
           ),
-
           decoration: BoxDecoration(
             color: Colors.white, // 배경색 설정
             border: Border.all(
@@ -284,7 +324,7 @@ Widget resultContent(resultcontroller) {
         Container(
           margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
           child: Text(
-            "피부 타입 설명 :",
+            "skin_type_description".tr,
             textAlign: TextAlign.left,
             style: TextStyle(
               color: Color(0xFF7D7D7D),
@@ -332,7 +372,6 @@ Widget resultContent(resultcontroller) {
             ),
           ),
         ),
-
       ],
     ),
   );
@@ -343,7 +382,7 @@ Widget resultData(controller, resultcontroller) {
     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 50),
     child: Column(
       children: [
-        ResultTitle("피부 타입"),
+        ResultTitle("skin_type".tr),
         resultSubtitle(resultcontroller),
         resultGraph(resultcontroller),
       ],
@@ -357,7 +396,7 @@ resultSubtitle(resultcontroller) {
       Container(
         padding: const EdgeInsets.fromLTRB(5, 15, 5, 5),
         child: Text(
-          resultcontroller.name.value + '님의 피부 분석 결과',
+          resultcontroller.name.value + 'skin_analysis_results'.tr,
           style: TextStyle(
             color: Color(0xFF979797),
             fontSize: 14,
@@ -372,7 +411,7 @@ resultSubtitle(resultcontroller) {
           TextSpan(
             children: [
               TextSpan(
-                text: '288가지의 피부 타입 중\n',
+                text: '288_result'.tr,
                 style: TextStyle(
                   color: Color(0xFF49A85E),
                   fontSize: 20,
@@ -381,7 +420,7 @@ resultSubtitle(resultcontroller) {
                 ),
               ),
               TextSpan(
-                text: resultcontroller.name.value + '님의 피부를 분석했어요',
+                text: resultcontroller.name.value + 'anlayzed_result'.tr,
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 20,
@@ -429,7 +468,7 @@ graphItem(controller, type) {
                   ),
                 ),
                 Container(
-                  width: 32,
+                  // width: 80,
                   clipBehavior: Clip.antiAlias,
                   decoration: ShapeDecoration(
                     color: controller.getColorFlag(type)
@@ -651,8 +690,9 @@ matchIngredient(resultcontroller) {
   // Start with adding a top spacer and titles
   listWidgets.addAll([
     Container(height: 25),
-    ResultTitle("처방 성분"),
-    careSubtitle("피부 타입에 맞는 성분 처방!", " ", "이런 성분이 잘 맞아요"),
+    ResultTitle("matched_ingredients".tr),
+    careSubtitle("prescription_ingredients_title".tr, " ", "ingredients_benef"
+        "it".tr),
     Container(height: 25),
   ]);
 
@@ -686,6 +726,7 @@ matchIngredient(resultcontroller) {
 
   // Return the whole structure wrapped in a Container and Column
   return Container(
+    margin: EdgeInsets.fromLTRB(200, 0, 200, 0),
     child: Column(
       children: listWidgets,
     ),
@@ -731,68 +772,68 @@ matchIngredientComment(ingredient, content) {
   );
 }
 
-recommendProduct(resultcontroller) {
-  return Container(
-      child: Column(children: [
-    Container(
-      height: 25,
-    ),
-    ResultTitle("재품 추천"),
-    careSubtitle(" ", "위 성분을 모두 담은", "위 성분을 모두 담은\n제품을 추천해드려요"),
-    Container(
-      height: 25,
-    ),
-    packageImage(),
-    packageDescription(),
-    Container(
-      height: 100,
-    ),
-  ]));
-}
+// recommendProduct(resultcontroller) {
+//   return Container(
+//       child: Column(children: [
+//     Container(
+//       height: 25,
+//     ),
+//     ResultTitle("재품 추천"),
+//     careSubtitle(" ", "위 성분을 모두 담은", "위 성분을 모두 담은\n제품을 추천해드려요"),
+//     Container(
+//       height: 25,
+//     ),
+//     // packageImage(),
+//     // packageDescription(),
+//     Container(
+//       height: 100,
+//     ),
+//   ]));
+// }
 
-packageImage() {
-  return Container(
-    padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-    child: _buildImage("totalitem.jpg"),
-  );
-}
-
-packageDescription() {
-  var wordTostyle = "맞춤 제작";
-  var spans = _getSpans("피부 타입 분석 결과를 바탕으로\n기성품이 아닌 맞춤 제작해드려요", wordTostyle,
-      skinrecommend_highlight);
-  return Container(
-      child: Column(
-    children: [
-      Container(
-        padding: const EdgeInsets.fromLTRB(0, 30, 0, 10),
-        child: Text.rich(
-          textAlign: TextAlign.center,
-          TextSpan(style: skinrecommend_content, children: spans),
-        ),
-      ),
-      Container(
-        padding: const EdgeInsets.fromLTRB(0, 30, 0, 10),
-        child: Text.rich(
-          textAlign: TextAlign.center,
-          TextSpan(
-              style: skinrecommend_highlight,
-              text: "더 자세하고 많은 정보들을\n앱에서 확인할 수 있어요!"),
-        ),
-      ),
-      Container(
-        padding: const EdgeInsets.fromLTRB(0, 30, 0, 10),
-        child: Text.rich(
-          textAlign: TextAlign.center,
-          TextSpan(
-              style: skinrecommend_highlight,
-              text: "베이스업 프로젝트를 구독하고\n4주 동안 특별 "
-                  "케어 받아보세요!"),
-        ),
-      ),
-    ],
-  ));
-}
+// packageImage() {
+//   return Container(
+//     padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+//     child: _buildImage("totalitem.jpg"),
+//   );
+// }
+//
+// packageDescription() {
+//   var wordTostyle = "맞춤 제작";
+//   var spans = _getSpans("피부 타입 분석 결과를 바탕으로\n기성품이 아닌 맞춤 제작해드려요", wordTostyle,
+//       skinrecommend_highlight);
+//   return Container(
+//       child: Column(
+//     children: [
+//       Container(
+//         padding: const EdgeInsets.fromLTRB(0, 30, 0, 10),
+//         child: Text.rich(
+//           textAlign: TextAlign.center,
+//           TextSpan(style: skinrecommend_content, children: spans),
+//         ),
+//       ),
+//       Container(
+//         padding: const EdgeInsets.fromLTRB(0, 30, 0, 10),
+//         child: Text.rich(
+//           textAlign: TextAlign.center,
+//           TextSpan(
+//               style: skinrecommend_highlight,
+//               text: "더 자세하고 많은 정보들을\n앱에서 확인할 수 있어요!"),
+//         ),
+//       ),
+//       Container(
+//         padding: const EdgeInsets.fromLTRB(0, 30, 0, 10),
+//         child: Text.rich(
+//           textAlign: TextAlign.center,
+//           TextSpan(
+//               style: skinrecommend_highlight,
+//               text: "베이스업 프로젝트를 구독하고\n4주 동안 특별 "
+//                   "케어 받아보세요!"),
+//         ),
+//       ),
+//     ],
+//   ));
+// }
 
 String detectDeviceType() {
   var userAgent = html.window.navigator.userAgent.toString();

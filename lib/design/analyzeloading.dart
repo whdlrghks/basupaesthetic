@@ -3,6 +3,8 @@ import 'package:basup_ver2/design/textstyle.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 
+import 'package:get/get.dart';
+
 
 enum DotType { square, circle, diamond, icon }
 
@@ -44,7 +46,7 @@ class _AnalyzeLoadingState extends State<AnalyzeLoading>
               Container(
                 padding: EdgeInsets.fromLTRB(30, 30, 30, 5),
                 child: Text(
-                  'BASUP SKIN AI 분석중...',
+                  'analyzing_skin'.tr,
                   style: submitloading_title,
                   textAlign: TextAlign.center,
                 ),
@@ -52,7 +54,7 @@ class _AnalyzeLoadingState extends State<AnalyzeLoading>
               Container(
                 padding: EdgeInsets.fromLTRB(30, 5, 30, 10),
                 child: Text(
-                  '총 4가지의 피부 데이터를 기반으로 \n고객님의 피부를 다방면으로 분석하고 있습니다.',
+                  'analyzing_skin_detail'.tr,
                   style: submitloading_content,
                   textAlign: TextAlign.center,
                 ),

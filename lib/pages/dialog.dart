@@ -1,4 +1,3 @@
-
 import 'package:basup_ver2/design/textstyle.dart';
 import 'package:basup_ver2/pages/index.dart';
 import 'package:flutter/material.dart';
@@ -23,21 +22,21 @@ showScopedialog(userid) {
       ),
       padding: EdgeInsets.fromLTRB(24, 18, 24, 5),
       // width: 275.w,
-      child:  Column(
+      child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             padding: EdgeInsets.all(5.0),
             child: Align(
               alignment: Alignment.topCenter,
-              child: Text("피부 현미경 촬영", style: removeusertitle),
+              child: Text('skin_microscope'.tr, style: removeusertitle),
             ),
           ),
           Container(
             margin: EdgeInsets.fromLTRB(0, 12, 0, 0),
             child: Align(
                 alignment: Alignment.topCenter,
-                child: Text("확인을 누르시면 현미경 촬영으로 넘어갑니다.",
+                child: Text('confirm_microscope'.tr,
                     style: TextStyle(
                         color: const Color(0x80151920),
                         fontWeight: FontWeight.w400,
@@ -48,14 +47,13 @@ showScopedialog(userid) {
           ),
           Container(
             alignment: Alignment.bottomRight,
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.center, children: [
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               Container(
                 height: 42,
                 width: 97.9,
                 decoration: BoxDecoration(
                     border:
-                    Border.all(color: const Color(0xffD3D8E1), width: 1),
+                        Border.all(color: const Color(0xffD3D8E1), width: 1),
                     borderRadius: BorderRadius.all(Radius.circular(8)),
                     color: Colors.white),
                 margin: EdgeInsets.fromLTRB(0, 0, 8.6, 10),
@@ -63,7 +61,7 @@ showScopedialog(userid) {
                   child: Align(
                     alignment: Alignment.center,
                     child: Text(
-                      "다음에 진행",
+                      'proceed_later'.tr,
                       style: removeuserreject,
                     ),
                   ),
@@ -83,12 +81,13 @@ showScopedialog(userid) {
                 ),
                 child: InkWell(
                   onTap: () {
-                    print("userid :"+ userid);
-                    Get.toNamed("/scope?userid="+userid);
+                    print("userid :" + userid);
+                    Get.toNamed("/scope?userid=" + userid);
                   },
                   child: Align(
                     alignment: Alignment.center,
-                    child: Text("현미경 진행", style: removeuserconfirm),
+                    child:
+                        Text('proceed_microscope'.tr, style: removeuserconfirm),
                   ),
                 ),
               ),
@@ -99,7 +98,6 @@ showScopedialog(userid) {
     ),
   );
 }
-
 
 showResultdialog(userid) {
   FocusNode referNameFocusNode = FocusNode();
@@ -119,21 +117,21 @@ showResultdialog(userid) {
       ),
       padding: EdgeInsets.fromLTRB(24, 18, 24, 5),
       // width: 275.w,
-      child:  Column(
+      child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             padding: EdgeInsets.all(5.0),
             child: Align(
               alignment: Alignment.topCenter,
-              child: Text("피부 데이터 완료", style: removeusertitle),
+              child: Text('skin_data_complete'.tr, style: removeusertitle),
             ),
           ),
           Container(
             margin: EdgeInsets.fromLTRB(0, 12, 0, 0),
             child: Align(
                 alignment: Alignment.topCenter,
-                child: Text("결과보기를 누르시면 결과가 보여집니다.",
+                child: Text('view_results'.tr,
                     style: TextStyle(
                         color: const Color(0x80151920),
                         fontWeight: FontWeight.w400,
@@ -144,14 +142,13 @@ showResultdialog(userid) {
           ),
           Container(
             alignment: Alignment.bottomRight,
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.center, children: [
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               Container(
                 height: 42,
                 width: 97.9,
                 decoration: BoxDecoration(
                     border:
-                    Border.all(color: const Color(0xffD3D8E1), width: 1),
+                        Border.all(color: const Color(0xffD3D8E1), width: 1),
                     borderRadius: BorderRadius.all(Radius.circular(8)),
                     color: Colors.white),
                 margin: EdgeInsets.fromLTRB(0, 10, 8.6, 10),
@@ -159,7 +156,7 @@ showResultdialog(userid) {
                   child: Align(
                     alignment: Alignment.center,
                     child: Text(
-                      "다음에 확인",
+                      'check_later'.tr,
                       style: removeuserreject,
                     ),
                   ),
@@ -179,12 +176,12 @@ showResultdialog(userid) {
                 ),
                 child: InkWell(
                   onTap: () {
-                    print("userid :"+ userid);
+                    print("userid :" + userid);
                     Get.toNamed("/result");
                   },
                   child: Align(
                     alignment: Alignment.center,
-                    child: Text("결과보기", style: removeuserconfirm),
+                    child: Text('view_result'.tr, style: removeuserconfirm),
                   ),
                 ),
               ),
@@ -195,8 +192,6 @@ showResultdialog(userid) {
     ),
   );
 }
-
-
 
 NoDatadialog() {
   FocusNode referNameFocusNode = FocusNode();
@@ -216,21 +211,21 @@ NoDatadialog() {
       ),
       padding: EdgeInsets.fromLTRB(24, 18, 24, 5),
       // width: 275.w,
-      child:  Column(
+      child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             padding: EdgeInsets.all(5.0),
             child: Align(
               alignment: Alignment.topCenter,
-              child: Text("피부 데이터", style: removeusertitle),
+              child: Text('no_skin_data'.tr, style: removeusertitle),
             ),
           ),
           Container(
             margin: EdgeInsets.fromLTRB(0, 12, 0, 0),
             child: Align(
                 alignment: Alignment.topCenter,
-                child: Text("피부 데이터가 없습니다 피부 문진을 진행해주세요.",
+                child: Text('no_skin_data_comment'.tr,
                     style: TextStyle(
                         color: const Color(0x80151920),
                         fontWeight: FontWeight.w400,
@@ -241,14 +236,13 @@ NoDatadialog() {
           ),
           Container(
             alignment: Alignment.bottomRight,
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.center, children: [
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               Container(
                 height: 42,
                 width: 97.9,
                 decoration: BoxDecoration(
                     border:
-                    Border.all(color: const Color(0xffD3D8E1), width: 1),
+                        Border.all(color: const Color(0xffD3D8E1), width: 1),
                     borderRadius: BorderRadius.all(Radius.circular(8)),
                     color: Colors.white),
                 margin: EdgeInsets.fromLTRB(0, 0, 8.6, 10),
@@ -256,7 +250,7 @@ NoDatadialog() {
                   child: Align(
                     alignment: Alignment.center,
                     child: Text(
-                      "다음에 진행",
+                      'proceed_later'.tr,
                       style: removeuserreject,
                     ),
                   ),
@@ -280,7 +274,8 @@ NoDatadialog() {
                   },
                   child: Align(
                     alignment: Alignment.center,
-                    child: Text("문진 진행", style: removeuserconfirm),
+                    child: Text('proceed_questionnaire'.tr,
+                        style: removeuserconfirm),
                   ),
                 ),
               ),
@@ -291,8 +286,6 @@ NoDatadialog() {
     ),
   );
 }
-
-
 
 faillogindialog() {
   return Dialog(
@@ -310,21 +303,21 @@ faillogindialog() {
       ),
       padding: EdgeInsets.fromLTRB(24, 18, 24, 5),
       // width: 275.w,
-      child:  Column(
+      child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             padding: EdgeInsets.all(5.0),
             child: Align(
               alignment: Alignment.topCenter,
-              child: Text("로그인 실패", style: removeusertitle),
+              child: Text('login_fail'.tr, style: removeusertitle),
             ),
           ),
           Container(
             margin: EdgeInsets.fromLTRB(0, 12, 0, 0),
             child: Align(
                 alignment: Alignment.topCenter,
-                child: Text("아이디와 비밀번호가 다릅니다\n다시 입력해주세요..",
+                child: Text('login_fail_comment'.tr,
                     style: TextStyle(
                         color: const Color(0x80151920),
                         fontWeight: FontWeight.w400,
@@ -335,14 +328,13 @@ faillogindialog() {
           ),
           Container(
             alignment: Alignment.bottomRight,
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.center, children: [
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               Container(
                 height: 42,
                 width: 160.9,
                 decoration: BoxDecoration(
                     border:
-                    Border.all(color: const Color(0xffD3D8E1), width: 1),
+                        Border.all(color: const Color(0xffD3D8E1), width: 1),
                     borderRadius: BorderRadius.all(Radius.circular(8)),
                     color: Colors.white),
                 margin: EdgeInsets.fromLTRB(0, 10, 8.6, 10),
@@ -350,7 +342,7 @@ faillogindialog() {
                   child: Align(
                     alignment: Alignment.center,
                     child: Text(
-                      "다음에 확인",
+                      'check_later'.tr,
                       style: removeuserreject,
                     ),
                   ),
@@ -366,9 +358,6 @@ faillogindialog() {
     ),
   );
 }
-
-
-
 
 ShowQRdialog(qr_url, routeurl) {
   FocusNode referNameFocusNode = FocusNode();
@@ -388,21 +377,21 @@ ShowQRdialog(qr_url, routeurl) {
       ),
       padding: EdgeInsets.fromLTRB(24, 18, 24, 5),
       width: 400,
-      child:  Column(
+      child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             padding: EdgeInsets.all(5.0),
             child: Align(
               alignment: Alignment.topCenter,
-              child: Text("현미경 입력", style: removeusertitle),
+              child: Text('microscope_input'.tr, style: removeusertitle),
             ),
           ),
           Container(
             margin: EdgeInsets.fromLTRB(0, 12, 0, 0),
             child: Align(
                 alignment: Alignment.topCenter,
-                child: Text("피부 현미경 데이터를 아래의 QR코드를 사용하여\n스마트폰 카메라로 접속해주세요.",
+                child: Text('connect_via_qr'.tr,
                     style: TextStyle(
                         color: const Color(0x80151920),
                         fontWeight: FontWeight.w400,
@@ -411,7 +400,6 @@ ShowQRdialog(qr_url, routeurl) {
                         fontSize: 14),
                     textAlign: TextAlign.center)),
           ),
-
           Container(
             margin: EdgeInsets.fromLTRB(0, 12, 0, 0),
             child: Center(
@@ -424,14 +412,13 @@ ShowQRdialog(qr_url, routeurl) {
           ),
           Container(
             alignment: Alignment.bottomRight,
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.center, children: [
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               Container(
                 height: 42,
                 width: 97.9,
                 decoration: BoxDecoration(
                     border:
-                    Border.all(color: const Color(0xffD3D8E1), width: 1),
+                        Border.all(color: const Color(0xffD3D8E1), width: 1),
                     borderRadius: BorderRadius.all(Radius.circular(8)),
                     color: Colors.white),
                 margin: EdgeInsets.fromLTRB(0, 0, 8.6, 10),
@@ -439,7 +426,7 @@ ShowQRdialog(qr_url, routeurl) {
                   child: Align(
                     alignment: Alignment.center,
                     child: Text(
-                      "다음에 진행",
+                      'proceed_later'.tr,
                       style: removeuserreject,
                     ),
                   ),
@@ -461,9 +448,14 @@ ShowQRdialog(qr_url, routeurl) {
                   onTap: () {
                     Get.toNamed(routeurl);
                   },
-                  child: Align(
-                    alignment: Alignment.center,
-                    child: Text("홈페이지에서 진행", style: removeuserconfirm),
+                  child: Container(
+                    child: Align(
+                      alignment: Alignment.center,
+                      child:
+                          Text('proceed_homepage'.tr, style:
+                          removeuserconfirm,
+                            textAlign: TextAlign.center,),
+                    ),
                   ),
                 ),
               ),
@@ -474,6 +466,3 @@ ShowQRdialog(qr_url, routeurl) {
     ),
   );
 }
-
-
-

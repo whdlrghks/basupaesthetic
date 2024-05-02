@@ -7,7 +7,7 @@ import 'button.dart';
 
 Widget Subtitle(title, controller) {
   return
-  Container(width: 450,
+  Container(width: 500,
 
     child:
     Row(
@@ -129,7 +129,7 @@ Widget QuestionTitle(title, controller) {
     children: [
 
       Container(
-        height: 150,
+        height: 170,
         width: 400,
         padding: EdgeInsets.fromLTRB(20, 30, 0, 0),
         child:Text(
@@ -183,7 +183,8 @@ Widget ResultTitle(title) {
           ),
         ),
         height: 40,
-        width: 120,
+        margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+        // width: 120,
         child: Center(
           child: Text(
             title,
