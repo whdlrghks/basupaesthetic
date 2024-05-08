@@ -11,8 +11,12 @@ import 'package:basup_ver2/data/customer.dart';
 import 'package:basup_ver2/design/analyzeloading.dart';
 import 'package:basup_ver2/design/textstyle.dart';
 import 'package:basup_ver2/design/value.dart';
+import 'package:basup_ver2/pages/skinresultprintpage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:printing/printing.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 import 'dart:html' as html;
 import 'package:flutter_widget_to_image/flutter_widget_to_image.dart';
@@ -75,11 +79,30 @@ class _SkinResultState extends State<SkinResult> {
               ));
   }
 
+  void _printDocument(resultcontroller) {
+    final pdf = pw.Document();
+
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) {
+          return pw.Column(children: []);
+        },
+      ),
+    );
+
+    Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdf.save(),
+    );
+  }
+
   Widget title(resultcontroller) {
     List<DropdownMenuItem<SurveyItem>> dropdownItems =
         resultcontroller.surveylist.map<DropdownMenuItem<SurveyItem>>((survey) {
       DateTime dateTime = DateTime.parse(survey.date);
-      String formattedDate = DateFormat.yMMMMd(Localizations.localeOf(context).toString()).add_jm().format(dateTime);
+      String formattedDate =
+          DateFormat.yMMMMd(Localizations.localeOf(context).toString())
+              .add_jm()
+              .format(dateTime);
 
       return DropdownMenuItem<SurveyItem>(
         value: survey,
@@ -114,7 +137,10 @@ class _SkinResultState extends State<SkinResult> {
               value: selectedSurvey,
               hint: Text(
                 DateFormat.yMMMMd(Localizations.localeOf(context).toString())
-                    .add_jm().format(dateTime)+" "+ 'result_time'.tr,
+                        .add_jm()
+                        .format(dateTime) +
+                    " " +
+                    'result_time'.tr,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.black,
@@ -150,27 +176,102 @@ class _SkinResultState extends State<SkinResult> {
           ],
         ],
       ),
-      Container(
-        padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
-        child: Text.rich(
-          TextSpan(
-            children: [
-              TextSpan(
-                text: resultcontroller.survey_id.value,
-                style: TextStyle(
-                  color: Color(0xFF49A85E),
-                  fontSize: 20,
-                  fontFamily: 'Pretendard',
-                  fontWeight: FontWeight.w700,
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween, // 양 끝에 위젯을 배치
+        children: [
+          SizedBox(width: 100), // 왼쪽 공간을 만듭니다.
+          Expanded(
+            child: Container(
+              alignment: Alignment.center, // 컨테이너 내부 텍스트를 중앙 정렬
+              child: Text.rich(
+                TextSpan(
+                  text: resultcontroller.survey_id.value,
+                  style: TextStyle(
+                    color: Color(0xFF49A85E),
+                    fontSize: 20,
+                    fontFamily: 'Pretendard',
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
+                textAlign: TextAlign.center,
               ),
-            ],
+            ),
           ),
-          textAlign: TextAlign.center,
-        ),
-      ),
+          Container(
+
+            margin: EdgeInsets.fromLTRB(0, 0, 100, 0),
+            child: IconButton(
+              icon: Icon(Icons.print),
+              onPressed: () {
+                printDocument(resultcontroller, descript);
+              },
+              tooltip: 'Print Document',
+            ),
+          ),
+        ],
+      )
     ]);
   }
+}
+
+Widget skintitle_print(resultcontroller) {
+  return Column(
+    children: [
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
+        child: Text(
+          resultcontroller.name.value + 'your_skin_type_is'.tr,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 18,
+            fontFamily: 'Pretendard',
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+        child: Container(
+          width: 300,
+          height: 33,
+          clipBehavior: Clip.antiAlias,
+          decoration: ShapeDecoration(
+            color: Color(0xFF49A85E),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(17),
+            ),
+          ),
+          child: Center(
+            child: Text(
+              resultcontroller.type.value,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontFamily: 'Pretendard',
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+      ),
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+        width: 450,
+        height: 46,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            tagContainer(resultcontroller.tag[0], resultcontroller.tag_flag[0]),
+            tagContainer(resultcontroller.tag[1], resultcontroller.tag_flag[1]),
+            if (resultcontroller.tag.length > 2)
+              tagContainer(
+                  resultcontroller.tag[2], resultcontroller.tag_flag[2]),
+          ],
+        ),
+      ),
+    ],
+  );
 }
 
 Widget _buildImage(String assetName, [double width = 300]) {
@@ -275,7 +376,6 @@ Widget skinDescription(descript) {
 Widget resultContent(resultcontroller) {
   print(resultcontroller.skinResultWebContent);
   return Container(
-
     margin: EdgeInsets.fromLTRB(150, 50, 150, 0),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -294,7 +394,7 @@ Widget resultContent(resultcontroller) {
           ),
         ),
         Container(
-          height: 300,
+          height: 450,
           child: ListView.builder(
             itemCount: resultcontroller.skinResultWebContent.length,
             itemBuilder: (context, index) {
@@ -691,13 +791,17 @@ matchIngredient(resultcontroller) {
   listWidgets.addAll([
     Container(height: 25),
     ResultTitle("matched_ingredients".tr),
-    careSubtitle("prescription_ingredients_title".tr, " ", "ingredients_benef"
-        "it".tr),
+    careSubtitle(
+        "prescription_ingredients_title".tr,
+        " ",
+        "ingredients_benef"
+                "it"
+            .tr),
     Container(height: 25),
   ]);
 
   // Dynamically add matchIngredientComment widgets based on ingredient list
-  for (int i = 0; i < resultcontroller.ingredient.length; i++) {
+  for (int i = 0; i < 6; i++) {
     // Make sure not to exceed the detail list's bounds
     if (i + 1 < resultcontroller.detail.length) {
       listWidgets.add(

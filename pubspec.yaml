@@ -47,6 +47,7 @@ dependencies:
   firebase_storage: ^11.0.16
   shared_preferences: ^2.0.6
   qr_flutter: ^4.0.0
+  printing: ^5.3.0
 
 dev_dependencies:
   flutter_test:
@@ -74,6 +75,10 @@ flutter:
     - assets/img.png
     - assets/totalitem.jpg
     - assets/backkey.png
+    - assets/fonts/AnyConv.com__Pretendard-Light.ttf
+    - assets/fonts/AnyConv.com__Pretendard-Bold.ttf
+    - assets/fonts/AnyConv.com__Pretendard-Medium.ttf
+    - assets/fonts/AnyConv.com__Pretendard-Regular.ttf
 
   fonts:
     - family: Pretendard
@@ -87,3 +92,4 @@ flutter:
         - asset: font/Pretendard-Regular.woff
         - asset: font/Pretendard-SemiBold.woff
         - asset: font/Pretendard-Thin.woff
+

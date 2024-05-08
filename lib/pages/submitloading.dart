@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 
 import 'dart:math';
 
+import 'package:get/get_utils/get_utils.dart';
+
 
 enum DotType { square, circle, diamond, icon }
 
@@ -39,7 +41,7 @@ class _SubmitLoadingState extends State<SubmitLoading>
             Container(
               padding: EdgeInsets.fromLTRB(30, 30, 30, 5),
               child: Text(
-                '피부 진단 데이터를 BASUP 서버로 전송중입니다.',
+                'sending_skin_data'.tr,
                 style: submitloading_title,
                 textAlign: TextAlign.center,
               ),
@@ -47,7 +49,7 @@ class _SubmitLoadingState extends State<SubmitLoading>
             Container(
               padding: EdgeInsets.fromLTRB(30, 5, 30, 10),
               child: Text(
-                '해당 데이터는 BASUP 개발진이 \n화장품 처방하는데 사용됩니다.',
+                'data_use_disclaimer'.tr,
                 style: submitloading_content,
                 textAlign: TextAlign.center,
               ),

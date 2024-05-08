@@ -63,7 +63,7 @@ Widget SubMultititle(title, controller, surveycontroller) {
           ),
         ),
         height: 22,
-        width: 88,
+        // width: 88,
         child: Center(
           child: Text(
             title,
@@ -182,8 +182,8 @@ Widget ResultTitle(title) {
             Radius.circular(24.0),
           ),
         ),
-        height: 40,
-        margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+        // height: 40,
+        padding: EdgeInsets.fromLTRB(30, 10, 30, 10),
         // width: 120,
         child: Center(
           child: Text(

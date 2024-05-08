@@ -81,7 +81,7 @@ nameField(resultcontroller, textcontroller) {
                 fontSize: 12,
                 height: 1,
               ),
-              labelText: "이름",
+              labelText: "name".tr,
             ),
             controller: textcontroller,
             onChanged: (text) {
@@ -278,7 +278,7 @@ Widget sexCheck(resultcontroller) {
                     },
                   ),
                 ),
-                child: Text("남성"),
+                child: Text("sex_m".tr),
                 onPressed: () async {
                   resultcontroller.gender.value = Gender.M;
                   resultcontroller.gendercheck.value = true;
@@ -326,7 +326,7 @@ Widget sexCheck(resultcontroller) {
                     },
                   ),
                 ),
-                child: Text("남성"),
+                child: Text("sex_m".tr),
                 onPressed: () async {
                   resultcontroller.gender.value = Gender.M;
                   resultcontroller.gendercheck.value = true;
@@ -378,7 +378,7 @@ Widget sexCheck(resultcontroller) {
                       },
                     ),
                   ),
-                  child: Text("여성"),
+                  child: Text("sex_w".tr),
                   onPressed: () async {
                     resultcontroller.gender.value = Gender.W;
                     resultcontroller.gendercheck.value = true;
@@ -428,7 +428,7 @@ Widget sexCheck(resultcontroller) {
                       },
                     ),
                   ),
-                  child: Text("여성"),
+                  child: Text("sex_w".tr),
                   onPressed: () async {
                     resultcontroller.gender.value = Gender.W;
                     resultcontroller.gendercheck.value = true;

@@ -277,7 +277,7 @@ class ResultController extends GetxController {
         return oilper > 10 ? totalWidth*oilper/100
             .toInt() : totalWidth*0.1;
       default:
-        return "";
+        return 0;
     }
   }
   getPerValue(type, totalWidth){

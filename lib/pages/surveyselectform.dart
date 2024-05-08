@@ -92,9 +92,10 @@ class _SelectFormState extends State<SelectForm> {
                 (surveycontroller.questionsize).toString())
                 // && currentItem.hasUserAnswer()
                 ? SubmitButton(
-                    "제출", controller, surveycontroller,  onSurveySubmit)
+                    "submit".tr, controller, surveycontroller,  onSurveySubmit)
                 : BackPressButton(
-                    "이전 질문으로 가기", controller, surveycontroller, onBackPressed),
+                    "previous_question".tr, controller, surveycontroller,
+                onBackPressed),
           ),
         )
       ],
@@ -148,22 +149,22 @@ class _SelectFormState extends State<SelectForm> {
     var type_result = "";
     switch (type_idx) {
       case "1":
-        type_result = "피부 상태 진단";
+        type_result = "skin_diagnosis".tr;
         break;
       case "2":
-        type_result = "수분량 진단";
+        type_result = "hydration_diagnosis".tr;
         break;
       case "3":
-        type_result = "유분량 진단";
+        type_result = "sebum_diagnosis".tr;
         break;
       case "4":
-        type_result = "주름 / 탄력 진단";
+        type_result = "wrinkle_elasticity_diagnosis".tr;
         break;
       case "5":
-        type_result = "색소 침착 확인";
+        type_result = "pigmentation_check".tr;
         break;
       case "6":
-        type_result = "민감성 확인";
+        type_result = "sensitivity_check".tr;
         break;
       default:
     }

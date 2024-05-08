@@ -80,13 +80,14 @@ class _UserInfoState extends State<UserInfo> {
         children: [
           BlankTopProGressMulti(controller),
           BlankTopGap(controller),
-          Subtitle("기본 정보", controller),
-          QuestionTitle("피부 진단을 위한\n간단한 기본 정보를 입력해주세요.", controller),
+          Subtitle("user_general_info".tr, controller),
+          QuestionTitle("info_input".tr, controller),
           nameField(resultcontroller, textcontroller),
           centerField(resultcontroller,textcontroller_center),
           dateYearPicker(),
           sexCheck(resultcontroller),
-          FirstNextButton("진단 시작하기", resultcontroller, onPressedButton)
+          FirstNextButton("start_diagnostice".tr, resultcontroller,
+              onPressedButton)
         ],
       )),
     );
@@ -119,7 +120,7 @@ class _UserInfoState extends State<UserInfo> {
         Container(
             padding: EdgeInsets.fromLTRB(5, 5, 5, 0),
             child: Text(
-              "년",
+              "year".tr,
               style: TextStyle(
                 fontFamily: "Pretendard",
                 fontSize: 16,
@@ -148,7 +149,7 @@ class _UserInfoState extends State<UserInfo> {
         Container(
             padding: EdgeInsets.fromLTRB(5, 5, 5, 0),
             child: Text(
-              "월",
+              "month".tr,
               style: TextStyle(
                 fontFamily: "Pretendard",
                 fontSize: 16,
@@ -182,7 +183,7 @@ class _UserInfoState extends State<UserInfo> {
         Container(
             padding: EdgeInsets.fromLTRB(5, 5, 5, 0),
             child: Text(
-              "일",
+              "day".tr,
               style: TextStyle(
                 fontFamily: "Pretendard",
                 fontSize: 16,
