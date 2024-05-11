@@ -7,6 +7,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'dart:html' as html;
 
 Future<void> printDocument(ResultController resultcontroller, descript) async {
   final pdf = pw.Document();
@@ -431,9 +432,15 @@ Future<void> printDocument(ResultController resultcontroller, descript) async {
     ),
   );
 
-  Printing.layoutPdf(
-    onLayout: (PdfPageFormat format) async => pdf.save(),
-  );
+  final bytes = await pdf.save();
+  final blob = html.Blob([bytes], 'application/pdf');
+  final url = html.Url.createObjectUrlFromBlob(blob);
+  html.window.open(url, "_blank");
+  html.Url.revokeObjectUrl(url);
+
+  // Printing.layoutPdf(
+  //   onLayout: (PdfPageFormat format) async => pdf.save(),
+  // );
 }
 
 pw.Widget graphItemPdf(controller, type, pdf, font) {
