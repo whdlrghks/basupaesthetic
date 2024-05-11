@@ -403,7 +403,7 @@ ShowQRdialog(qr_url, routeurl) {
           Container(
             margin: EdgeInsets.fromLTRB(0, 12, 0, 0),
             child: Center(
-              child: QrImage(
+              child: QrImageView(
                 data: qr_url,
                 version: QrVersions.auto,
                 size: 200.0,

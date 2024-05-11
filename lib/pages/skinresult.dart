@@ -19,7 +19,6 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 import 'dart:html' as html;
-import 'package:flutter_widget_to_image/flutter_widget_to_image.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 

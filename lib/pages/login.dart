@@ -210,8 +210,8 @@ class _LoginScreenState extends State<LoginScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 40),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.green, // Button color
-                  onPrimary: Colors.white, // Text color
+                  backgroundColor: Colors.green, // 버튼 배경 색상
+                  foregroundColor: Colors.white,
                 ),
                 onPressed: _login,
                 child: Padding(

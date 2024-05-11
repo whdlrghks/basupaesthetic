@@ -1,3 +1,4 @@
+import 'package:basup_ver2/controller/localecontroller.dart';
 import 'package:basup_ver2/controller/resultcontroller.dart';
 import 'package:basup_ver2/design/value.dart';
 import 'package:flutter/material.dart';
@@ -6,27 +7,40 @@ import 'package:get/get.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/services.dart' show Uint8List, rootBundle;
 import 'dart:html' as html;
-
+String sanitizeString(String input) {
+  // 여기서 추가적으로 필요한 문자 변환을 정의할 수 있습니다.
+  return input.replaceAll('‘', "'").replaceAll('’', "'");
+}
 Future<void> printDocument(ResultController resultcontroller, descript) async {
   final pdf = pw.Document();
 
+  final LocaleController localeController = Get.find();
+  try {
   // 폰트 파일 로드
-  final fontData_Light = await rootBundle.load("fonts/AnyConv"
-      ".com__Pretendard-Light.ttf");
-  final fontData_Bold = await rootBundle.load("fonts/AnyConv"
-      ".com__Pretendard-Bold.ttf");
-  final fontData_Medium = await rootBundle.load("fonts/AnyConv"
-      ".com__Pretendard-Medium.ttf");
-  final fontData_Regular = await rootBundle.load("fonts/AnyConv"
-      ".com__Pretendard-Regular.ttf");
-  final Light = pw.Font.ttf(fontData_Light);
-  final Bold = pw.Font.ttf(fontData_Bold);
-  final Medium = pw.Font.ttf(fontData_Medium);
-  final Regular = pw.Font.ttf(fontData_Regular);
+  // final fontData_Light = await rootBundle.load("fonts/AnyConv"
+  //     ".com__Pretendard-Light.ttf");
+  // final fontData_Bold = await rootBundle.load("fonts/AnyConv"
+  //     ".com__Pretendard-Bold.ttf");
+  // final fontData_Medium = await rootBundle.load("fonts/AnyConv"
+  //     ".com__Pretendard-Medium.ttf");
+  // final fontData_Regular = await rootBundle.load("fonts/AnyConv"
+  //     ".com__Pretendard-Regular.ttf");
+  final Light =
+  // localeController.locale.value ==
+  //     Locale('ko', 'KR') ? await PdfGoogleFonts.:
+  await
+  PdfGoogleFonts
+      .notoSansRegular();
+  // pw.Font.ttf(fontData_Light.buffer.asByteData(0, fontData_Light.lengthInBytes));
+  final Bold = await PdfGoogleFonts.notoSansBold();
+  // pw.Font.ttf(fontData_Bold.buffer.asByteData(0, fontData_Bold.lengthInBytes));
+  // final Medium = pw.Font.ttf(fontData_Medium.buffer.asByteData(0, fontData_Medium.lengthInBytes));
+  final Regular =await PdfGoogleFonts.notoSansRegular();
+  // pw.Font.ttf(fontData_Regular.buffer.asByteData(0, fontData_Regular.lengthInBytes));
 
-  List<pw.Widget> textWidgets = descript
+  final textWidgets = descript
       .map((text) {
         List<String> parts = text.split("-");
         parts[0] = parts[0].trim(); // Remove any leading/trailing whitespace
@@ -319,11 +333,11 @@ Future<void> printDocument(ResultController resultcontroller, descript) async {
                 ),
                 pw.Column(
                   children: [
-                    graphItemPdf(resultcontroller, DataType.SENS, pdf, Medium),
-                    graphItemPdf(resultcontroller, DataType.TIGHT, pdf, Medium),
-                    graphItemPdf(resultcontroller, DataType.PIG, pdf, Medium),
-                    graphItemPdf(resultcontroller, DataType.WATER, pdf, Medium),
-                    graphItemPdf(resultcontroller, DataType.OIL, pdf, Medium),
+                    graphItemPdf(resultcontroller, DataType.SENS, pdf,Regular),
+                    graphItemPdf(resultcontroller, DataType.TIGHT, pdf,Regular),
+                    graphItemPdf(resultcontroller, DataType.PIG, pdf,Regular),
+                    graphItemPdf(resultcontroller, DataType.WATER, pdf,Regular),
+                    graphItemPdf(resultcontroller, DataType.OIL, pdf,Regular),
                   ],
                 )
               ]),
@@ -367,7 +381,8 @@ Future<void> printDocument(ResultController resultcontroller, descript) async {
                           alignment: pw.Alignment.centerLeft, // 좌측 정렬
                           padding: pw.EdgeInsets.symmetric(horizontal: 0),
                           child: pw.Text(
-                            resultcontroller.skinResultWebContent[index],
+                            sanitizeString(resultcontroller
+            .skinResultWebContent[index]),
                             textAlign: pw.TextAlign.left,
                             style: pw.TextStyle(
                               font: Light,
@@ -441,9 +456,13 @@ Future<void> printDocument(ResultController resultcontroller, descript) async {
   // Printing.layoutPdf(
   //   onLayout: (PdfPageFormat format) async => pdf.save(),
   // );
+  } catch (e) {
+    print("An error occurred while creating the PDF: $e");
+    // 에러 처리 로직 추가...
+  }
 }
 
-pw.Widget graphItemPdf(controller, type, pdf, font) {
+pw.Widget graphItemPdf(controller, type, pdf,font) {
   print("$type is start");
   return pw.Column(
     children: [

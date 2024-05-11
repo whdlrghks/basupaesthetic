@@ -26,6 +26,15 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  var localeController = Get.put(LocaleController());
+  // 시스템 로케일을 기반으로 초기 로케일 설정
+  var systemLocale = WidgetsBinding.instance.window.locale;
+  if (systemLocale != null) {
+    localeController.changeLocale(systemLocale.languageCode, systemLocale.countryCode ?? 'US');
+  } else {
+    localeController.changeLocale('ko', 'KR');  // 기본값으로 'ko', 'KR' 설정
+  }
   var surveyController = Get.put(SurveyController(), tag: "survey");
   var sizeController = Get.put(SizeController(), tag: "size");
   var resultController = Get.put(ResultController(), tag: "result");

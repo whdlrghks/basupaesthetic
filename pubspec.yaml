@@ -38,16 +38,17 @@ dependencies:
   cupertino_icons: ^1.0.2
   get : ^4.6.4
   http: ^0.13.5
-  flutter_cupertino_date_picker: ^1.0.26+2
+  flutter_cupertino_date_picker_fork: ^1.0.7
   intl: ^0.17.0
-  flutter_widget_to_image: ^0.0.1
   url_launcher: ^6.0.20
   cloud_firestore: ^4.7.0
   firebase_core: ^2.7.0
   firebase_storage: ^11.0.16
   shared_preferences: ^2.0.6
-  qr_flutter: ^4.0.0
-  printing: ^5.3.0
+  qr_flutter: ^4.1.0
+  printing: ^5.11.1
+  google_fonts: ^2.1.0
+  pdf: ^3.8.3
 
 dev_dependencies:
   flutter_test:
