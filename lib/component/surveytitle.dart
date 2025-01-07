@@ -56,6 +56,7 @@ Widget SubMultititle(title, controller, surveycontroller) {
         ),
       ),
       Container(
+        margin: EdgeInsets.fromLTRB(5, 0, 5, 0),
         decoration: BoxDecoration(
           color: survey_subtitle,
           borderRadius: BorderRadius.all(

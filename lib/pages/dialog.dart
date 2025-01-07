@@ -8,9 +8,11 @@ showScopedialog(userid) {
   FocusNode referNameFocusNode = FocusNode();
 
   return Dialog(
+
+    backgroundColor: Colors.white,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.all(
-        Radius.circular(16.0),
+        Radius.circular(40.0),
       ),
     ),
     child: Container(
@@ -103,9 +105,10 @@ showResultdialog(userid) {
   FocusNode referNameFocusNode = FocusNode();
 
   return Dialog(
+    backgroundColor: Colors.white,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.all(
-        Radius.circular(16.0),
+        Radius.circular(40.0),
       ),
     ),
     child: Container(
@@ -197,9 +200,10 @@ NoDatadialog() {
   FocusNode referNameFocusNode = FocusNode();
 
   return Dialog(
+    backgroundColor: Colors.white,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.all(
-        Radius.circular(16.0),
+        Radius.circular(40.0),
       ),
     ),
     child: Container(
@@ -289,9 +293,10 @@ NoDatadialog() {
 
 faillogindialog() {
   return Dialog(
+    backgroundColor: Colors.white,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.all(
-        Radius.circular(16.0),
+        Radius.circular(40.0),
       ),
     ),
     child: Container(
@@ -363,9 +368,10 @@ ShowQRdialog(qr_url, routeurl) {
   FocusNode referNameFocusNode = FocusNode();
 
   return Dialog(
+    backgroundColor: Colors.white,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.all(
-        Radius.circular(16.0),
+        Radius.circular(40.0),
       ),
     ),
     child: Container(

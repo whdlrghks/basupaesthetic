@@ -1,3 +1,4 @@
+import 'package:basup_ver2/component/loadingdialog.dart';
 import 'package:basup_ver2/controller/localecontroller.dart';
 import 'package:basup_ver2/controller/resultcontroller.dart';
 import 'package:basup_ver2/controller/surveycontroller.dart';
@@ -26,7 +27,7 @@ Future<List<Customer>> searchCustomers(String aestheticId) async {
     // If this customer group already exists, add the survey to it
     if (customerGroups.containsKey(customerKey)) {
       customerGroups[customerKey]!.surveys.add(
-        SurveyItem(date: data['date'], surveyId: data['survey_id']),
+        SurveyEachItem(date: data['date'], surveyId: data['survey_id']),
       );
     } else {
       // Otherwise, create a new customer group with this survey
@@ -35,7 +36,7 @@ Future<List<Customer>> searchCustomers(String aestheticId) async {
         age: data['age'],
         name: data['name'],
         sex: data['sex'],
-        surveys: [SurveyItem(date: data['date'], surveyId: data['survey_id'])],
+        surveys: [SurveyEachItem(date: data['date'], surveyId: data['survey_id'])],
         user_id: data['user_id'], // Assuming 'user_id' is how you identify the customer document
       );
     }
@@ -53,6 +54,8 @@ class CustomersListPage extends StatelessWidget {
 
   var surveyController = Get.find<SurveyController>(tag: "survey");
 
+  LocaleController localeController = Get.find();
+
   var type = "initial";
 
 
@@ -63,6 +66,8 @@ class CustomersListPage extends StatelessWidget {
 
     resultcontroller.initmachine();
     resultcontroller.initscope();
+
+
     return Scaffold(
       appBar: AppBar(
         title: Text('customers_list'.tr),
@@ -99,7 +104,7 @@ class CustomersListPage extends StatelessWidget {
                 trailing: IconButton(
                   icon: Icon(Icons.arrow_forward),
                   onPressed: () {
-                    SurveyItem? mostRecentSurvey = customer.getMostRecentSurvey();
+                    SurveyEachItem? mostRecentSurvey = customer.getMostRecentSurvey();
                     if(mostRecentSurvey !=null){
                       resultcontroller.age.value = customer.age;
                       resultcontroller.name.value = customer.name;
@@ -132,7 +137,15 @@ class CustomersListPage extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
+        onPressed: () async {
+          LoadingDialog.show();
+
+          await localeController.loadLocale();
+          await resultcontroller.initNewuser();
+          await surveyController.readyforSheet('initial');
+
+          // 로딩 다이얼로그 닫기
+          LoadingDialog.hide();
           Get.toNamed("/survey");
         },
         backgroundColor: Color(0xFF49A85E),

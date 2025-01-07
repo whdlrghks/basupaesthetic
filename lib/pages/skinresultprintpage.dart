@@ -19,26 +19,28 @@ Future<void> printDocument(ResultController resultcontroller, descript) async {
   final LocaleController localeController = Get.find();
   try {
   // 폰트 파일 로드
-  // final fontData_Light = await rootBundle.load("fonts/AnyConv"
-  //     ".com__Pretendard-Light.ttf");
-  // final fontData_Bold = await rootBundle.load("fonts/AnyConv"
+  final fontData_Light = await rootBundle.load("assets/fonts/AnyConv"
+      ".com__Pretendard-Light.ttf");
+  // final fontData_Bold = await rootBundle.load("assets/fonts/AnyConv"
   //     ".com__Pretendard-Bold.ttf");
-  // final fontData_Medium = await rootBundle.load("fonts/AnyConv"
+  // final fontData_Medium = await rootBundle.load("assets/fonts/AnyConv"
   //     ".com__Pretendard-Medium.ttf");
-  // final fontData_Regular = await rootBundle.load("fonts/AnyConv"
-  //     ".com__Pretendard-Regular.ttf");
+  final fontData_Regular = await rootBundle.load("assets/fonts/AnyConv"
+      ".com__Pretendard-Regular.ttf");
   final Light =
   // localeController.locale.value ==
   //     Locale('ko', 'KR') ? await PdfGoogleFonts.:
-  await
-  PdfGoogleFonts
-      .notoSansRegular();
-  // pw.Font.ttf(fontData_Light.buffer.asByteData(0, fontData_Light.lengthInBytes));
+  // await
+  // PdfGoogleFonts
+  //     .notoSansThin();
+
+  pw.Font.ttf(fontData_Light.buffer.asByteData());
   final Bold = await PdfGoogleFonts.notoSansBold();
   // pw.Font.ttf(fontData_Bold.buffer.asByteData(0, fontData_Bold.lengthInBytes));
   // final Medium = pw.Font.ttf(fontData_Medium.buffer.asByteData(0, fontData_Medium.lengthInBytes));
-  final Regular =await PdfGoogleFonts.notoSansRegular();
-  // pw.Font.ttf(fontData_Regular.buffer.asByteData(0, fontData_Regular.lengthInBytes));
+  final Regular =
+  // await PdfGoogleFonts.notoSansRegular();
+  pw.Font.ttf(fontData_Regular.buffer.asByteData());
 
   final textWidgets = descript
       .map((text) {

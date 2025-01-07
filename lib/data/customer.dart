@@ -1,12 +1,12 @@
-class SurveyItem{
+class SurveyEachItem{
   String date;
   String surveyId;
-  SurveyItem({
+  SurveyEachItem({
     required this.date,
     required this.surveyId
   });
-  factory SurveyItem.fromMap(Map<String, dynamic> map) {
-    return SurveyItem(
+  factory SurveyEachItem.fromMap(Map<String, dynamic> map) {
+    return SurveyEachItem(
       date: map['date'] as String,
       surveyId: map['survey_id'] as String,
     );
@@ -20,7 +20,7 @@ class Customer {
   final String name;
   final String sex;
 
-  final List<SurveyItem> surveys; // Changed to store SurveyItem objects
+  final List<SurveyEachItem> surveys; // Changed to store SurveyItem objects
   // final String surveyId;
   final String user_id;
 
@@ -34,11 +34,11 @@ class Customer {
   });
 
   factory Customer.fromFirestore(Map<String, dynamic> firestore) {
-    var surveyItems = <SurveyItem>[];
+    var surveyItems = <SurveyEachItem>[];
     if (firestore['surveys'] != null) {
       // Ensure each item is treated as a Map<String, dynamic>
       var surveysList = List<Map<String, dynamic>>.from(firestore['surveys']);
-      surveyItems = surveysList.map((item) => SurveyItem.fromMap(item)).toList();
+      surveyItems = surveysList.map((item) => SurveyEachItem.fromMap(item)).toList();
     }
 
     return Customer(
@@ -53,7 +53,7 @@ class Customer {
 
 
   // Method to add a new survey item to the customer
-  void addSurvey(SurveyItem surveyItem) {
+  void addSurvey(SurveyEachItem surveyItem) {
     surveys.add(surveyItem);
   }
 
@@ -70,7 +70,7 @@ class Customer {
     return surveys.first.date;
   }
   // Method to find the most recent survey item
-  SurveyItem? getMostRecentSurvey() {
+  SurveyEachItem? getMostRecentSurvey() {
     if (surveys.isEmpty) {
       return null; // Or handle accordingly if no surveys exist
     }

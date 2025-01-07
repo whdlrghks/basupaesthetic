@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-backKey(){
+backKey({bool fromResult =false }){
 
   return Container(
     padding: EdgeInsets.fromLTRB(20, 0, 0, 10),
@@ -18,7 +18,7 @@ backKey(){
         fit: BoxFit.fill,
       ),
       onTap: (){
-        Get.offAllNamed('/index');
+        fromResult ? Get.offAllNamed('/index') : Get.back();
       },
     ),
   );

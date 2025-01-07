@@ -47,6 +47,7 @@ class SurveyController extends GetxController{
 
     current_idx = 0;
     makeSurveyList(jsonResponse["result"]["questions"], type);
+
     return;
   }
 
@@ -63,6 +64,8 @@ class SurveyController extends GetxController{
             element["answerList"]);
         SurveyItemList.add(temp);
       });
+
+      singleton = false;
       return;
     } catch (e) {
       print(e);

@@ -16,21 +16,33 @@ import 'package:flutter/material.dart';
 
 import 'resultcontroller.dart';
 
+String getLanguageParamFromLocale(Locale? locale) {
+  if (locale == null) return 'English'; // 기본값
+
+  switch (locale.languageCode) {
+    case 'ko':
+      return 'KOR';
+    case 'en':
+      return 'ENG';
+    case 'ja':
+      return 'JPN';
+    case 'zh':
+      return 'CHN';
+    case 'id':
+      return 'IND';
+  // 추가 언어가 필요하면 여기에 추가
+    default:
+      return 'KOR'; // 기본값
+  }
+}
+
 Future<String> fetchGetSurvey(type) async {
   print("fetchGetSurvey ");
   String baseUrl = dev_hidden_tap ? Dev_URL : URL; // URL 설정
   final LocaleController localeController = Get.find();
-  await localeController.loadLocale();
-
-  String languageParam;
-  // LocaleController에서 현재 설정된 Locale에 따라 언어 문자열 결정
-  if (localeController.locale.value == Locale('ko', 'KR')) {
-    languageParam = 'Korean';
-  } else if (localeController.locale.value == Locale('en', 'US')) {
-    languageParam = 'English';
-  } else {
-    languageParam = 'Korean'; // 기본값 설정
-  }
+  // await localeController.loadLocale();
+  Locale? currentLocale = localeController.locale.value;
+  String languageParam = getLanguageParamFromLocale(currentLocale);
 
   String temp = '$baseUrl/survey';
   var url = Uri.parse(temp);
@@ -213,9 +225,10 @@ Future<String> fetchSurveySubmit() async {
   print("fetchSurveySubmit " + decodeData);
   print("fetchSurveySubmit " + parsed["result"]["surveyCode"]);
   if (parsed["resCode"] == CODE_OK) {
+    print("test okay");
     resultController.survey_id.value = parsed["result"]["surveyCode"];
     await createUserDocument(resultController);
-    Get.toNamed("/index?userid="+resultController.user_id.value);
+    // Get.toNamed("/index?userid="+resultController.user_id.value);
     return CODE_OK;
   } else {
     print("Fail to login");
@@ -248,17 +261,8 @@ fetchSurveyResult(surveyCode) async {
   String baseUrl = dev_hidden_tap ? Dev_URL : URL; // URL 설정
   final LocaleController localeController = Get.find();
   await localeController.loadLocale();
-
-  String languageParam;
-  // LocaleController에서 현재 설정된 Locale에 따라 언어 문자열 결정
-  if (localeController.locale.value == Locale('ko', 'KR')) {
-    languageParam = 'Korean';
-  } else if (localeController.locale.value == Locale('en', 'US')) {
-    languageParam = 'English';
-  } else {
-    languageParam = 'Korean'; // 기본값 설정
-  }
-
+  Locale? currentLocale = localeController.locale.value;
+  String languageParam = getLanguageParamFromLocale(currentLocale);
   String temp = '$baseUrl/survey/result';
   var url = Uri.parse(temp);
 

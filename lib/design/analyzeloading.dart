@@ -21,7 +21,7 @@ class _AnalyzeLoadingState extends State<AnalyzeLoading>
   void initState() {
     controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 5),
+      duration: const Duration(seconds: 10),
     )..addListener(() {
         setState(() {});
       });

@@ -151,7 +151,7 @@ class AppTranslations extends Translations {
       'proceed_questionnaire': '문진 진행',
       'login_failed': '로그인 실패',
       'login_failed_comment': '자격 증명을 확인하고 다시 시도해주세요.',
-      'microscope_input': '현미경 입력',
+      '력': '현미경 입력',
       'connect_via_qr': '피부 현미경 데이터를 아래의 QR코드를 사용하여\n스마트폰 카메라로 접속해주세요.',
       'proceed_homepage': '홈페이지에서 진행',
       'customers_list': '고객 리스트',

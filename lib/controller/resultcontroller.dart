@@ -92,6 +92,9 @@ class ResultController extends GetxController {
   var e = 0.obs;
   var f = 0.obs;
 
+  var machine_check = false.obs;
+  var microscope_check = false.obs;
+
   inituser(){
 
      name.value = "주영";
@@ -109,6 +112,22 @@ class ResultController extends GetxController {
      selectedDatecheck.value = false;
 
      surveylist = [];
+  }
+
+  initNewuser(){
+
+    name.value = "주영";
+    name_check.value = false;
+    user_id.value ="";
+
+    age.value = "";
+    gender.value = Gender.None;
+    gendercheck.value = false;
+
+    selectedDateTime.value = DateTime.parse("1996-01-01");
+    selectedDatecheck.value = false;
+
+    surveylist = [];
   }
 
   initscope(){

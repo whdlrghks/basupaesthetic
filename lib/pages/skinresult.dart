@@ -31,7 +31,7 @@ class SkinResult extends StatefulWidget {
 
 class _SkinResultState extends State<SkinResult> {
   // Initial selected survey (you can set a default or leave it null)
-  SurveyItem? selectedSurvey;
+  SurveyEachItem? selectedSurvey;
 
   var isLoading = false;
 
@@ -43,39 +43,45 @@ class _SkinResultState extends State<SkinResult> {
     var resultcontroller = Get.find<ResultController>(tag: "result");
 
     descript = (resultcontroller.decodeSkinType(resultcontroller.type.value));
-    return Scaffold(
-        body: isLoading
-            ? AnalyzeLoading() // 로딩 중 인디케이터 표시
-            : Stack(
-                children: [
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    child: ListView(children: [
-                      BlankTopGap(controller),
-                      title(resultcontroller),
-                      BlankBetweenTitleContent(controller),
+    return WillPopScope(
+      onWillPop: () async {
+        Get.offAllNamed('/index');
+        return false; // true를 반환하면 뒤로가기가 동작, false면 막음
+      },
+      child: Scaffold(
+          body: isLoading
+              ? AnalyzeLoading() // 로딩 중 인디케이터 표시
+              : Stack(
+                  children: [
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: ListView(children: [
+                        BlankTopGap(controller),
+                        title(resultcontroller),
+                        BlankBetweenTitleContent(controller),
 
-                      Row(
-                        children: [
-                          Expanded(
-                            child: skintitle(resultcontroller, descript),
-                          ),
-                          Expanded(
-                            child: resultData(controller, resultcontroller),
-                          ),
-                        ],
-                      ),
-                      resultContent(resultcontroller),
-                      // careRoutine(controller, resultcontroller),
-                      matchIngredient(resultcontroller),
-                      // recommendProduct(resultcontroller),
-                    ]),
-                  ),
-                ],
-              ));
+                        Row(
+                          children: [
+                            Expanded(
+                              child: skintitle(resultcontroller, descript),
+                            ),
+                            Expanded(
+                              child: resultData(controller, resultcontroller),
+                            ),
+                          ],
+                        ),
+                        resultContent(resultcontroller),
+                        // careRoutine(controller, resultcontroller),
+                        matchIngredient(resultcontroller),
+                        // recommendProduct(resultcontroller),
+                      ]),
+                    ),
+                  ],
+                )),
+    );
   }
 
   void _printDocument(resultcontroller) {
@@ -95,15 +101,16 @@ class _SkinResultState extends State<SkinResult> {
   }
 
   Widget title(resultcontroller) {
-    List<DropdownMenuItem<SurveyItem>> dropdownItems =
-        resultcontroller.surveylist.map<DropdownMenuItem<SurveyItem>>((survey) {
+    List<DropdownMenuItem<SurveyEachItem>> dropdownItems = resultcontroller
+        .surveylist
+        .map<DropdownMenuItem<SurveyEachItem>>((survey) {
       DateTime dateTime = DateTime.parse(survey.date);
       String formattedDate =
           DateFormat.yMMMMd(Localizations.localeOf(context).toString())
               .add_jm()
               .format(dateTime);
 
-      return DropdownMenuItem<SurveyItem>(
+      return DropdownMenuItem<SurveyEachItem>(
         value: survey,
         child: Text(
           formattedDate,
@@ -129,10 +136,10 @@ class _SkinResultState extends State<SkinResult> {
         children: [
           Container(
             margin: EdgeInsets.fromLTRB(0, 0, 100, 0),
-            child: backKey(),
+            child: backKey(fromResult: true),
           ),
           if (dropdownItems.isNotEmpty) ...[
-            DropdownButton<SurveyItem>(
+            DropdownButton<SurveyEachItem>(
               value: selectedSurvey,
               hint: Text(
                 DateFormat.yMMMMd(Localizations.localeOf(context).toString())
@@ -149,6 +156,7 @@ class _SkinResultState extends State<SkinResult> {
                 ),
               ),
               items: dropdownItems,
+              focusColor: Colors.white,
               onChanged: (newValue) async {
                 setState(() {
                   isLoading = true; // 로딩 시작
@@ -197,7 +205,6 @@ class _SkinResultState extends State<SkinResult> {
             ),
           ),
           Container(
-
             margin: EdgeInsets.fromLTRB(0, 0, 100, 0),
             child: IconButton(
               icon: Icon(Icons.print),
@@ -557,7 +564,7 @@ graphItem(controller, type) {
         child: Row(
           children: [
             Expanded(
-              flex: 4,
+              flex: 8,
               child: Row(children: [
                 Container(
                   padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
@@ -568,6 +575,7 @@ graphItem(controller, type) {
                 ),
                 Container(
                   // width: 80,
+                  padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
                   clipBehavior: Clip.antiAlias,
                   decoration: ShapeDecoration(
                     color: controller.getColorFlag(type)
@@ -597,10 +605,6 @@ graphItem(controller, type) {
                   ),
                 ),
               ]),
-            ),
-            Expanded(
-              flex: 4,
-              child: Container(),
             ),
             Expanded(
               flex: 2,
@@ -644,7 +648,7 @@ graphItem(controller, type) {
               child: Container(
                 width: controller.getPer(type, 303),
                 height: 20,
-                padding: const EdgeInsets.only(top: 3.0),
+                padding: const EdgeInsets.only(top: 0.0),
                 decoration: ShapeDecoration(
                   color: Color(0xFF49A85E),
                   shape: RoundedRectangleBorder(

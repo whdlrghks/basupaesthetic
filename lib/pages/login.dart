@@ -75,6 +75,15 @@ class _LoginScreenState extends State<LoginScreen> {
           var pw = documentData['pw'];
 
           if (pw == password) {
+            LocaleController localeController = Get.find();
+            // LocaleController에서 현재 설정된 Locale에 따라 언어 문자열 결정
+            if (localeController.locale.value == Locale('ko', 'KR')) {
+              localeController.changeLocale('ko', 'KR');
+            } else if (localeController.locale.value == Locale('en', 'US')) {
+              localeController.changeLocale('en', 'US');
+            } else {
+              localeController.changeLocale('en', 'US');
+            }
             print("login complete");
             SessionManager.setLoginStatus(true, shopId).then((_) {
               resultcontroller.aestheticId.value = shopId;

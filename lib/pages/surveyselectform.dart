@@ -1,10 +1,13 @@
 import 'package:basup_ver2/component/blankgap.dart';
 import 'package:basup_ver2/component/button.dart';
+import 'package:basup_ver2/component/loadingdialog.dart';
 import 'package:basup_ver2/component/surveytitle.dart';
 import 'package:basup_ver2/controller/httpscontroller.dart';
+import 'package:basup_ver2/controller/resultcontroller.dart';
 import 'package:basup_ver2/controller/sizecontroller.dart';
 import 'package:basup_ver2/controller/surveycontroller.dart';
 import 'package:basup_ver2/data/surveyitem.dart';
+import 'package:basup_ver2/design/value.dart';
 import 'package:basup_ver2/pages/authguard.dart';
 import 'package:basup_ver2/pages/index.dart';
 import 'package:basup_ver2/pages/skinresult.dart';
@@ -105,10 +108,22 @@ class _SelectFormState extends State<SelectForm> {
   onSurveySubmit() async {
 
     await surveycontroller.allocateSurveyResult();
-    Get.to(SubmitLoading(), transition: Transition.rightToLeftWithFade);
-    await fetchSurveySubmit();
-    GetPage(name: '/shortform', page : ()=> AuthGuard(child: ShortForm
-      ()));
+
+    LoadingDialog.show();
+    var result = await fetchSurveySubmit();
+    print("finish onsurveysubmit");
+    LoadingDialog.hide();
+    if(result == CODE_OK){
+
+      var resultController = Get.find<ResultController>(tag: "result");
+      Get.toNamed("/index?userid="+resultController.user_id.value);
+    }else{
+
+      GetPage(name: '/shortform', page : ()=> AuthGuard(child: ShortForm
+        ()));
+    }
+
+    // Get.toNamed("/index?userid="+resultController.user_id.value);
     // Get.offAll(Index(), transition: Transition.rightToLeftWithFade);
   }
 
