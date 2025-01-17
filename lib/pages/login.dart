@@ -6,11 +6,10 @@ import 'package:basup_ver2/pages/customerslistpage.dart';
 import 'package:basup_ver2/pages/dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' as fs;
-import 'package:basup_ver2/pages/index.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
+// (불필요한 import 제거: 예) index.dart 등 현재 안 쓰는 파일)
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -18,127 +17,127 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _idController = TextEditingController();
+  final TextEditingController _idController       = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  var resultcontroller = Get.find<ResultController>(tag: "result");
-// Function to save the login ID to SharedPreferences
-  Future<void> saveLoginId(String loginId) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('loginId', loginId);
-  }
+
+  // GetX Controller
+  final resultController = Get.find<ResultController>(tag: "result");
+
   @override
   void initState() {
     super.initState();
     _checkLoginStatus();
   }
 
+  /// 이미 로그인 상태인지 확인
   void _checkLoginStatus() async {
     bool isLoggedIn = await SessionManager.getLoginStatus();
     if (isLoggedIn) {
-      // Assuming Index() is your main page after login
-      var id = await SessionManager.getLoginaestheticId();
-      Future.microtask(() => Get.offAll(CustomersListPage(
-            aestheticId: id,
-          ))); // Replace with correct navigation if necessary
+      // 이미 로그인: aestheticId 불러와서 바로 CustomersListPage 이동
+      String? id = await SessionManager.getLoginaestheticId();
+      if (id != null && id.isNotEmpty) {
+        Future.microtask(() =>
+            Get.offAll(CustomersListPage(aestheticId: id))
+        );
+      }
+      // else: 예외 처리 (로그인 정보가 없는데 isLoggedIn이 true인 경우)
     }
   }
 
-  void _login() async {
-    final String shopId = _idController.text.trim();
+  /// 로그인 버튼 클릭 시 호출
+  Future<void> _login() async {
+    final String shopId   = _idController.text.trim();
     final String password = _passwordController.text.trim();
 
-    print("login");
-
-    // Assuming you have a 'shops' collection and each shop has an 'id' and 'password'
-    final querySnapshot = await fs.FirebaseFirestore.instance
-        .collection('aesthetic')
-        .where('id', isEqualTo: shopId)
-        // .where('password', isEqualTo: hash(password)) // You should hash the password
-        .get();
-
-    // Check if at least one document was found
-    if (querySnapshot.docs.isNotEmpty) {
-      print("find");
-      try {
-        // Check if at least one document was found
-        if (querySnapshot.docs.isNotEmpty) {
-          // Assuming 'id' is unique and only one document should match,
-          // we'll take the first document found
-          var document = querySnapshot.docs.first;
-          print(document);
-
-          // Access the document's data
-          Map<String, dynamic> documentData =
-              document.data() as Map<String, dynamic>;
-
-          // Now, you can access individual fields using the field names
-          var pw = documentData['pw'];
-
-          if (pw == password) {
-            LocaleController localeController = Get.find();
-            // LocaleController에서 현재 설정된 Locale에 따라 언어 문자열 결정
-            if (localeController.locale.value == Locale('ko', 'KR')) {
-              localeController.changeLocale('ko', 'KR');
-            } else if (localeController.locale.value == Locale('en', 'US')) {
-              localeController.changeLocale('en', 'US');
-            } else {
-              localeController.changeLocale('en', 'US');
-            }
-            print("login complete");
-            SessionManager.setLoginStatus(true, shopId).then((_) {
-              resultcontroller.aestheticId.value = shopId;
-              Get.offAll(CustomersListPage(aestheticId: shopId));
-              saveLoginId(shopId);
-              // Get.toNamed("/index");
-            }).catchError((error) {
-              // Handle errors, for example:
-              print("Login failed: $error");
-
-              Get.dialog(faillogindialog());
-            });
-          }
-          else{
-
-            Get.dialog(faillogindialog());
-          }
-        } else {
-          // Handle the case where no documents match the shopId
-          print("No matching document found for shopId: $shopId");
-          Get.dialog(faillogindialog());
-        }
-      } catch (e) {
-        // 예외가 발생했을 때 실행되는 코드
-        print('An error occurred: $e');
-
-        Get.dialog(faillogindialog());
-      } finally {
-        // 예외 발생 여부와 관계없이 실행되는 코드
-        print('This block is always executed');
-      }
-    } else {
-
-        Get.dialog(faillogindialog());
-
+    if (shopId.isEmpty || password.isEmpty) {
+      Get.dialog(faillogindialog());
+      return;
     }
+
+    try {
+      // Firestore 쿼리
+      final querySnapshot = await fs.FirebaseFirestore.instance
+          .collection('aesthetic')
+          .where('id', isEqualTo: shopId)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        // 매칭되는 shopId 없음
+        Get.dialog(faillogindialog());
+        return;
+      }
+
+      // 문서가 존재하면 첫 번째 문서를 사용
+      final doc    = querySnapshot.docs.first;
+      final data   = doc.data() as Map<String, dynamic>;
+      final dbPw   = data['pw'];   // Firestore에 저장된 비밀번호 (평문)
+
+      if (dbPw == password) {
+        // 비밀번호 일치 → 로그인 성공
+        _applyLocaleSetting();
+        await SessionManager.setLoginStatus(true, shopId);
+
+        resultController.aestheticId.value = shopId;
+
+        // SharedPreferences에 loginId 저장 (필요 시)
+        await _saveLoginId(shopId);
+
+        // 메인 페이지 혹은 리스트 페이지로 이동
+        Get.offAll(CustomersListPage(aestheticId: shopId));
+      } else {
+        // 비밀번호 불일치
+        Get.dialog(faillogindialog());
+      }
+    } catch (e) {
+      // Firestore 조회 중 예외 발생
+      print("Login error: $e");
+      Get.dialog(faillogindialog());
+    }
+  }
+
+  /// 언어 설정 (LocaleController)
+  void _applyLocaleSetting() {
+    final localeController = Get.find<LocaleController>();
+    final currentLocale = localeController.locale.value;
+
+    // 예: ko_KR, en_US 말고 다른 locale면 무조건 en_US로 처리
+    if (currentLocale == const Locale('ko', 'KR')) {
+      localeController.changeLocale('ko', 'KR');
+    } else if (currentLocale == const Locale('en', 'US')) {
+      localeController.changeLocale('en', 'US');
+    } else {
+      localeController.changeLocale('en', 'US');
+    }
+  }
+
+  /// 로그인 ID 저장 (SharedPreferences)
+  Future<void> _saveLoginId(String loginId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('loginId', loginId);
   }
 
   @override
   Widget build(BuildContext context) {
- // LocaleController 인스턴스 등록
     return Scaffold(
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Row( children : [
-              Expanded(flex:9, child: Container()),
-              Expanded(child: Container(
-                width: 100,
-                 child:
-              LanguagePickerWidget(),),),
-              Expanded(flex:2,child: Container())
-              ]),
+            // 언어 스위치 위젯
+            Row(
+              children: [
+                const Expanded(flex: 9, child: SizedBox.shrink()),
+                Expanded(
+                  child: SizedBox(
+                    width: 100,
+                    child: LanguagePickerWidget(),
+                  ),
+                ),
+                const Expanded(flex: 2, child: SizedBox.shrink()),
+              ],
+            ),
 
+            // 타이틀
             Text(
               'BASUP \nfor Aesthetic',
               style: TextStyle(
@@ -149,25 +148,28 @@ class _LoginScreenState extends State<LoginScreen> {
                   Shadow(
                     blurRadius: 10.0,
                     color: Colors.black.withOpacity(0.5),
-                    offset: Offset(5.0, 5.0),
+                    offset: const Offset(5.0, 5.0),
                   ),
                 ],
               ),
+              textAlign: TextAlign.center,
             ),
-            Container(height: 60,),
+            const SizedBox(height: 60),
+
             Text(
               'contact_basup'.tr,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.black54,
                 fontSize: 17,
                 fontWeight: FontWeight.w300,
-                shadows: [],
               ),
             ),
-            SizedBox(height: 80), // Adjust the spacing
+            const SizedBox(height: 80),
+
+            // ID 입력
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40),
-              child: Container(
+              child: SizedBox(
                 width: 400,
                 child: TextField(
                   controller: _idController,
@@ -177,21 +179,23 @@ class _LoginScreenState extends State<LoginScreen> {
                     hintText: 'user_id'.tr,
                     contentPadding: const EdgeInsets.all(15),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
+                      borderSide: const BorderSide(color: Colors.white),
                       borderRadius: BorderRadius.circular(5),
                     ),
                     enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
+                      borderSide: const BorderSide(color: Colors.white),
                       borderRadius: BorderRadius.circular(5),
                     ),
                   ),
                 ),
               ),
             ),
-            SizedBox(height: 20), // Adjust the spacing
+            const SizedBox(height: 20),
+
+            // PW 입력
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40),
-              child: Container(
+              child: SizedBox(
                 width: 400,
                 child: TextField(
                   controller: _passwordController,
@@ -202,24 +206,26 @@ class _LoginScreenState extends State<LoginScreen> {
                     hintText: 'password'.tr,
                     contentPadding: const EdgeInsets.all(15),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
+                      borderSide: const BorderSide(color: Colors.white),
                       borderRadius: BorderRadius.circular(5),
                     ),
                     enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
+                      borderSide: const BorderSide(color: Colors.white),
                       borderRadius: BorderRadius.circular(5),
                     ),
                   ),
                 ),
               ),
             ),
-            SizedBox(height: 40), // Adjust the spacing
+            const SizedBox(height: 40),
+
+            // 로그인 버튼
             Container(
               width: 440,
               padding: const EdgeInsets.symmetric(horizontal: 40),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green, // 버튼 배경 색상
+                  backgroundColor: Colors.green,
                   foregroundColor: Colors.white,
                 ),
                 onPressed: _login,
@@ -227,7 +233,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   padding: const EdgeInsets.all(20.0),
                   child: Text(
                     'login'.tr,
-                    style: TextStyle(fontSize: 20),
+                    style: const TextStyle(fontSize: 20),
                   ),
                 ),
               ),

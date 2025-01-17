@@ -29,12 +29,17 @@ var surveycontroller = Get.find<SurveyController>(tag: "survey");
     // TODO: implement initState
     super.initState();
 
+    // 만약 첫 빌드 이후 한 번만 사이즈를 가져와서 저장하고 싶다면:
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final size = MediaQuery.of(context).size;
+      controller.width(size.width.toInt());
+      controller.height(size.height.toInt());
+    });
   }
+
 
   @override
   Widget build(BuildContext context) {
-    controller.width(MediaQuery.of(context).size.width.toInt());
-    controller.height(MediaQuery.of(context).size.height.toInt());
 
     SurveyItem currentItem =
     surveycontroller.getSurveyItemList()[surveycontroller.current_idx];

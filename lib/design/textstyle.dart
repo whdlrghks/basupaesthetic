@@ -164,3 +164,11 @@ var index_button = TextStyle(
   fontWeight: FontWeight.w600,
   letterSpacing: 0.28,
 );
+
+var more_button = TextStyle(
+  color: Colors.white,
+  fontSize: 17,
+  fontFamily: 'Pretendard',
+  fontWeight: FontWeight.w400,
+  letterSpacing: 0.28,
+);

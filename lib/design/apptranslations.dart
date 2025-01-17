@@ -130,6 +130,17 @@ class AppTranslations extends Translations {
       "sending_skin_data": "Sending skin diagnosis data to the BASUP server.",
       "data_use_disclaimer": "This data will be used by BASUP developers for "
           "cosmetic prescription.",
+
+      'search_keyword': 'Search', // 이미 존재하던 것
+      // 새로 추가
+      'load_more': 'Load More',
+      'all_customers_loaded': 'All customers loaded.',
+      'no_search_results': 'No search results found.',
+      "analyzing_skin_detail_1": "BASUP is retrieving your data.",
+      "analyzing_skin_detail_2": "BASUP is now loading the microscope data.",
+      "analyzing_skin_detail_3": "BASUP AI is analyzing the microscopic data.",
+      "analyzing_skin_detail_4": "BASUP is generating the skin analysis "
+          "report.",
     },
     'ko_KR': {
       'contact_basup': 'BASUP에 연락하여 사전 회원가입을 하고 로그인해주세요',
@@ -256,6 +267,15 @@ class AppTranslations extends Translations {
       "submit":"제출",
       "sending_skin_data": "피부 진단 데이터를 BASUP 서버로 전송중입니다.",
       "data_use_disclaimer": "해당 데이터는 BASUP 개발진이 \n화장품 처방하는데 사용됩니다.",
+      'search_keyword': '검색', // 이미 존재하던 것
+      // 새로 추가
+      'load_more': '더 보기',
+      'all_customers_loaded': '모든 고객을 불러왔습니다.',
+      'no_search_results': '검색 결과가 없습니다.',
+      "analyzing_skin_detail_1": "현재 고객님의 데이터를 읽어오고 있습니다.",
+      "analyzing_skin_detail_2": "현재 피부 현미경 데이터를 불러오고 있습니다.",
+      "analyzing_skin_detail_3": "현재 피부 현미경 데이터를 BASUP AI가 분석하고 있습니다.",
+      "analyzing_skin_detail_4": "피부 결과보고서를 작성하고 있습니다.",
     },
     // 추가 언어 지원
   };

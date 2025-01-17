@@ -39,7 +39,6 @@ Future<void> main() async {
   var sizeController = Get.put(SizeController(), tag: "size");
   var resultController = Get.put(ResultController(), tag: "result");
 
-  Get.put(LocaleController());
   var type = "initial";
   surveyController.readyforSheet(type);
 

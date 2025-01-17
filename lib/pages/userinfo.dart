@@ -24,16 +24,32 @@ class _UserInfoState extends State<UserInfo> {
   var controller = Get.find<SizeController>(tag: "size");
   var resultcontroller = Get.find<ResultController>(tag: "result");
 
-  List<String> dropdownYearList = ["년"];
-  List<String> dropdownMonthList = ["월"];
-  List<String> dropdownDateList = ["일"];
+  // Dropdown 리스트 (년도, 월, 일)
+  final List<String> dropdownYearList = ["년"];
+  final List<String> dropdownMonthList = ["월"];
+  final List<String> dropdownDateList = ["일"];
 
-  TextEditingController textcontroller = TextEditingController();
-  TextEditingController textcontroller_center = TextEditingController();
-  // Function to retrieve the login ID from SharedPreferences
+  // 텍스트 필드 컨트롤러
+  final TextEditingController textcontroller       = TextEditingController(); // 사용자 이름
+  final TextEditingController textcontrollerCenter = TextEditingController(); // 센터 ID (readOnly)
+
+  // [1] SharedPreferences에서 loginId(= aestheticId) 가져오기
   Future<String?> getLoginId() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('loginId'); // This will return null if no loginId is set
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('loginId');
+  }
+
+  // [2] aestheticId가 비었다면, SharedPreferences에서 불러와 세팅
+  Future<void> _initAestheticIdIfNeeded() async {
+    if (resultcontroller.aestheticId.value.isEmpty) {
+      final id = await getLoginId();
+      if (id != null && id.isNotEmpty) {
+        // 리액티브 변수 세팅
+        resultcontroller.aestheticId.value = id;
+        // UI 표시
+        textcontrollerCenter.text = id;
+      }
+    }
   }
 
   @override
@@ -41,9 +57,9 @@ class _UserInfoState extends State<UserInfo> {
     // TODO: implement initState
     super.initState();
 
-    DateTime now = DateTime.now();
-    DateFormat formatter = DateFormat('yyyy-MM-dd');
-    var strToday = formatter.format(now).split("-");
+    // 날짜 관련 리스트 초기화
+    final now = DateTime.now();
+    final strToday = DateFormat('yyyy-MM-dd').format(now).split("-");
     for (int i = 1950; i < int.parse(strToday[0]); i++) {
       dropdownYearList.add(i.toString());
     }
@@ -54,25 +70,22 @@ class _UserInfoState extends State<UserInfo> {
       dropdownDateList.add(i.toString());
     }
 
+    // 이름 필드 변화 감지 → resultcontroller에 반영
     textcontroller.addListener(() {
       resultcontroller.name.value = textcontroller.text;
-      if (textcontroller.text != "") {
-        resultcontroller.name_check.value = true;
-      } else {
-        resultcontroller.name_check.value = false;
-      }
+      resultcontroller.name_check.value = textcontroller.text.isNotEmpty;
     });
 
-    resultcontroller.aestheticId.value == "" ? getLoginId() : "";
+    // (센터ID) aestheticId가 비었으면 SharedPreferences에서 가져옴
+    _initAestheticIdIfNeeded();
 
-
-    // fetchSurveyResultNo();
   }
 
   @override
   Widget build(BuildContext context) {
-    controller.width(MediaQuery.of(context).size.width.toInt());
-    controller.height(MediaQuery.of(context).size.height.toInt());
+    final size = MediaQuery.of(context).size;
+    controller.width(size.width.toInt());
+    controller.height(size.height.toInt());
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -83,7 +96,7 @@ class _UserInfoState extends State<UserInfo> {
           Subtitle("user_general_info".tr, controller),
           QuestionTitle("info_input".tr, controller),
           nameField(resultcontroller, textcontroller),
-          centerField(resultcontroller,textcontroller_center),
+          centerField(resultcontroller,textcontrollerCenter),
           dateYearPicker(),
           sexCheck(resultcontroller),
           FirstNextButton("start_diagnostice".tr, resultcontroller,
@@ -93,104 +106,95 @@ class _UserInfoState extends State<UserInfo> {
     );
   }
 
-  dateYearPicker() {
+  /// 생년월일 입력 (연/월/일) 드롭다운
+  Widget dateYearPicker() {
     return Container(
-      padding: EdgeInsets.fromLTRB(20, 30, 20, 10),
+      padding: const EdgeInsets.fromLTRB(20, 30, 20, 10),
       width: 350,
-      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        DropdownButton<String>(
-          value: resultcontroller.selectedyear.value,
-          onChanged: (String? newValue) {
-            setState(() {
-              resultcontroller.selectedyear.value = newValue!;
-              if (resultcontroller.selectedyear.value != "년" &&
-                  resultcontroller.selectedmonth.value != "월" &&
-                  resultcontroller.selecteddate.value != "일") {
-                resultcontroller.selectedDatecheck.value = true;
-              }
-            });
-          },
-          items: dropdownYearList.map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value, textAlign: TextAlign.center),
-            );
-          }).toList(),
-        ),
-        Container(
-            padding: EdgeInsets.fromLTRB(5, 5, 5, 0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // 연도
+          DropdownButton<String>(
+            value: resultcontroller.selectedyear.value,
+            onChanged: (String? newValue) {
+              setState(() {
+                resultcontroller.selectedyear.value = newValue!;
+                _updateSelectedDateCheck();
+              });
+            },
+            items: dropdownYearList.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value, textAlign: TextAlign.center),
+              );
+            }).toList(),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
             child: Text(
               "year".tr,
-              style: TextStyle(
-                fontFamily: "Pretendard",
-                fontSize: 16,
-              ),
-            )),
-        DropdownButton<String>(
-          value: resultcontroller.selectedmonth.value,
-          onChanged: (String? newValue) {
-            setState(() {
-              resultcontroller.selectedmonth.value = newValue!;
-              if (resultcontroller.selectedyear.value != "년" &&
-                  resultcontroller.selectedmonth.value != "월" &&
-                  resultcontroller.selecteddate.value != "일") {
-                resultcontroller.selectedDatecheck.value = true;
-              }
-            });
-          },
-          items:
-              dropdownMonthList.map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value, textAlign: TextAlign.center),
-            );
-          }).toList(),
-        ),
-        Container(
-            padding: EdgeInsets.fromLTRB(5, 5, 5, 0),
+              style: const TextStyle(fontFamily: "Pretendard", fontSize: 16),
+            ),
+          ),
+          // 월
+          DropdownButton<String>(
+            value: resultcontroller.selectedmonth.value,
+            onChanged: (String? newValue) {
+              setState(() {
+                resultcontroller.selectedmonth.value = newValue!;
+                _updateSelectedDateCheck();
+              });
+            },
+            items: dropdownMonthList.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value, textAlign: TextAlign.center),
+              );
+            }).toList(),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
             child: Text(
               "month".tr,
-              style: TextStyle(
-                fontFamily: "Pretendard",
-                fontSize: 16,
-              ),
-            )),
-        DropdownButton<String>(
-          value: resultcontroller.selecteddate.value,
-          onChanged: (String? newValue) {
-            setState(() {
-              resultcontroller.selecteddate.value = newValue!;
-              print(newValue);
-              if (resultcontroller.selectedyear.value != "년" &&
-                  resultcontroller.selectedmonth.value != "월" &&
-                  resultcontroller.selecteddate.value != "일") {
-                resultcontroller.selectedDatecheck.value = true;
-                DateTime now = DateTime.now();
-                // int age = now.year - dob.year;
-                // if (now.month < dob.month || (now.month == dob.month && now.day < dob.day)) {
-                //   age--;
-                // }
-              }
-            });
-          },
-          items: dropdownDateList.map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value, textAlign: TextAlign.center),
-            );
-          }).toList(),
-        ),
-        Container(
-            padding: EdgeInsets.fromLTRB(5, 5, 5, 0),
+              style: const TextStyle(fontFamily: "Pretendard", fontSize: 16),
+            ),
+          ),
+          // 일
+          DropdownButton<String>(
+            value: resultcontroller.selecteddate.value,
+            onChanged: (String? newValue) {
+              setState(() {
+                resultcontroller.selecteddate.value = newValue!;
+                _updateSelectedDateCheck();
+              });
+            },
+            items: dropdownDateList.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value, textAlign: TextAlign.center),
+              );
+            }).toList(),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
             child: Text(
               "day".tr,
-              style: TextStyle(
-                fontFamily: "Pretendard",
-                fontSize: 16,
-              ),
-            )),
-      ]),
+              style: const TextStyle(fontFamily: "Pretendard", fontSize: 16),
+            ),
+          ),
+        ],
+      ),
     );
+  }
+
+  /// 날짜가 모두 선택되었는지 체크 -> selectedDatecheck.value = true
+  void _updateSelectedDateCheck() {
+    if (resultcontroller.selectedyear.value != "년" &&
+        resultcontroller.selectedmonth.value != "월" &&
+        resultcontroller.selecteddate.value != "일") {
+      resultcontroller.selectedDatecheck.value = true;
+    }
   }
 
   onPressedButton() {

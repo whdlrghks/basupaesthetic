@@ -57,6 +57,7 @@ Widget SubMultititle(title, controller, surveycontroller) {
       ),
       Container(
         margin: EdgeInsets.fromLTRB(5, 0, 5, 0),
+        padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
         decoration: BoxDecoration(
           color: survey_subtitle,
           borderRadius: BorderRadius.all(
@@ -79,9 +80,13 @@ Widget SubMultititle(title, controller, surveycontroller) {
       ),
       Container(
         padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
-        width: 45,
-        child: Center(
-          child: Obx(
+        width: 80,
+
+        alignment: Alignment.centerLeft,
+        child:
+        // Center(
+        //   child:
+          Obx(
             () => Text(
               (surveycontroller.current_idx+1).toString() +
                   "/" +
@@ -94,7 +99,7 @@ Widget SubMultititle(title, controller, surveycontroller) {
                   height: 1.0),
             ),
           ),
-        ),
+        // ),
       ),
     ],
   );

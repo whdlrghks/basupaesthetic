@@ -37,143 +37,96 @@ tagContainer(tag, flag) {
   );
 }
 
-nameField(resultcontroller, textcontroller) {
+/// Reusable TextField builder
+Widget buildTextField({
+  required String label,
+  required TextEditingController controller,
+  TextInputType keyboardType = TextInputType.text,
+  bool readOnly = false,
+  bool enabled = true,
+  ValueChanged<String>? onChanged,
+}) {
   return Container(
+    width: 250,
+    child: TextField(
+      keyboardType: keyboardType,
+      controller: controller,
+      readOnly: readOnly,
+      enabled: enabled,
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        isDense: true,
+        alignLabelWithHint: true,
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.black38, width: 1.0),
+          borderRadius: BorderRadius.circular(11.0),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.black38, width: 1.0),
+          borderRadius: BorderRadius.circular(11.0),
+        ),
+        floatingLabelBehavior: FloatingLabelBehavior.auto,
+        labelText: label,
+        labelStyle: TextStyle(
+          color: Color(0xff979797),
+          fontSize: 12,
+          fontFamily: "Pretendard",
+          height: 1,
+        ),
+        floatingLabelStyle: TextStyle(
+          color: Color(0xff979797),
+          fontSize: 12,
+          height: 1,
+        ),
+      ),
+      style: TextStyle(fontFamily: "Pretendard"),
+    ),
+  );
+}
+
+// nameField
+Widget nameField(resultcontroller, textcontroller) {
+  return Padding(
     padding: const EdgeInsets.fromLTRB(10, 0, 10, 20),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Container(
-          width: 250,
-          child:
-              // Column(children: [
-              //   Expanded(
-              //     child: SizedBox(
-              //       child:
-              TextField(
-            keyboardType: TextInputType.name,
-            minLines: 1,
-            //Normal textInputField will be displayed
-            maxLines: 1,
-            textAlign: TextAlign.start,
-            decoration: InputDecoration(
-              // contentPadding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-              isDense: true,
-              alignLabelWithHint: true,
-              enabledBorder: new OutlineInputBorder(
-                borderSide: new BorderSide(color: Colors.black38, width: 1.0),
-                borderRadius: BorderRadius.circular(11.0),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.black38, width: 1.0),
-                borderRadius: BorderRadius.circular(11.0),
-              ),
-              focusColor: Colors.black38,
-              floatingLabelBehavior: FloatingLabelBehavior.auto,
-              labelStyle: TextStyle(
-                color: Color(0xff979797),
-                fontSize: 12,
-                  fontFamily: "Pretendard",
-                height: 1,
-              ),
-              floatingLabelStyle: TextStyle(
-                color: Color(0xff979797),
-                fontSize: 12,
-                height: 1,
-              ),
-              labelText: "name".tr,
-            ),
-            controller: textcontroller,
-            onChanged: (text) {
-              resultcontroller.name.value = text;
-              if (text != "") {
-                resultcontroller.name_check.value = true;
-              } else {
-                resultcontroller.name_check.value = false;
-              }
-            },style: TextStyle(
-
-                fontFamily: "Pretendard",
-              ),
-            //       ),
-            //     ),
-            //   ),
-            // ]),
-          ),
+        buildTextField(
+          label: "name".tr,
+          controller: textcontroller,
+          onChanged: (text) {
+            resultcontroller.name.value = text;
+            resultcontroller.name_check.value = text.isNotEmpty;
+          },
         ),
       ],
     ),
   );
 }
 
-centerField(resultcontroller, textcontroller) {
-  return Container(
+// centerField (read-only)
+Widget centerField(resultcontroller, textcontroller) {
+  // 미리 aestheticId 값을 세팅
+  textcontroller.text = resultcontroller.aestheticId.value;
+
+  return Padding(
     padding: const EdgeInsets.fromLTRB(10, 0, 10, 20),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Container(
-          width: 250,
-          child:
-          // Column(children: [
-          //   Expanded(
-          //     child: SizedBox(
-          //       child:
-          TextField(
-            keyboardType: TextInputType.name,
-            minLines: 1,
-            //Normal textInputField will be displayed
-            maxLines: 1,
-            textAlign: TextAlign.start,
-            decoration: InputDecoration(
-              // contentPadding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-              isDense: true,
-              alignLabelWithHint: true,
-              enabledBorder: new OutlineInputBorder(
-                borderSide: new BorderSide(color: Colors.black38, width: 1.0),
-                borderRadius: BorderRadius.circular(11.0),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.black38, width: 1.0),
-                borderRadius: BorderRadius.circular(11.0),
-              ),
-              focusColor: Colors.black38,
-              floatingLabelBehavior: FloatingLabelBehavior.auto,
-              labelStyle: TextStyle(
-                color: Color(0xff979797),
-                fontSize: 12,
-                fontFamily: "Pretendard",
-                height: 1,
-              ),
-              floatingLabelStyle: TextStyle(
-                color: Color(0xff979797),
-                fontSize: 12,
-                height: 1,
-              ),
-              labelText: resultcontroller.aestheticId.value == ""? "센터ID" : resultcontroller.aestheticId.value,
-            ),
-            controller: textcontroller,
-            onChanged: (text) {
-              resultcontroller.aestheticId.value = text;
-              if (text != "") {
-                resultcontroller.aestheticId_check.value = true;
-              } else {
-                resultcontroller.aestheticId_check.value = false;
-              }
-            },style: TextStyle(
-
-            fontFamily: "Pretendard",
-          ),
-            //       ),
-            //     ),
-            //   ),
-            // ]),
-          ),
+        buildTextField(
+          label: resultcontroller.aestheticId.value.isEmpty
+              ? "센터ID"
+              : resultcontroller.aestheticId.value,
+          controller: textcontroller,
+          readOnly: true,      // 사용자가 못 바꾸도록
+          onChanged: null,     // onChanged 불필요
         ),
       ],
     ),
   );
 }
+
 
 ageField(resultcontroller, textcontroller) {
   return Container(

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:basup_ver2/design/color.dart';
 import 'package:basup_ver2/design/textstyle.dart';
 import 'package:basup_ver2/design/value.dart';
@@ -5,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:html' as html;
 
 backKey({bool fromResult =false }){
 
@@ -141,7 +144,7 @@ UnselectedAnswer(
             surveycontroller.current_idx = surveycontroller.current_idx + 1;
             pressed();
           } else {
-            onSubmit(answercheck, idx);
+            onSubmit(idx);
           }
         },
       ),
@@ -243,47 +246,141 @@ NextButton(title,  surveycontroller, onPressedButton) {
 }
 
 
-
-scopeButton(abletitle, disabletitle, flag, _file, onPressedButton, setter) {
-  return Row(
-    mainAxisAlignment: MainAxisAlignment.center,
+Widget scopeButton({
+  required String abletitle,
+  required String disabletitle,
+  required RxBool flag,
+  required RxList<html.File> fileList,
+  // 여러 장 촬영 함수
+  required void Function(RxList<html.File> fileList, RxBool flag)
+  onPressedButton,
+}) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.center,
     children: [
-      Obx(
-            () => Container(
-          height: 90,
-          width: 350,
-          padding: EdgeInsets.fromLTRB(0, 33, 0, 1),
-          child: ElevatedButton(
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.resolveWith((states) {
-                if (!flag.value) {
-                  return button_abled;
-                } else {
-                  return button_disabled;
-                }
-              }),
-              shape: MaterialStateProperty.resolveWith(
-                    (states) {
-                  return RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(9));
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Obx(
+                () => Container(
+              height: 90,
+              width: 350,
+              padding: EdgeInsets.fromLTRB(0, 33, 0, 1),
+              child: ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.resolveWith((states) {
+                    if (!flag.value) {
+                      return button_abled;
+                    } else {
+                      return button_disabled;
+                    }
+                  }),
+                  shape: MaterialStateProperty.resolveWith((states) {
+                    return RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(9));
+                  }),
+                ),
+                child: Text(
+                  flag.value ? disabletitle : abletitle,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontFamily: "Pretendard",
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                onPressed: () {
+                  // 콜백을 통해 파일 리스트에 이미지 추가
+                  onPressedButton(fileList, flag);
                 },
               ),
             ),
-            child: Text(
-              flag.value ? disabletitle : abletitle ,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontFamily: "Pretendard",
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            onPressed: (){ onPressedButton(setter,flag); },
           ),
-        ),
+        ],
       ),
+      // 촬영된 파일을 썸네일로 표시/삭제
+      _buildThumbnails(fileList, flag),
     ],
   );
+}
+
+/// 여러 장 찍힌 파일을 썸네일로 보여주고 삭제할 수 있는 위젯
+Widget _buildThumbnails( RxList<html.File> files, flag// <-- callback to parent
+) {
+  if (files.isEmpty) {
+    return SizedBox.shrink();
+  }
+  return Obx(() => Padding(
+    padding: const EdgeInsets.only(top: 8),
+    child: Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: files.asMap().entries.map((entry) {
+        final index = entry.key;
+        final file = entry.value;
+        return FutureBuilder<String>(
+          future: _convertFileToDataUrl(file),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return SizedBox(
+                width: 80,
+                height: 80,
+                child: Center(child: CircularProgressIndicator()),
+              );
+            }
+            final dataUrl = snapshot.data!;
+            return Stack(
+              children: [
+                // 썸네일 이미지
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    dataUrl,
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                // 삭제 버튼(X)
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: GestureDetector(
+                    onTap: () {
+                      // Instead of setState here, call [onRemove(index)] so parent can remove item & rebuild
+                      files.removeAt(index);
+                      if(files.isEmpty){
+                        flag.value = false;
+                      }
+                    },
+                    child: Container(
+                      color: Colors.black54,
+                      child: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      }).toList(),
+    ),
+  ),);
+}
+
+/// html.File -> base64 dataUrl 변환
+Future<String> _convertFileToDataUrl(html.File file) async {
+  final reader = html.FileReader();
+  final completer = Completer<String>();
+  reader.onLoadEnd.listen((_) {
+    completer.complete(reader.result as String);
+  });
+  reader.readAsDataUrl(file);
+  return completer.future;
 }
 
 SubmitScopeButton(title,  controller, onPressedButton) {

@@ -112,6 +112,7 @@ showResultdialog(userid) {
       ),
     ),
     child: Container(
+      width: 300,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.all(
@@ -148,7 +149,6 @@ showResultdialog(userid) {
             child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               Container(
                 height: 42,
-                width: 97.9,
                 decoration: BoxDecoration(
                     border:
                         Border.all(color: const Color(0xffD3D8E1), width: 1),
@@ -166,26 +166,6 @@ showResultdialog(userid) {
                   onTap: () {
                     Get.offAll(Index());
                   },
-                ),
-              ),
-              Container(
-                height: 42,
-                width: 120.5,
-                margin: EdgeInsets.fromLTRB(8.6, 10, 0, 10),
-                decoration: ShapeDecoration(
-                  color: Color(0xFF34A853),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8)),
-                ),
-                child: InkWell(
-                  onTap: () {
-                    print("userid :" + userid);
-                    Get.toNamed("/result");
-                  },
-                  child: Align(
-                    alignment: Alignment.center,
-                    child: Text('view_result'.tr, style: removeuserconfirm),
-                  ),
                 ),
               ),
             ]),

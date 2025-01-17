@@ -20,169 +20,194 @@ import 'package:get/get.dart';
 class SelectForm extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return _SelectFormState();
   }
 }
 
 class _SelectFormState extends State<SelectForm> {
-  var surveycontroller = Get.find<SurveyController>(tag: "survey");
-  var controller = Get.find<SizeController>(tag: "size");
-  var current_idx = -1;
+  // 컨트롤러 이름을 카멜케이스로 정리
+  final surveyController = Get.find<SurveyController>(tag: "survey");
+  final sizeController = Get.find<SizeController>(tag: "size");
 
-  var answercheck = [false, false, false, false, false];
+  // 기존 current_idx -> currentIndex
+  int currentIndex = -1;
 
-  var nextflag = false;
+  // answerCheck를 RxList로 관리 (0~4 인덱스)
+  RxList<bool> answerCheck = RxList<bool>.filled(5, false);
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    current_idx = surveycontroller.current_idx;
-    answercheck = [false, false, false, false, false];
+    // 초기값 세팅
+    currentIndex = surveyController.current_idx;
+    // 여기서도 필요하다면 재초기화 가능
+    // answerCheck.value = [false, false, false, false, false];
   }
 
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance!.addPostFrameCallback((_) {
-      controller.width(MediaQuery.of(context).size.width.toInt());
-      controller.height(MediaQuery.of(context).size.height.toInt());
+      sizeController.width(MediaQuery.of(context).size.width.toInt());
+      sizeController.height(MediaQuery.of(context).size.height.toInt());
     });
-    SurveyItem currentItem =
-        surveycontroller.getSurveyItemList()[surveycontroller.current_idx];
-    if (currentItem.hasUserAnswer()) {
-      answercheck[currentItem.getUserAnswer()] = true;
-    }
 
-    // TODO: implement build
-    return  Scaffold(
-        body:  Column(
-      children: [
-        BlankTopProGressMulti(controller),
-        BlankTopGap(controller),
-        Obx(
-          () => SubMultititle(
-              getQuestionType(surveycontroller.current_idx, currentItem),
-              controller,
-              surveycontroller),
-        ),
-        Container(height: 35,),
-        MultiQuestionTitle(currentItem.getQuestionTitle(), controller),
-        answercheck[1]
-            ? SelectedAnswer(surveycontroller, 1, currentItem,
-          onPressedAnswer, answercheck)
-            : UnselectedAnswer(
-                surveycontroller, 1, currentItem, onPressedAnswer, onSubmit,answercheck),
-        answercheck[2]
-            ? SelectedAnswer(surveycontroller, 2, currentItem,
-          onPressedAnswer, answercheck)
-            : UnselectedAnswer(
-                surveycontroller, 2, currentItem, onPressedAnswer, onSubmit, answercheck),
-        answercheck[3]
-            ? SelectedAnswer(surveycontroller, 3, currentItem,
-          onPressedAnswer, answercheck)
-            : UnselectedAnswer(
-                surveycontroller, 3, currentItem, onPressedAnswer, onSubmit, answercheck),
-        answercheck[4]
-            ? SelectedAnswer(surveycontroller, 4, currentItem,
-          onPressedAnswer, answercheck)
-            : UnselectedAnswer(
-                surveycontroller, 4, currentItem, onPressedAnswer, onSubmit, answercheck),
-        BlankBackSubmit(controller),
-        Container(
-          child: Obx(
-            () =>  ((surveycontroller.current_idx+1).toString() ==
-                (surveycontroller.questionsize).toString())
-                // && currentItem.hasUserAnswer()
-                ? SubmitButton(
-                    "submit".tr, controller, surveycontroller,  onSurveySubmit)
-                : BackPressButton(
-                    "previous_question".tr, controller, surveycontroller,
-                onBackPressed),
-          ),
-        )
-      ],
-    ),);
+
+
+    return Scaffold(
+      body:  Obx(() {
+        final currentIndex = surveyController.current_idx;
+        final currentItem = surveyController.getSurveyItemList()[currentIndex];
+
+        // 이미 답변이 있다면 해당 인덱스 true
+        if (currentItem.hasUserAnswer()) {
+          // getUserAnswer()가 예: 1 ~ 4 인덱스를 반환한다고 가정
+          answerCheck[currentItem.getUserAnswer()] = true;
+        }
+        return Column(
+          children: [
+            BlankTopProGressMulti(sizeController),
+            BlankTopGap(sizeController),
+
+            // 질문 유형
+            SubMultititle(
+              getQuestionType(currentIndex, currentItem),
+              sizeController,
+              surveyController,
+            ),
+            SizedBox(height: 35),
+            MultiQuestionTitle(currentItem.getQuestionTitle(), sizeController),
+
+            // 반복 문항
+            Column(
+              children: List.generate(4, (index) {
+                final answerIndex = index + 1;
+                if (answerCheck[answerIndex]) {
+                  return SelectedAnswer(
+                    surveyController,
+                    answerIndex,
+                    currentItem,
+                    onPressAnswerReset,
+                    answerCheck,
+                  );
+                } else {
+                  return UnselectedAnswer(
+                    surveyController,
+                    answerIndex,
+                    currentItem,
+                    onPressAnswerReset,
+                    onSubmitAnswer,
+                    answerCheck,
+                  );
+                }
+              }),
+            ),
+
+            // 뒤로가기 or 제출 버튼
+            BlankBackSubmit(sizeController),
+            if ((surveyController.current_idx + 1).toString() ==
+                (surveyController.questionsize).toString())
+              SubmitButton("submit".tr, sizeController, surveyController, onSurveySubmit)
+            else
+              BackPressButton("previous_question".tr, sizeController, surveyController, onBackPressed),
+          ],
+        );
+      }),
+    );
   }
 
-  onSurveySubmit() async {
-
-    await surveycontroller.allocateSurveyResult();
+  // --- 설문 제출 로직 ---
+  Future<void> onSurveySubmit() async {
+    await surveyController.allocateSurveyResult();
 
     LoadingDialog.show();
-    var result = await fetchSurveySubmit();
-    print("finish onsurveysubmit");
-    LoadingDialog.hide();
-    if(result == CODE_OK){
+    try {
+      var result = await fetchSurveySubmit();
+      print("finish onSurveySubmit");
 
-      var resultController = Get.find<ResultController>(tag: "result");
-      Get.toNamed("/index?userid="+resultController.user_id.value);
-    }else{
-
-      GetPage(name: '/shortform', page : ()=> AuthGuard(child: ShortForm
-        ()));
-    }
-
-    // Get.toNamed("/index?userid="+resultController.user_id.value);
-    // Get.offAll(Index(), transition: Transition.rightToLeftWithFade);
-  }
-
-  onPressedAnswer() {
-    setState(() {
-      current_idx = surveycontroller.current_idx;
-      answercheck = [false, false, false, false, false];
-    });
-  }
-
-  onBackPressed() {
-    surveycontroller.current_idx = surveycontroller.current_idx - 1;
-    SurveyItem currentItem =
-        surveycontroller.getSurveyItemList()[surveycontroller.current_idx];
-    currentItem.answerType == 0
-        ? setState(() {
-            current_idx = surveycontroller.current_idx;
-            answercheck = [false, false, false, false, false];
-          })
-        : Get.to(ShortForm());
-  }
-
-  onSubmit(answercheck, idx){
-    setState(() {
-      for(int i= 1 ; i < 5 ; i++){
-        if(idx.toString() == i.toString()){
-          answercheck[i] = true;
-        }
-        else{
-          answercheck[i] = false;
-        }
+      LoadingDialog.hide();
+      if (result == CODE_OK) {
+        var resultController = Get.find<ResultController>(tag: "result");
+        // 파라미터로 전달 (Getx 4.x 방식)
+        Get.toNamed("/index", parameters: {
+          "userid": resultController.user_id.value
+        });
+      } else {
+        // 에러 시 shortform 이동
+        GetPage(
+          name: '/shortform',
+          page: () => AuthGuard(child: ShortForm()),
+        );
       }
-    });
+    } catch (e) {
+      // 네트워크/기타 에러 처리
+      print("onSurveySubmit Error: $e");
+    } finally {
+    }
   }
 
-  getQuestionType(int idx, currentItem) {
-    var type_idx = currentItem.getQuestionType().toString();
-    var type_result = "";
-    switch (type_idx) {
+  // --- 기존 onPressedAnswer() 역할: 선택지 리셋 ---
+  void onPressAnswerReset() {
+    // 굳이 setState 없이 RxList 값을 바꿔도 Obx가 있으면 재빌드됩니다.
+    currentIndex = surveyController.current_idx;
+    for (int i = 0; i < answerCheck.length; i++) {
+      answerCheck[i] = false;
+    }
+  }
+
+  // --- 이전 질문으로 돌아가기 ---
+  void onBackPressed() {
+    // 현재 SurveyController에 있는 인덱스 감소
+    surveyController.current_idx = surveyController.current_idx - 1;
+    // 새로 바뀐 인덱스 기준으로 아이템 조회
+    SurveyItem currentItem = surveyController
+        .getSurveyItemList()[surveyController.current_idx];
+
+    // answerType == 0 이면 현재 페이지에서 answerCheck 리셋
+    // 아니면 ShortForm으로 이동
+    if (currentItem.answerType == 0) {
+      currentIndex = surveyController.current_idx;
+      for (int i = 0; i < answerCheck.length; i++) {
+        answerCheck[i] = false;
+      }
+    } else {
+      Get.to(() => ShortForm());
+    }
+  }
+
+  // --- 기존 onSubmit(answercheck, idx) → 선택지 클릭 시 호출 ---
+  void onSubmitAnswer(int idx) {
+    print("onSubmitAnswer");
+    // idx만 true, 나머지는 false
+    for (int i = 1; i < 5; i++) {
+      answerCheck[i] = (i == idx);
+    }
+  }
+
+  // --- 질문 유형 얻기 ---
+  String getQuestionType(int idx, SurveyItem currentItem) {
+    var typeIdx = currentItem.getQuestionType().toString();
+    var typeResult = "";
+    switch (typeIdx) {
       case "1":
-        type_result = "skin_diagnosis".tr;
+        typeResult = "skin_diagnosis".tr;
         break;
       case "2":
-        type_result = "hydration_diagnosis".tr;
+        typeResult = "hydration_diagnosis".tr;
         break;
       case "3":
-        type_result = "sebum_diagnosis".tr;
+        typeResult = "sebum_diagnosis".tr;
         break;
       case "4":
-        type_result = "wrinkle_elasticity_diagnosis".tr;
+        typeResult = "wrinkle_elasticity_diagnosis".tr;
         break;
       case "5":
-        type_result = "pigmentation_check".tr;
+        typeResult = "pigmentation_check".tr;
         break;
       case "6":
-        type_result = "sensitivity_check".tr;
+        typeResult = "sensitivity_check".tr;
         break;
       default:
     }
-    return type_result;
+    return typeResult;
   }
 }

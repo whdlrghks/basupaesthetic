@@ -85,6 +85,13 @@ class ResultController extends GetxController {
   var right_uv_flag= false.obs;
   var head_uv_flag= false.obs;
 
+  var left_led_list = [];
+  var right_led_list = [];
+  var head_led_list = [];
+  var left_uv_list = [];
+  var right_uv_list = [];
+  var head_uv_list = [];
+
   var a = 0.obs;
   var b = 0.obs;
   var c = 0.obs;
@@ -128,6 +135,7 @@ class ResultController extends GetxController {
     selectedDatecheck.value = false;
 
     surveylist = [];
+
   }
 
   initscope(){
@@ -144,6 +152,12 @@ class ResultController extends GetxController {
     right_uv_flag.value= false;
     head_uv_flag.value= false;
 
+    left_led_list = [];
+    right_led_list = [];
+    head_led_list = [];
+    left_uv_list = [];
+    right_uv_list = [];
+    head_uv_list = [];
   }
 
   initmachine(){
