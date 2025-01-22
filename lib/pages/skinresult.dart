@@ -12,6 +12,9 @@ import 'package:basup_ver2/design/analyzeloading.dart';
 import 'package:basup_ver2/design/textstyle.dart';
 import 'package:basup_ver2/design/value.dart';
 import 'package:basup_ver2/pages/skinresultprintpage.dart';
+import 'package:basup_ver2/service/firebase.dart';
+import 'package:basup_ver2/service/result_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:printing/printing.dart';
@@ -33,14 +36,22 @@ class _SkinResultState extends State<SkinResult> {
   // Initial selected survey (you can set a default or leave it null)
   SurveyEachItem? selectedSurvey;
 
+  var resultcontroller = Get.find<ResultController>(tag: "result");
   var isLoading = false;
 
   var descript = [];
 
+
+  late ResultService _resultService; // 우리가 만든 서비스 클래스
+
+  @override
+  void initState() {
+    super.initState();
+    _resultService = ResultService(resultController: resultcontroller);
+  }
   @override
   Widget build(BuildContext context) {
     var controller = Get.find<SizeController>(tag: "size");
-    var resultcontroller = Get.find<ResultController>(tag: "result");
 
     descript = (resultcontroller.decodeSkinType(resultcontroller.type.value));
     return WillPopScope(
@@ -104,7 +115,19 @@ class _SkinResultState extends State<SkinResult> {
     List<DropdownMenuItem<SurveyEachItem>> dropdownItems = resultcontroller
         .surveylist
         .map<DropdownMenuItem<SurveyEachItem>>((survey) {
-      DateTime dateTime = DateTime.parse(survey.date);
+          print("~~~~~~~~~~~");
+          print(survey);
+      dynamic field = survey.date;
+      late DateTime dateTime ;
+
+      if (field is Timestamp) {
+        dateTime = field.toDate();
+      } else if (field is String) {
+        dateTime = DateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(field);
+      } else {
+        throw Exception("Unsupported date format: $field");
+      } // 가정
+      // DateTime dateTime = DateTime.parse();
       String formattedDate =
           DateFormat.yMMMMd(Localizations.localeOf(context).toString())
               .add_jm()
@@ -125,10 +148,13 @@ class _SkinResultState extends State<SkinResult> {
       );
     }).toList();
     DateTime dateTime = DateTime.parse(resultcontroller.survey_date.value);
+
     // Formats to Year-Month-Day
     int year = dateTime.year;
     int month = dateTime.month;
     int day = dateTime.day;
+
+    late var _skindatalist;
 
     return Column(children: [
       Row(
@@ -162,7 +188,13 @@ class _SkinResultState extends State<SkinResult> {
                   isLoading = true; // 로딩 시작
                 });
                 selectedSurvey = newValue;
-                await fetchSurveyResult(selectedSurvey!.surveyId);
+                if(selectedSurvey!.onlysurvey){
+                  await fetchSurveyResult(selectedSurvey!.surveyId);
+                }else{
+                  _skindatalist = await getSkinDataList(selectedSurvey!
+                      .surveyId);
+                  await _resultService.handleSkinDataIsNewer(_skindatalist[0]);
+                }
                 setState(() {
                   isLoading = false; // 로딩 종료
                   print("setstate");
@@ -466,6 +498,8 @@ Widget resultContent(resultcontroller) {
           ),
         ),
         const SizedBox(height: 32),
+
+        if(resultcontroller.skinResultContent.length >2)
         Container(
           child: Text(
             resultcontroller.skinResultContent[2],

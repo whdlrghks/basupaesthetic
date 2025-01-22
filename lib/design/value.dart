@@ -8,6 +8,13 @@ var access_Dev_Token = "skinlab2021!";
 var web_skin_result= "https://4gqaleeyx2.execute-api.ap-northeast-2.amazonaws"
     ".com/default/GET_BASUP_RESULT";
 
+var web_survey_result = "https://xjkw6qxlva.execute-api.ap-northeast-2"
+    ".amazonaws.com/survey/result";
+
+var web_calculate_url = "https://47ypsfx6a0.execute-api.ap-northeast-2.amazonaws.com/default/basup-ai-model-submit";
+var web_calculate_lookup= "https://1upjrsxfi0.execute-api.ap-northeast-2"
+    ".amazonaws.com/default/basup-ai-model-lookup";
+
 
 enum Gender { M, W, None }
 

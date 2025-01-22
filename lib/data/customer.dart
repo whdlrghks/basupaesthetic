@@ -1,14 +1,17 @@
 class SurveyEachItem{
   String date;
   String surveyId;
+  bool onlysurvey;
   SurveyEachItem({
     required this.date,
-    required this.surveyId
+    required this.surveyId,
+    required this.onlysurvey,
   });
   factory SurveyEachItem.fromMap(Map<String, dynamic> map) {
     return SurveyEachItem(
       date: map['date'] as String,
       surveyId: map['survey_id'] as String,
+      onlysurvey: map['onlysurvey'] as bool,
     );
   }
 }

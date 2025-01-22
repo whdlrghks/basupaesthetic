@@ -28,7 +28,8 @@ Future<List<Customer>> searchCustomers(String aestheticId) async {
     // If this customer group already exists, add the survey to it
     if (customerGroups.containsKey(customerKey)) {
       customerGroups[customerKey]!.surveys.add(
-        SurveyEachItem(date: data['date'], surveyId: data['survey_id']),
+        SurveyEachItem(date: data['date'], surveyId: data['survey_id'],
+            onlysurvey: data['onlysurvey']),
       );
     } else {
       // Otherwise, create a new customer group with this survey
@@ -37,7 +38,8 @@ Future<List<Customer>> searchCustomers(String aestheticId) async {
         age: data['age'],
         name: data['name'],
         sex: data['sex'],
-        surveys: [SurveyEachItem(date: data['date'], surveyId: data['survey_id'])],
+        surveys: [SurveyEachItem(date: data['date'], surveyId: data['survey_id'],
+            onlysurvey: data['onlysurvey'])],
         user_id: data['user_id'], // Assuming 'user_id' is how you identify the customer document
       );
     }
@@ -150,7 +152,8 @@ class _CustomersListPageState extends State<CustomersListPage> {
 
       if (customerGroups.containsKey(customerKey)) {
         customerGroups[customerKey]!.surveys.add(
-          SurveyEachItem(date: data['date'], surveyId: data['survey_id']),
+          SurveyEachItem(date: data['date'], surveyId: data['survey_id'],
+              onlysurvey: data['onlysurvey']),
         );
       } else {
         customerGroups[customerKey] = Customer(
@@ -159,7 +162,8 @@ class _CustomersListPageState extends State<CustomersListPage> {
           name: data['name'],
           sex: data['sex'],
           surveys: [
-            SurveyEachItem(date: data['date'], surveyId: data['survey_id'])
+            SurveyEachItem(date: data['date'], surveyId: data['survey_id'],
+                onlysurvey: data['onlysurvey'])
           ],
           user_id: data['user_id'],
         );

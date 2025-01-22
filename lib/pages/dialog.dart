@@ -149,6 +149,7 @@ showResultdialog(userid) {
             child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               Container(
                 height: 42,
+                width: 200,
                 decoration: BoxDecoration(
                     border:
                         Border.all(color: const Color(0xffD3D8E1), width: 1),
@@ -264,6 +265,98 @@ NoDatadialog() {
                 ),
               ),
             ]),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+NetworkErrorDialog() {
+  return Dialog(
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(
+        Radius.circular(40.0),
+      ),
+    ),
+    child: Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.all(
+          Radius.circular(40.0),
+        ),
+      ),
+      padding: const EdgeInsets.fromLTRB(24, 18, 24, 5),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // 타이틀
+          Container(
+            padding: const EdgeInsets.all(5.0),
+            child: Align(
+              alignment: Alignment.topCenter,
+              // "network_error".tr 등 번역키 추가 가능
+              child: Text("error_occurred".tr, style: removeusertitle),
+            ),
+          ),
+
+          // 본문(메시지)
+          Container(
+            margin: const EdgeInsets.fromLTRB(0, 12, 0, 0),
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Text(
+                "error_text".tr,
+                style: const TextStyle(
+                  color: Color(0x80151920),
+                  fontWeight: FontWeight.w400,
+                  fontFamily: "Pretendard",
+                  fontStyle: FontStyle.normal,
+                  fontSize: 14,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+
+          // 버튼들
+          Container(
+            alignment: Alignment.bottomRight,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+
+                // "확인" or "닫기" 버튼
+                Container(
+                  height: 42,
+                  width: 120.5,
+                  margin: const EdgeInsets.fromLTRB(8.6, 0, 0, 10),
+                  decoration: ShapeDecoration(
+                    color: const Color(0xFF34A853),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: InkWell(
+                    onTap: () {
+                      // Dialog 닫기만 진행 (사용자가 재시도 시에
+                      // 호출부에서 다시 fetchCalculateAILookup 등 진행 가능)
+                      Get.back();
+                      Get.offAllNamed('/index');
+                    },
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        // "확인" - 번역키 사용 시 변경 가능
+                        'check_later'.tr,
+                        style: removeuserconfirm,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

@@ -52,6 +52,8 @@ class ResultController extends GetxController {
   var oilper = 65;
   var pigper = 66;
 
+  var job_id ="".obs;
+
   var graphName =['resistance'.tr, 'elasticity'.tr, 'pigmentation'.tr, 'moisture_retention'.tr,
   'oil_retention'.tr ];
 

@@ -141,6 +141,10 @@ class AppTranslations extends Translations {
       "analyzing_skin_detail_3": "BASUP AI is analyzing the microscopic data.",
       "analyzing_skin_detail_4": "BASUP is generating the skin analysis "
           "report.",
+      "error_occurred" : "Network Error",
+      "error_text" : "Try later",
+      "check_later" : "Check",
+
     },
     'ko_KR': {
       'contact_basup': 'BASUP에 연락하여 사전 회원가입을 하고 로그인해주세요',
@@ -276,6 +280,10 @@ class AppTranslations extends Translations {
       "analyzing_skin_detail_2": "현재 피부 현미경 데이터를 불러오고 있습니다.",
       "analyzing_skin_detail_3": "현재 피부 현미경 데이터를 BASUP AI가 분석하고 있습니다.",
       "analyzing_skin_detail_4": "피부 결과보고서를 작성하고 있습니다.",
+
+      "error_occurred" : "Network Error",
+      "error_text" : "잠시 후에 다시 시도해주세요.",
+      "check_later" : "확인",
     },
     // 추가 언어 지원
   };

@@ -24,7 +24,7 @@ class _AnalyzeLoadingState extends State<AnalyzeLoading>
   void initState() {
     _minuteCounter = 0;
     // 이 예시 timer는 1분(60초) 간격으로 실행
-    _timer = Timer.periodic(Duration(minutes: 1), (timer) {
+    _timer = Timer.periodic(Duration(seconds: 30), (timer) {
       setState(() {
         _minuteCounter++;
         // 원하시는 로직:
