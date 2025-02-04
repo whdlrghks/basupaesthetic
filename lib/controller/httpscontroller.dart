@@ -397,7 +397,8 @@ Future<void> _saveNewSkinDataDoc({
 }
 
 fetchSurveyResult(surveyCode) async {
-  print("fetchSurveyResult ");
+
+  print("[DEBUG]`fetchSurveyResult");
 
   var resultController = Get.find<ResultController>(tag: "result");
   //
@@ -426,6 +427,7 @@ fetchSurveyResult(surveyCode) async {
 
   url = url.replace(queryParameters: _query);
 
+  print("[DEBUG]`fetchSurveyResult url : ${url}");
   print(url);
 
   http.Response response = await http.get(
@@ -445,6 +447,7 @@ fetchSurveyResult(surveyCode) async {
   var result_status = parsed["resCode"];
   var result = parsed["result"];
   print(parsed);
+  print("[DEBUG]`fetchSurveyResult parsed : ${parsed}");
 
   if (result_status == CODE_OK) {
     resultController.survey_id.value = surveyCode;
@@ -1128,6 +1131,8 @@ fetchSetSurveyResult(surveyCode) async {
 
 fetchWebSkinTypeResult(skintype) async {
   // return;
+
+  print("[DEBUG]` fetchWebSkinTypeResult");
   print("fetchWebSkinTypeResult ");
 
   var resultController = Get.find<ResultController>(tag: "result");
@@ -1136,6 +1141,8 @@ fetchWebSkinTypeResult(skintype) async {
   String baseUrl = web_survey_result; // URL 설정
   final LocaleController localeController = Get.find();
   await localeController.loadLocale();
+
+  print("[DEBUG]` loadLocale");
 
   String languageParam;
   // LocaleController에서 현재 설정된 Locale에 따라 언어 문자열 결정

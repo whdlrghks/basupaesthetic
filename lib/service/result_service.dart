@@ -273,7 +273,9 @@ class ResultService {
     resultController.type.value = finalSkintype;
 
     // 바로 웹 결과 호출
+    print("[DEBUG]`before  fetchWebSkinTypeResult");
     await fetchWebSkinTypeResult(finalSkintype);
+    print("[DEBUG]`before  fetchWebSkinResult");
     await fetchWebSkinResult(finalSkintype);
   }
 

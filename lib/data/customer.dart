@@ -14,6 +14,16 @@ class SurveyEachItem{
       onlysurvey: map['onlysurvey'] as bool,
     );
   }
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is SurveyEachItem &&
+              runtimeType == other.runtimeType &&
+              surveyId == other.surveyId &&
+              date == other.date;
+
+  @override
+  int get hashCode => surveyId.hashCode ^ date.hashCode;
 }
 
 class Customer {

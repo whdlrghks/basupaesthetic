@@ -34,21 +34,69 @@ class SkinResult extends StatefulWidget {
 
 class _SkinResultState extends State<SkinResult> {
   // Initial selected survey (you can set a default or leave it null)
-  SurveyEachItem? selectedSurvey;
+  Rxn<SurveyEachItem> selectedSurvey = Rxn<SurveyEachItem>();
 
   var resultcontroller = Get.find<ResultController>(tag: "result");
-  var isLoading = false;
+  var isLoading = false.obs;
 
   var descript = [];
 
+  late DateTime _dateTime;
 
+  late List<DropdownMenuItem<SurveyEachItem>> dropdownItems;
   late ResultService _resultService; // 우리가 만든 서비스 클래스
-
+  @override
+  void dispose() {
+    super.dispose();
+  }
   @override
   void initState() {
     super.initState();
+
     _resultService = ResultService(resultController: resultcontroller);
+    if (resultcontroller.surveylist.isNotEmpty) {
+      // 예시: 설문 목록이 이미 날짜 순으로 정렬되어 있다면 첫 번째 항목 선택
+      selectedSurvey.value = resultcontroller.surveylist.first;
+      _dateTime = DateTime.parse(selectedSurvey.value!.date);
+    } else {
+      // 만약 설문 목록이 없으면 기본 날짜 값 설정 (또는 적절한 예외처리)
+      _dateTime = DateTime.now();
+    }
+
+    dropdownItems = resultcontroller.surveylist
+        .map<DropdownMenuItem<SurveyEachItem>>((survey) {
+      print("~~~~~~~~~~~");
+      print(survey.date);
+      dynamic field = survey.date;
+      late DateTime dateTime;
+
+      if (field is Timestamp) {
+        dateTime = field.toDate();
+      } else if (field is String) {
+        dateTime = DateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(field);
+      } else {
+        throw Exception("Unsupported date format: $field");
+      } // 가정
+      // DateTime dateTime = DateTime.parse();
+      String formattedDate =
+          DateFormat("yyyy-MM-dd h:mma").format(dateTime).toLowerCase();
+
+      return DropdownMenuItem<SurveyEachItem>(
+        value: survey,
+        child: Text(
+          formattedDate + " " +'result_time'.tr,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 14,
+            fontFamily: 'Pretendard',
+            fontWeight: FontWeight.w600,
+          ),
+        ), // Use the formatted date here
+      );
+    }).toList();
   }
+
   @override
   Widget build(BuildContext context) {
     var controller = Get.find<SizeController>(tag: "size");
@@ -59,39 +107,41 @@ class _SkinResultState extends State<SkinResult> {
         Get.offAllNamed('/index');
         return false; // true를 반환하면 뒤로가기가 동작, false면 막음
       },
-      child: Scaffold(
-          body: isLoading
-              ? AnalyzeLoading() // 로딩 중 인디케이터 표시
-              : Stack(
-                  children: [
-                    Positioned(
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      child: ListView(children: [
-                        BlankTopGap(controller),
-                        title(resultcontroller),
-                        BlankBetweenTitleContent(controller),
+      child: Obx(
+        () => Scaffold(
+            body: isLoading.value
+                ? AnalyzeLoading() // 로딩 중 인디케이터 표시
+                : Stack(
+                    children: [
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        child: ListView(children: [
+                          BlankTopGap(controller),
+                          title(resultcontroller),
+                          BlankBetweenTitleContent(controller),
 
-                        Row(
-                          children: [
-                            Expanded(
-                              child: skintitle(resultcontroller, descript),
-                            ),
-                            Expanded(
-                              child: resultData(controller, resultcontroller),
-                            ),
-                          ],
-                        ),
-                        resultContent(resultcontroller),
-                        // careRoutine(controller, resultcontroller),
-                        matchIngredient(resultcontroller),
-                        // recommendProduct(resultcontroller),
-                      ]),
-                    ),
-                  ],
-                )),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: skintitle(resultcontroller, descript),
+                              ),
+                              Expanded(
+                                child: resultData(controller, resultcontroller),
+                              ),
+                            ],
+                          ),
+                          resultContent(resultcontroller),
+                          // careRoutine(controller, resultcontroller),
+                          matchIngredient(resultcontroller),
+                          // recommendProduct(resultcontroller),
+                        ]),
+                      ),
+                    ],
+                  )),
+      ),
     );
   }
 
@@ -112,50 +162,7 @@ class _SkinResultState extends State<SkinResult> {
   }
 
   Widget title(resultcontroller) {
-    List<DropdownMenuItem<SurveyEachItem>> dropdownItems = resultcontroller
-        .surveylist
-        .map<DropdownMenuItem<SurveyEachItem>>((survey) {
-          print("~~~~~~~~~~~");
-          print(survey);
-      dynamic field = survey.date;
-      late DateTime dateTime ;
-
-      if (field is Timestamp) {
-        dateTime = field.toDate();
-      } else if (field is String) {
-        dateTime = DateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(field);
-      } else {
-        throw Exception("Unsupported date format: $field");
-      } // 가정
-      // DateTime dateTime = DateTime.parse();
-      String formattedDate =
-          DateFormat.yMMMMd(Localizations.localeOf(context).toString())
-              .add_jm()
-              .format(dateTime);
-
-      return DropdownMenuItem<SurveyEachItem>(
-        value: survey,
-        child: Text(
-          formattedDate,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 14,
-            fontFamily: 'Pretendard',
-            fontWeight: FontWeight.w600,
-          ),
-        ), // Use the formatted date here
-      );
-    }).toList();
-    DateTime dateTime = DateTime.parse(resultcontroller.survey_date.value);
-
-    // Formats to Year-Month-Day
-    int year = dateTime.year;
-    int month = dateTime.month;
-    int day = dateTime.day;
-
     late var _skindatalist;
-
     return Column(children: [
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -165,41 +172,49 @@ class _SkinResultState extends State<SkinResult> {
             child: backKey(fromResult: true),
           ),
           if (dropdownItems.isNotEmpty) ...[
-            DropdownButton<SurveyEachItem>(
-              value: selectedSurvey,
-              hint: Text(
-                DateFormat.yMMMMd(Localizations.localeOf(context).toString())
-                        .add_jm()
-                        .format(dateTime) +
-                    " " +
-                    'result_time'.tr,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 14,
-                  fontFamily: 'Pretendard',
-                  fontWeight: FontWeight.w600,
-                ),
+            Obx(
+              () => DropdownButton<SurveyEachItem>(
+                value: selectedSurvey.value,
+                // hint: Text(
+                //   DateFormat("yyyy-MM-dd h:mma").format(_dateTime).toLowerCase() +
+                //       " " +
+                //       'result_time'.tr,
+                //   textAlign: TextAlign.center,
+                //   style: TextStyle(
+                //     color: Colors.black,
+                //     fontSize: 14,
+                //     fontFamily: 'Pretendard',
+                //     fontWeight: FontWeight.w600,
+                //   ),
+                // ),
+                items: dropdownItems,
+                focusColor: Colors.white,
+                onChanged: (newValue) async {
+                  print("[DEBUG]`onchanged start");
+                  if (newValue == null) return;
+                  if (!mounted) return; // 혹시 모를 경우 체크
+                  selectedSurvey.value = newValue;
+                  print("[DEBUG]`selectedSurvey.value : ${selectedSurvey.value
+                  }");
+                  isLoading.value = true; // 로딩 시작
+
+                  print("[DEBUG]`isLoading.value : ${isLoading.value}");
+                  if (selectedSurvey.value!.onlysurvey) {
+
+                    print("[DEBUG]`before fetchSurveyResult");
+                    await fetchSurveyResult(selectedSurvey.value!.surveyId);
+                  } else {
+                    print("[DEBUG]`before getSkinDataList");
+                    _skindatalist =
+                        await getSkinDataList(selectedSurvey.value!.surveyId);
+
+                    print("[DEBUG]`before  _resultService.handleSkinDataIsNewer");
+                    await _resultService
+                        .handleSkinDataIsNewer(_skindatalist[0]);
+                  }
+                  isLoading.value = false; // 로딩 종료
+                },
               ),
-              items: dropdownItems,
-              focusColor: Colors.white,
-              onChanged: (newValue) async {
-                setState(() {
-                  isLoading = true; // 로딩 시작
-                });
-                selectedSurvey = newValue;
-                if(selectedSurvey!.onlysurvey){
-                  await fetchSurveyResult(selectedSurvey!.surveyId);
-                }else{
-                  _skindatalist = await getSkinDataList(selectedSurvey!
-                      .surveyId);
-                  await _resultService.handleSkinDataIsNewer(_skindatalist[0]);
-                }
-                setState(() {
-                  isLoading = false; // 로딩 종료
-                  print("setstate");
-                });
-              },
             ),
           ] else ...[
             Text(
@@ -224,7 +239,7 @@ class _SkinResultState extends State<SkinResult> {
               alignment: Alignment.center, // 컨테이너 내부 텍스트를 중앙 정렬
               child: Text.rich(
                 TextSpan(
-                  text: resultcontroller.survey_id.value,
+                  text: selectedSurvey.value!.surveyId,
                   style: TextStyle(
                     color: Color(0xFF49A85E),
                     fontSize: 20,
@@ -498,20 +513,19 @@ Widget resultContent(resultcontroller) {
           ),
         ),
         const SizedBox(height: 32),
-
-        if(resultcontroller.skinResultContent.length >2)
-        Container(
-          child: Text(
-            resultcontroller.skinResultContent[2],
-            textAlign: TextAlign.left,
-            style: TextStyle(
-              color: Color(0xFF7D7D7D),
-              fontSize: 16,
-              fontFamily: 'Pretendard',
-              fontWeight: FontWeight.w400,
+        if (resultcontroller.skinResultContent.length > 2)
+          Container(
+            child: Text(
+              resultcontroller.skinResultContent[2],
+              textAlign: TextAlign.left,
+              style: TextStyle(
+                color: Color(0xFF7D7D7D),
+                fontSize: 16,
+                fontFamily: 'Pretendard',
+                fontWeight: FontWeight.w400,
+              ),
             ),
           ),
-        ),
       ],
     ),
   );
@@ -867,7 +881,7 @@ matchIngredient(resultcontroller) {
 
   // Return the whole structure wrapped in a Container and Column
   return Container(
-    margin: EdgeInsets.fromLTRB(200, 0, 200, 0),
+    margin: EdgeInsets.fromLTRB(150, 0, 150, 0),
     child: Column(
       children: listWidgets,
     ),

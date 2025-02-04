@@ -1,3 +1,4 @@
+import 'package:basup_ver2/controller/authcontroller.dart';
 import 'package:basup_ver2/design/textstyle.dart';
 import 'package:basup_ver2/pages/index.dart';
 import 'package:flutter/material.dart';
@@ -165,7 +166,16 @@ showResultdialog(userid) {
                     ),
                   ),
                   onTap: () {
-                    Get.offAll(Index());
+
+                    // 로그인 상태를 GetX의 AuthController로 확인
+                    final authController = Get.find<AuthController>();
+                    if (!authController.isLoggedIn.value) {
+                      // 로그인이 되어있지 않다면 "/" 라우트로 이동
+                      Get.offAllNamed('/');
+                    } else {
+                      // 로그인이 되어 있다면 Index 페이지로 이동
+                      Get.offAll(Index());
+                    }
                   },
                 ),
               ),

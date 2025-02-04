@@ -13,6 +13,7 @@ import 'package:basup_ver2/pages/index.dart';
 import 'package:basup_ver2/pages/skinresult.dart';
 import 'package:basup_ver2/pages/submitloading.dart';
 import 'package:basup_ver2/pages/surveyshortform.dart';
+import 'package:basup_ver2/service/authmiddleware.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -135,7 +136,7 @@ class _SelectFormState extends State<SelectForm> {
         // 에러 시 shortform 이동
         GetPage(
           name: '/shortform',
-          page: () => AuthGuard(child: ShortForm()),
+          page: () =>  ShortForm(), middlewares: [AuthMiddleware()],
         );
       }
     } catch (e) {

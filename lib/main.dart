@@ -1,3 +1,4 @@
+import 'package:basup_ver2/controller/authcontroller.dart';
 import 'package:basup_ver2/controller/localecontroller.dart';
 import 'package:basup_ver2/controller/resultcontroller.dart';
 import 'package:basup_ver2/controller/sizecontroller.dart';
@@ -13,6 +14,7 @@ import 'package:basup_ver2/pages/skinresult.dart';
 import 'package:basup_ver2/pages/skinscope.dart';
 import 'package:basup_ver2/pages/surveyselectform.dart';
 import 'package:basup_ver2/pages/surveyshortform.dart';
+import 'package:basup_ver2/service/authmiddleware.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -38,6 +40,7 @@ Future<void> main() async {
   var surveyController = Get.put(SurveyController(), tag: "survey");
   var sizeController = Get.put(SizeController(), tag: "size");
   var resultController = Get.put(ResultController(), tag: "result");
+  var authcontroller = Get.put(AuthController(), permanent: true);
 
   var type = "initial";
   surveyController.readyforSheet(type);
@@ -65,14 +68,14 @@ class MyApp extends StatelessWidget {
         // initialRoute: '/',
         getPages: [
           GetPage(name: '/', page: () =>  LoginScreen()),
-          GetPage(name: '/index', page: () => AuthGuard(child: Index())),
-          GetPage(name: '/survey', page: () =>  UserInfo()),
-          GetPage(name: '/machine', page: () => AuthGuard(child:  SkinMachine
-            ())),
+          GetPage(name: '/index', page: () => Index(), middlewares: [AuthMiddleware()]),
+          GetPage(name: '/survey', page: () =>  UserInfo(), middlewares: [AuthMiddleware()]),
+          GetPage(name: '/machine', page: () => SkinMachine
+            (), middlewares: [AuthMiddleware()]),
           GetPage(name: '/scope', page: () => SkinScope()),
-          GetPage(name: '/result', page: () => AuthGuard(child: SkinResult())),
-          GetPage(name: '/shortform', page : ()=> AuthGuard(child: ShortForm
-            ())),
+          GetPage(name: '/result', page: () => SkinResult(), middlewares: [AuthMiddleware()]),
+          GetPage(name: '/shortform', page : ()=> ShortForm
+            (), middlewares: [AuthMiddleware()]),
           // Add other routes as needed
         ],
     );

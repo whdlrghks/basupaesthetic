@@ -44,10 +44,14 @@ class _SkinScopeState extends State<SkinScope> {
   RxList<html.File> rightUvFiles = <html.File>[].obs;
 
   @override
-  Future<void> initState() async {
+  void initState() {
     // TODO: implement initState
     super.initState();
 
+    _initializeData();
+  }
+
+  void _initializeData() async {
     resultcontroller.initscope();
 
     final userid = Get.parameters['userid'] ?? '';
@@ -55,8 +59,9 @@ class _SkinScopeState extends State<SkinScope> {
 
     final survey_id = Get.parameters['survey_id'] ?? '';
     resultcontroller.survey_id.value = survey_id;
-    await _fetchSurveyData(survey_id);
 
+    // 비동기 작업 실행
+    await _fetchSurveyData(survey_id);
   }
   // // Function to open the camera and set the file
   // void openCamera(void Function(html.File) setFile, _flag) {
@@ -358,58 +363,79 @@ class _SkinScopeState extends State<SkinScope> {
     List<String> uploadTypes = [];
     List<Future<String>> uploadTasks = [];
 
-    void addUploadTask(html.File? file, String type, String basePath) {
+    // 로그: 각 파일 리스트의 길이 출력
+    print("=== 업로드 시작 ===");
+    print("leftLedFiles count: ${leftLedFiles.length}");
+    print("rightLedFiles count: ${rightLedFiles.length}");
+    print("headLedFiles count: ${headLedFiles.length}");
+    print("leftUvFiles count: ${leftUvFiles.length}");
+    print("rightUvFiles count: ${rightUvFiles.length}");
+    print("headUvFiles count: ${headUvFiles.length}");
+
+    // 업로드 태스크 추가 함수
+    void addUploadTask(html.File? file, String type, String basePath, int idx) {
       if (file != null) {
-        String uploadPath = "images/$user_id/$basePath/${user_id}_$now.jpg";
+        // 각 파일의 이름도 로그로 출력 (dart:html의 File 객체는 .name 프로퍼티가 있음)
+        print("Adding upload task - type: $type, file name: ${file.name}");
+        String uploadPath = "images/$user_id/$basePath/${user_id}_${now}_${idx}"
+            ".jpg";
         uploadTasks.add(uploadFileAndRetrieveURL(file, uploadPath));
         uploadTypes.add(type);
       }
     }
 
-    // 2) [다중 업로드] RxList 항목들을 업로드 등록
-    // 예: Left LED (다중)
+    // (1) Left LED (다중)
     for (int i = 0; i < leftLedFiles.length; i++) {
       final file = leftLedFiles[i];
-      // 구분을 위해 type을 'left_led_$i'로 지정
-      addUploadTask(file, 'left_led_$i', 'leftLed');
+      print("leftLedFiles[$i]: ${file.name}");
+      addUploadTask(file, 'left_led_$i', 'leftLed',i);
     }
 
-    // Right LED (다중)
+    // (2) Right LED (다중)
     for (int i = 0; i < rightLedFiles.length; i++) {
       final file = rightLedFiles[i];
-      addUploadTask(file, 'right_led_$i', 'rightLed');
+      print("rightLedFiles[$i]: ${file.name}");
+      addUploadTask(file, 'right_led_$i', 'rightLed',i);
     }
 
-    // Head LED (다중)
+    // (3) Head LED (다중)
     for (int i = 0; i < headLedFiles.length; i++) {
       final file = headLedFiles[i];
-      addUploadTask(file, 'head_led_$i', 'headLed');
+      print("headLedFiles[$i]: ${file.name}");
+      addUploadTask(file, 'head_led_$i', 'headLed',i);
     }
 
-    // Left UV (다중)
+    // (4) Left UV (다중)
     for (int i = 0; i < leftUvFiles.length; i++) {
       final file = leftUvFiles[i];
-      addUploadTask(file, 'left_uv_$i', 'leftUv');
+      print("leftUvFiles[$i]: ${file.name}");
+      addUploadTask(file, 'left_uv_$i', 'leftUv',i);
     }
 
-    // Right UV (다중)
+    // (5) Right UV (다중)
     for (int i = 0; i < rightUvFiles.length; i++) {
       final file = rightUvFiles[i];
-      addUploadTask(file, 'right_uv_$i', 'rightUv');
+      print("rightUvFiles[$i]: ${file.name}");
+      addUploadTask(file, 'right_uv_$i', 'rightUv',i);
     }
 
-    // Head UV (다중)
+    // (6) Head UV (다중)
     for (int i = 0; i < headUvFiles.length; i++) {
       final file = headUvFiles[i];
-      addUploadTask(file, 'head_uv_$i', 'headUv');
+      print("headUvFiles[$i]: ${file.name}");
+      addUploadTask(file, 'head_uv_$i', 'headUv',i);
     }
-    try {
-      print("try");
-      // 3) 모든 업로드 병렬 실행
-      List<String> urls = await Future.wait(uploadTasks);
-      // urls 길이 == uploadTasks 길이 == uploadTypes 길이
 
-      // 예: 여러 장 URL을 임시 저장할 리스트들
+    // 전체 업로드 태스크 개수 로그 출력
+    print("Total upload tasks: ${uploadTasks.length}");
+
+    try {
+      print("업로드 시작: Future.wait() 호출");
+      // 모든 업로드 병렬 실행
+      List<String> urls = await Future.wait(uploadTasks);
+      print("모든 업로드 완료. 업로드된 URL 개수: ${urls.length}");
+
+      // 각 URL을 타입별로 분류
       List<String> leftLedUrls = [];
       List<String> rightLedUrls = [];
       List<String> headLedUrls = [];
@@ -417,14 +443,12 @@ class _SkinScopeState extends State<SkinScope> {
       List<String> rightUvUrls = [];
       List<String> headUvUrls = [];
 
-      // 4) 업로드 완료 후, 각 URL을 타입별로 분류
       for (int i = 0; i < urls.length; i++) {
         final url = urls[i];
         final t = uploadTypes[i];
         print("업로드 완료: type=$t, url=$url");
 
         if (t.startsWith("left_led_")) {
-          // leftLedFiles에 해당하는 다중 URL
           leftLedUrls.add(url);
         } else if (t.startsWith("right_led_")) {
           rightLedUrls.add(url);
@@ -436,15 +460,14 @@ class _SkinScopeState extends State<SkinScope> {
           rightUvUrls.add(url);
         } else if (t.startsWith("head_uv_")) {
           headUvUrls.add(url);
-        }
-        // 단일 파일 (기존)인 경우
-        else if (t == 'single_left_led') {
+        } else if (t == 'single_left_led') {
           resultcontroller.left_led = url;
         } else if (t == 'single_right_led') {
           resultcontroller.right_led = url;
         }
       }
-      print("finish");
+
+      // 결과값을 resultcontroller에 저장
       resultcontroller.left_led_list = leftLedUrls;
       resultcontroller.right_led_list = rightLedUrls;
       resultcontroller.head_led_list = headLedUrls;
@@ -452,7 +475,9 @@ class _SkinScopeState extends State<SkinScope> {
       resultcontroller.right_uv_list = rightUvUrls;
       resultcontroller.head_uv_list = headUvUrls;
 
-      resultcontroller.scope_id = user_id+"_"+survey_id+"_"+now.toString();
+      resultcontroller.scope_id = user_id + "_" + survey_id + "_" + now.toString();
+      print("생성된 scope_id: ${resultcontroller.scope_id}");
+
 
       print("resultcontroller.scope_id");
       await createSkinScope(resultcontroller);
