@@ -7,7 +7,9 @@ import 'package:basup_ver2/component/surveytitle.dart';
 import 'package:basup_ver2/controller/httpscontroller.dart';
 import 'package:basup_ver2/controller/resultcontroller.dart';
 import 'package:basup_ver2/controller/sizecontroller.dart';
+import 'package:basup_ver2/design/value.dart';
 import 'package:basup_ver2/pages/surveyshortform.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:basup_ver2/pages/dialog.dart';
@@ -42,11 +44,18 @@ class _SkinScopeState extends State<SkinScope> {
   RxList<html.File> rightUvFiles = <html.File>[].obs;
 
   @override
-  void initState() {
+  Future<void> initState() async {
     // TODO: implement initState
     super.initState();
 
     resultcontroller.initscope();
+
+    final userid = Get.parameters['userid'] ?? '';
+    resultcontroller.user_id.value = userid;
+
+    final survey_id = Get.parameters['survey_id'] ?? '';
+    resultcontroller.survey_id.value = survey_id;
+    await _fetchSurveyData(survey_id);
 
   }
   // // Function to open the camera and set the file
@@ -213,17 +222,43 @@ class _SkinScopeState extends State<SkinScope> {
     var userAgent = html.window.navigator.userAgent.toString().toLowerCase();
     return userAgent.contains("iphone") || userAgent.contains("android");
   }
+  /// Firestore에서 survey_id에 해당하는 데이터를 조회하여
+  /// aestheticId, age, name, sex, user_id 값을 resultcontroller에 저장하는 함수
+  Future<void> _fetchSurveyData(String surveyId) async {
+    try {
+      // 'surveys' 컬렉션에서 survey_id가 일치하는 문서를 검색
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('surveys') // 실제 컬렉션 이름으로 변경 필요
+          .where('survey_id', isEqualTo: surveyId)
+          .limit(1)
+          .get();
+
+      if (snapshot.docs.isNotEmpty) {
+        // 첫 번째 문서의 데이터를 Map<String, dynamic>로 가져옴
+        final data = snapshot.docs.first.data() as Map<String, dynamic>;
+
+        // Firestore에서 가져온 데이터를 resultcontroller에 저장
+        resultcontroller.aestheticId.value = data['aestheticId'];
+        resultcontroller.age.value = data['age'];
+        resultcontroller.name.value = data['name'];
+        // 만약 resultcontroller에 gender 대신 sex 변수가 있다면 그대로 저장하고,
+        // 아니라면 Gender enum으로 변환하는 등 적절히 조정하세요.
+        resultcontroller.gender.value = (data['sex'] == "M") ? Gender.M :
+        Gender.W;
+        resultcontroller.user_id.value = data['user_id'];
+      } else {
+        print("No survey data found for survey_id: $surveyId");
+      }
+    } catch (error) {
+      print("Error fetching survey data: $error");
+    }
+  }
 
 
 
   @override
   Widget build(BuildContext context) {
 
-    final userid = Get.parameters['userid'] ?? '';
-    resultcontroller.user_id.value = userid;
-
-    final survey_id = Get.parameters['survey_id'] ?? '';
-    resultcontroller.survey_id.value = survey_id;
     return Scaffold(
       body: SingleChildScrollView(
           child: Column(
