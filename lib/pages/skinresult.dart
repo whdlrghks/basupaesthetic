@@ -453,7 +453,7 @@ Widget resultContent(resultcontroller) {
             itemBuilder: (context, index) {
               return ListTile(
                 title: Text(
-                  resultcontroller.skinResultWebContent[index],
+                  resultcontroller.skinResultWebContent[index].replaceAll(r"\n", "\n"),
                   textAlign: TextAlign.left,
                   style: TextStyle(
                     color: Color(0xFF7D7D7D),
@@ -489,7 +489,7 @@ Widget resultContent(resultcontroller) {
         ),
         Container(
           child: Text(
-            resultcontroller.skinResultContent[0],
+            resultcontroller.skinResultContent[0].replaceAll(r"\n", "\n"),
             textAlign: TextAlign.left,
             style: TextStyle(
               color: Color(0xFF7D7D7D),
@@ -502,7 +502,7 @@ Widget resultContent(resultcontroller) {
         const SizedBox(height: 32),
         Container(
           child: Text(
-            resultcontroller.skinResultContent[1],
+            resultcontroller.skinResultContent[1].replaceAll(r"\n", "\n"),
             textAlign: TextAlign.left,
             style: TextStyle(
               color: Color(0xFF7D7D7D),
@@ -516,7 +516,7 @@ Widget resultContent(resultcontroller) {
         if (resultcontroller.skinResultContent.length > 2)
           Container(
             child: Text(
-              resultcontroller.skinResultContent[2],
+              resultcontroller.skinResultContent[2].replaceAll(r"\n", "\n"),
               textAlign: TextAlign.left,
               style: TextStyle(
                 color: Color(0xFF7D7D7D),
