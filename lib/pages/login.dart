@@ -1,4 +1,5 @@
 import 'package:basup_ver2/component/languagepickerwidget.dart';
+import 'package:basup_ver2/controller/authcontroller.dart';
 import 'package:basup_ver2/controller/localecontroller.dart';
 import 'package:basup_ver2/controller/resultcontroller.dart';
 import 'package:basup_ver2/controller/sessionmanager.dart';
@@ -22,6 +23,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   // GetX Controller
   final resultController = Get.find<ResultController>(tag: "result");
+
+  final authController = Get.find<AuthController>();
 
   @override
   void initState() {
@@ -81,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // SharedPreferences에 loginId 저장 (필요 시)
         await _saveLoginId(shopId);
-
+        authController.checkLoginStatus();
         // 메인 페이지 혹은 리스트 페이지로 이동
         Get.offAll(CustomersListPage(aestheticId: shopId));
       } else {

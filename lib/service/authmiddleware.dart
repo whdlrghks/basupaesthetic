@@ -10,6 +10,7 @@ class AuthMiddleware extends GetMiddleware {
   @override
   RouteSettings? redirect(String? route) {
     final authController = Get.find<AuthController>();
+    print("AuthMiddleware: 현재 isLoggedIn 값 = ${authController.isLoggedIn.value}, 현재 route = $route");
     if (!authController.isLoggedIn.value) {
       // 로그인하지 않은 경우 '/login' 페이지로 리다이렉트
       return const RouteSettings(name: '/login');
