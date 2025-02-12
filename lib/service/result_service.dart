@@ -294,6 +294,10 @@ class ResultService {
     resultController.type.value = finalSkintype;
 
     await createUserDocument(resultController: resultController, onlysurvey: false);
+    await getLatestSurveyFromUsers(
+        resultController,
+        resultController.name.value,
+        resultController.aestheticId.value)
     await fetchWebSkinTypeResult(finalSkintype);
     await fetchWebSkinResult(finalSkintype);
   }
