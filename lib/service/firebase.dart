@@ -131,6 +131,38 @@ Future<List<Map<String, dynamic>>> getSkinDataList(String surveyId) async {
 
 
 
+Future<List<Map<String, dynamic>>> getBeforeSkinDataList(String surveyId,
+    String date)
+async {
+  final query = await FirebaseFirestore.instance
+      .collection('survey_id_skin_data')
+      .where('survey_id', isEqualTo: surveyId)
+      .get();
+  // Firestore에서 가져온 문서들을 Map 형식으로 변환
+  final docs = query.docs.map((doc) => doc.data()).toList();
+  print("skindata docs");
+  print(docs);
+
+  // 전달받은 date 문자열을 DateTime으로 변환 (예: "2025-02-12 14:56:11.772")
+  final cutoff = DateTime.parse(date);
+
+  // cutoff 이전의 date를 가진 문서들만 필터링
+  final filteredDocs = docs.where((doc) {
+    final docDate = DateTime.parse(doc['date']);
+    return docDate.isBefore(cutoff);
+  }).toList();
+
+  // 내림차순 정렬: 가장 최근의 문서가 맨 앞에 오도록
+  filteredDocs.sort((a, b) {
+    final dateA = DateTime.parse(a['date']);
+    final dateB = DateTime.parse(b['date']);
+    return dateB.compareTo(dateA);
+  });
+
+  return filteredDocs;
+}
+
+
 Future<List<Map<String, dynamic>>> getMicroscopeList(String surveyId) async {
   final query = await FirebaseFirestore.instance
       .collection('skin_microscope_images')

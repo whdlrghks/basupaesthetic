@@ -25,6 +25,147 @@ class SurveyEachItem{
   @override
   int get hashCode => surveyId.hashCode ^ date.hashCode;
 }
+class SkinSurveyResult {
+  List<dynamic> cosIngredients;
+  List<dynamic> ingredient;
+  List<dynamic> detail;
+  List<String> routineContent;
+  List<String> routineKeyword;
+  List<String> skinResultWebContent;
+
+  List<String> skinResultContent;
+  List<List<String>> skinResultWebIngre;
+  int sensper;
+  int tightper;
+  int waterper;
+  int oilper;
+  int pigper;
+  String type;
+  List<String> tag;
+  List<bool> tagFlag;
+
+  SkinSurveyResult({
+    List<dynamic>? cosIngredients,
+    List<dynamic>? ingredient,
+    List<dynamic>? detail,
+    List<String>? routineContent,
+    List<String>? routineKeyword,
+    List<String>? skinResultWebContent,
+    List<List<String>>? skinResultWebIngre,
+    List<String>? skinResultContent,
+    int? sensper,
+    int? tightper,
+    int? waterper,
+    int? oilper,
+    int? pigper,
+    String? type,
+    List<String>? tag,
+    List<bool>? tagFlag,
+  })  : cosIngredients = cosIngredients ?? [],
+        ingredient = ingredient ?? [],
+        detail = detail ?? [],
+        routineContent = routineContent ?? [],
+        routineKeyword = routineKeyword ?? [],
+        skinResultWebContent = skinResultWebContent ?? [],
+        skinResultWebIngre = skinResultWebIngre ?? [],
+        skinResultContent = skinResultContent ?? [],
+        sensper = sensper ?? 0,
+        tightper = tightper ?? 0,
+        waterper = waterper ?? 0,
+        oilper = oilper ?? 0,
+        pigper = pigper ?? 0,
+        type = type ?? "",
+        tag = tag ?? [],
+        tagFlag = tagFlag ?? [];
+
+  /// Map의 키에 해당하는 값이 있으면 해당 필드를 업데이트합니다.
+  void updateFromMap(Map<String, dynamic> data) {
+    if (data.containsKey('cos_ingredients')) {
+      cosIngredients = List<dynamic>.from(data['cos_ingredients'] ?? []);
+    }
+    if (data.containsKey('ingredient')) {
+      ingredient = List<dynamic>.from(data['ingredient'] ?? []);
+    }
+    if (data.containsKey('detail')) {
+      detail = List<dynamic>.from(data['detail'] ?? []);
+    }
+    if (data.containsKey('routinecontent')) {
+      routineContent = List<String>.from(data['routinecontent'] ?? []);
+    }
+    if (data.containsKey('routinekeyword')) {
+      routineKeyword = List<String>.from(data['routinekeyword'] ?? []);
+    }
+    if (data.containsKey('skinResultWebContent')) {
+      skinResultWebContent = List<String>.from(data['skinResultWebContent'] ?? []);
+    }
+    if (data.containsKey('skinResultContent')) {
+      skinResultContent = List<String>.from(data['skinResultContent'] ?? []);
+    }
+    if (data.containsKey('skinResultWebIngre')) {
+      var temp = data['skinResultWebIngre'];
+      if (temp is List) {
+        skinResultWebIngre = temp.map<List<String>>((e) {
+          return List<String>.from(e);
+        }).toList();
+      }
+    }
+    if (data.containsKey('sensper')) {
+      sensper = data['sensper'] is int
+          ? data['sensper']
+          : int.tryParse(data['sensper'].toString()) ?? 0;
+    }
+    if (data.containsKey('tightper')) {
+      tightper = data['tightper'] is int
+          ? data['tightper']
+          : int.tryParse(data['tightper'].toString()) ?? 0;
+    }
+    if (data.containsKey('waterper')) {
+      waterper = data['waterper'] is int
+          ? data['waterper']
+          : int.tryParse(data['waterper'].toString()) ?? 0;
+    }
+    if (data.containsKey('oilper')) {
+      oilper = data['oilper'] is int
+          ? data['oilper']
+          : int.tryParse(data['oilper'].toString()) ?? 0;
+    }
+    if (data.containsKey('pigper')) {
+      pigper = data['pigper'] is int
+          ? data['pigper']
+          : int.tryParse(data['pigper'].toString()) ?? 0;
+    }
+    if (data.containsKey('type')) {
+      type = data['type']?.toString() ?? "";
+    }
+    if (data.containsKey('tag')) {
+      tag = List<String>.from(data['tag'] ?? []);
+    }
+    if (data.containsKey('tag_flag')) {
+      tagFlag = List<bool>.from(data['tag_flag'] ?? []);
+    }
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'cos_ingredients': cosIngredients,
+      'ingredient': ingredient,
+      'detail': detail,
+      'routinecontent': routineContent,
+      'routinekeyword': routineKeyword,
+      'skinResultWebContent': skinResultWebContent,
+      'skinResultWebIngre': skinResultWebIngre,
+      'skinResultContent' : skinResultContent,
+      'sensper': sensper,
+      'tightper': tightper,
+      'waterper': waterper,
+      'oilper': oilper,
+      'pigper': pigper,
+      'type': type,
+      'tag': tag,
+      'tag_flag': tagFlag,
+    };
+  }
+}
 
 class Customer {
   final String aestheticId;

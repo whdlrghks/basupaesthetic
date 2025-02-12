@@ -1,3 +1,4 @@
+
 import 'dart:ui';
 
 import 'package:basup_ver2/component/blankgap.dart';
@@ -49,6 +50,7 @@ class _SkinResultState extends State<SkinResult> {
   void dispose() {
     super.dispose();
   }
+
   @override
   void initState() {
     super.initState();
@@ -58,6 +60,32 @@ class _SkinResultState extends State<SkinResult> {
       // 예시: 설문 목록이 이미 날짜 순으로 정렬되어 있다면 첫 번째 항목 선택
       selectedSurvey.value = resultcontroller.surveylist.first;
       _dateTime = DateTime.parse(selectedSurvey.value!.date);
+      SkinSurveyResult newskindata = new SkinSurveyResult();
+      Map<String, dynamic> resultData1 = {
+        'cos_ingredients':
+        resultcontroller.cos_ingredients.value,
+        'ingredient': resultcontroller.ingredient.value,
+        'detail': resultcontroller.detail.value,
+        'routinecontent': resultcontroller.routinecontent.value,
+        'routinekeyword': resultcontroller.routinekeyword.value,
+        'skinResultContent' : resultcontroller
+            .skinResultContent,
+        'skinResultWebContent':
+        resultcontroller.skinResultWebContent,
+        'skinResultWebIngre':
+        resultcontroller.skinResultWebIngre,
+        'sensper': resultcontroller.sensper,
+        'tightper': resultcontroller.tightper,
+        'waterper': resultcontroller.waterper,
+        'oilper': resultcontroller.oilper,
+        'pigper': resultcontroller.pigper,
+        'type': resultcontroller.type.value,
+        'tag': resultcontroller.tag,
+        'tag_flag': resultcontroller.tag_flag,
+      };
+      newskindata.updateFromMap(resultData1);
+      resultcontroller.addSurveyResult(
+          selectedSurvey.value!, newskindata);
     } else {
       // 만약 설문 목록이 없으면 기본 날짜 값 설정 (또는 적절한 예외처리)
       _dateTime = DateTime.now();
@@ -84,7 +112,7 @@ class _SkinResultState extends State<SkinResult> {
       return DropdownMenuItem<SurveyEachItem>(
         value: survey,
         child: Text(
-          formattedDate + " " +'result_time'.tr,
+          formattedDate + " " + 'result_time'.tr,
           textAlign: TextAlign.center,
           style: TextStyle(
             color: Colors.black,
@@ -194,23 +222,88 @@ class _SkinResultState extends State<SkinResult> {
                   if (newValue == null) return;
                   if (!mounted) return; // 혹시 모를 경우 체크
                   selectedSurvey.value = newValue;
-                  print("[DEBUG]`selectedSurvey.value : ${selectedSurvey.value
-                  }");
+                  print(
+                      "[DEBUG]`selectedSurvey.value : ${selectedSurvey.value}");
                   isLoading.value = true; // 로딩 시작
 
                   print("[DEBUG]`isLoading.value : ${isLoading.value}");
-                  if (selectedSurvey.value!.onlysurvey) {
 
-                    print("[DEBUG]`before fetchSurveyResult");
-                    await fetchSurveyResult(selectedSurvey.value!.surveyId);
+                  if (resultcontroller.surveyItemList
+                          .containsKey(selectedSurvey.value) &&
+                      resultcontroller
+                          .surveyItemList[selectedSurvey.value]!.isNotEmpty) {
+                    // 해당 key에 대한 값이 존재하면, 해당 결과를 resultcontroller의 필드들에 적용
+                    resultcontroller
+                        .applySurveyResultForKey(selectedSurvey.value!);
                   } else {
-                    print("[DEBUG]`before getSkinDataList");
-                    _skindatalist =
-                        await getSkinDataList(selectedSurvey.value!.surveyId);
+                    if (selectedSurvey.value!.onlysurvey) {
+                      print("[DEBUG]`before fetchSurveyResult");
+                      await fetchSurveyResult(selectedSurvey.value!.surveyId);
+                      SkinSurveyResult newskindata = new SkinSurveyResult();
+                      Map<String, dynamic> resultData1 = {
+                        'cos_ingredients':
+                            resultcontroller.cos_ingredients.value,
+                        'ingredient': resultcontroller.ingredient.value,
+                        'detail': resultcontroller.detail.value,
+                        'routinecontent': resultcontroller.routinecontent.value,
+                        'routinekeyword': resultcontroller.routinekeyword.value,
+                        'skinResultContent' : resultcontroller
+                            .skinResultContent,
+                        'skinResultWebContent':
+                            resultcontroller.skinResultWebContent,
+                        'skinResultWebIngre':
+                            resultcontroller.skinResultWebIngre,
+                        'sensper': resultcontroller.sensper,
+                        'tightper': resultcontroller.tightper,
+                        'waterper': resultcontroller.waterper,
+                        'oilper': resultcontroller.oilper,
+                        'pigper': resultcontroller.pigper,
+                        'type': resultcontroller.type.value,
+                        'tag': resultcontroller.tag,
+                        'tag_flag': resultcontroller.tag_flag,
+                      };
+                      newskindata.updateFromMap(resultData1);
+                      resultcontroller.addSurveyResult(
+                          selectedSurvey.value, newskindata);
+                    } else {
+                      print("[DEBUG]`before getSkinDataList");
+                      print(selectedSurvey.value!.date);
+                      _skindatalist = await getBeforeSkinDataList(
+                          selectedSurvey.value!.surveyId,
+                          selectedSurvey.value!.date);
 
-                    print("[DEBUG]`before  _resultService.handleSkinDataIsNewer");
-                    await _resultService
-                        .handleSkinDataIsNewer(_skindatalist[0]);
+                      print(
+                          "[DEBUG]`before  _resultService.handleSkinDataIsNewer");
+                      await _resultService
+                          .handleSkinDataIsNewer(_skindatalist[0]);
+                      SkinSurveyResult tempskindata = new SkinSurveyResult();
+                      Map<String, dynamic> resultData2 = {
+                        'cos_ingredients':
+                            resultcontroller.cos_ingredients.value,
+                        'ingredient': resultcontroller.ingredient.value,
+                        'detail': resultcontroller.detail.value,
+                        'routinecontent': resultcontroller.routinecontent.value,
+                        'routinekeyword': resultcontroller.routinekeyword.value,
+                        'skinResultContent' : resultcontroller
+                            .skinResultContent,
+                        'skinResultWebContent':
+                            resultcontroller.skinResultWebContent,
+                        'skinResultWebIngre':
+                            resultcontroller.skinResultWebIngre,
+                        'sensper': resultcontroller.sensper,
+                        'tightper': resultcontroller.tightper,
+                        'waterper': resultcontroller.waterper,
+                        'oilper': resultcontroller.oilper,
+                        'pigper': resultcontroller.pigper,
+                        'type': resultcontroller.type.value,
+                        'tag': resultcontroller.tag,
+                        'tag_flag': resultcontroller.tag_flag,
+                      };
+                      tempskindata.updateFromMap(resultData2);
+
+                      resultcontroller.addSurveyResult(
+                          selectedSurvey.value, tempskindata);
+                    }
                   }
                   isLoading.value = false; // 로딩 종료
                 },
@@ -453,7 +546,8 @@ Widget resultContent(resultcontroller) {
             itemBuilder: (context, index) {
               return ListTile(
                 title: Text(
-                  resultcontroller.skinResultWebContent[index].replaceAll(r"\n", "\n"),
+                  resultcontroller.skinResultWebContent[index]
+                      .replaceAll(r"\n", "\n"),
                   textAlign: TextAlign.left,
                   style: TextStyle(
                     color: Color(0xFF7D7D7D),

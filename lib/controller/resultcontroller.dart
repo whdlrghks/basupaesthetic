@@ -1,3 +1,4 @@
+import 'package:basup_ver2/data/customer.dart';
 import 'package:basup_ver2/design/value.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -27,6 +28,8 @@ class ResultController extends GetxController {
   var type = "RNTD1De1".obs;
   var tag = ["수분", "탄력", "수분부족"];
   var tag_flag = [true, true, false];
+
+  Map<SurveyEachItem, List<SkinSurveyResult>> surveyItemList ={};
 
   var skinResultContent = [
     '부족한 유수분만 채워주면 피부톤도 고르고\n피부 노화 위험도 낮은 건강하고 이상적인 피부지만\n유수분이 부족해 잔주름이 쉽게 생길 수 있고\n건조하고 각질이 생길 수도 있는 피부예요!',
@@ -121,6 +124,7 @@ class ResultController extends GetxController {
      selectedDatecheck.value = false;
 
      surveylist = [];
+     surveyItemList = {};
   }
 
   initNewuser(){
@@ -137,6 +141,7 @@ class ResultController extends GetxController {
     selectedDatecheck.value = false;
 
     surveylist = [];
+    surveyItemList = {};
 
   }
 
@@ -178,6 +183,47 @@ class ResultController extends GetxController {
      corneous_machine_flag.value = false;
      blemishes_machine_flag.value = false;
      sebum_machine_flag.value = false;
+  }
+
+
+  void addSurveyResult(SurveyEachItem key, SkinSurveyResult newResult) {
+    if (surveyItemList.containsKey(key)) {
+      surveyItemList[key]!.add(newResult);
+    } else {
+      surveyItemList[key] = [newResult];
+    }
+  }
+
+  // ResultController 클래스 내에 추가할 함수
+  void applySurveyResultForKey(SurveyEachItem key) {
+    // 해당 key에 해당하는 SkinSurveyResult 리스트가 존재하고, 값이 있을 경우
+    if (surveyItemList.containsKey(key) && surveyItemList[key]!.isNotEmpty) {
+      // 최신 SkinSurveyResult를 선택 (리스트의 마지막 요소)
+      SkinSurveyResult result = surveyItemList[key]!.last;
+
+      // Rx 변수의 경우 .value로 업데이트
+      cos_ingredients.value = result.cosIngredients;
+      ingredient.value = result.ingredient;
+      detail.value = result.detail;
+      routinecontent.value = result.routineContent;
+      routinekeyword.value = result.routineKeyword;
+      type.value = result.type;
+
+      // Rx가 아닌 일반 변수들은 직접 할당
+      skinResultWebContent = result.skinResultWebContent;
+      skinResultWebIngre = result.skinResultWebIngre;
+
+      // 정수형 변수들도 직접 할당
+      sensper = result.sensper;
+      tightper = result.tightper;
+      waterper = result.waterper;
+      oilper = result.oilper;
+      pigper = result.pigper;
+
+      // 리스트 변수들도 직접 할당
+      tag = List.from(result.tag);
+      tag_flag = List.from(result.tagFlag);
+    }
   }
 
   setData(sens, tight, water,oil, pig){

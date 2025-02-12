@@ -3,9 +3,11 @@ import 'dart:math';
 import 'package:basup_ver2/controller/localecontroller.dart';
 import 'package:basup_ver2/controller/surveycontroller.dart';
 import 'package:basup_ver2/data/cosmeticdata.dart';
+import 'package:basup_ver2/data/customer.dart';
 import 'package:basup_ver2/design/value.dart';
 import 'package:basup_ver2/pages/dialog.dart';
 import 'package:basup_ver2/pages/skinresult.dart';
+import 'package:basup_ver2/service/firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -672,6 +674,10 @@ Future<void> createUserDocument(
     'user_id': documentName,
     'onlysurvey': onlysurvey,
   });
+  await getLatestSurveyFromUsers(
+      resultController,
+      name,
+      aestheticId);
   print('Document created with name: $documentName');
   return;
 }
@@ -816,6 +822,7 @@ fetchWebSkinResult(skincode) async {
     print('Skin Result Web Content: ${resultController.skinResultWebContent}');
     print(
         'Skin Result Web Ingredients: ${resultController.skinResultWebIngre}');
+
 
     return CODE_OK;
   } else {

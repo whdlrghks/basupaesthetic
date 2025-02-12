@@ -292,12 +292,13 @@ class ResultService {
     final latestDoc = newDocs[0];
     final finalSkintype = latestDoc['skintype'];
     resultController.type.value = finalSkintype;
+    await Future.delayed(Duration(milliseconds: 500));
 
     await createUserDocument(resultController: resultController, onlysurvey: false);
-    await getLatestSurveyFromUsers(
-        resultController,
-        resultController.name.value,
-        resultController.aestheticId.value)
+    // final newlist =await getLatestSurveyFromUsers(
+    //     resultController,
+    //     resultController.name.value,
+    //     resultController.aestheticId.value);
     await fetchWebSkinTypeResult(finalSkintype);
     await fetchWebSkinResult(finalSkintype);
   }
