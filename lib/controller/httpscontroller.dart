@@ -750,8 +750,8 @@ Future<void> createSkinScope(resultController) async {
     'date': date,
     'survey_id': survey_id,
   });
-  await createUserDocument(
-      resultController: resultController, onlysurvey: false);
+  // await createUserDocument(
+  //     resultController: resultController, onlysurvey: false);
   print('Document created with name: $scope_id');
   return;
 }
