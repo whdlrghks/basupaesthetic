@@ -40,17 +40,20 @@ class ResultService {
       print("No survey_id found in users collection");
       return;
     }
+    final microscopeList = await getMicroscopeList(surveyId);
 
     // onlySurvey == true면, 마이크로스코프나 머신데이터 없이 설문 결과만 처리
+
     final onlySurvey = latestSurveyMap['onlysurvey'] == true;
     if (onlySurvey) {
-      await fetchOnlySurveyResult(surveyId);
-      return;
+      if (!microscopeList.isNotEmpty) {
+        await fetchOnlySurveyResult(surveyId);
+        return;
+      }
     }
 
     // (A) 설문 + 스킨데이터 + 마이크로스코프 모두 체크
     final skinDataList = await getSkinDataList(surveyId);
-    final microscopeList = await getMicroscopeList(surveyId);
 
     if (skinDataList.isNotEmpty) {
       final latestSkinDataDoc = skinDataList[0];
