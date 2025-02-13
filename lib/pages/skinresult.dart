@@ -1,4 +1,3 @@
-
 import 'dart:ui';
 
 import 'package:basup_ver2/component/blankgap.dart';
@@ -62,18 +61,14 @@ class _SkinResultState extends State<SkinResult> {
       _dateTime = DateTime.parse(selectedSurvey.value!.date);
       SkinSurveyResult newskindata = new SkinSurveyResult();
       Map<String, dynamic> resultData1 = {
-        'cos_ingredients':
-        resultcontroller.cos_ingredients.value,
+        'cos_ingredients': resultcontroller.cos_ingredients.value,
         'ingredient': resultcontroller.ingredient.value,
         'detail': resultcontroller.detail.value,
         'routinecontent': resultcontroller.routinecontent.value,
         'routinekeyword': resultcontroller.routinekeyword.value,
-        'skinResultContent' : resultcontroller
-            .skinResultContent,
-        'skinResultWebContent':
-        resultcontroller.skinResultWebContent,
-        'skinResultWebIngre':
-        resultcontroller.skinResultWebIngre,
+        'skinResultContent': resultcontroller.skinResultContent,
+        'skinResultWebContent': resultcontroller.skinResultWebContent,
+        'skinResultWebIngre': resultcontroller.skinResultWebIngre,
         'sensper': resultcontroller.sensper,
         'tightper': resultcontroller.tightper,
         'waterper': resultcontroller.waterper,
@@ -84,8 +79,7 @@ class _SkinResultState extends State<SkinResult> {
         'tag_flag': resultcontroller.tag_flag,
       };
       newskindata.updateFromMap(resultData1);
-      resultcontroller.addSurveyResult(
-          selectedSurvey.value!, newskindata);
+      resultcontroller.addSurveyResult(selectedSurvey.value!, newskindata);
     } else {
       // 만약 설문 목록이 없으면 기본 날짜 값 설정 (또는 적절한 예외처리)
       _dateTime = DateTime.now();
@@ -142,7 +136,7 @@ class _SkinResultState extends State<SkinResult> {
                 : Stack(
                     children: [
                       Positioned(
-                        top: 0,
+                        top: 30,
                         left: 0,
                         right: 0,
                         bottom: 0,
@@ -150,20 +144,59 @@ class _SkinResultState extends State<SkinResult> {
                           BlankTopGap(controller),
                           title(resultcontroller),
                           BlankBetweenTitleContent(controller),
-
-                          Row(
-                            children: [
-                              Expanded(
-                                child: skintitle(resultcontroller, descript),
-                              ),
-                              Expanded(
-                                child: resultData(controller, resultcontroller),
-                              ),
-                            ],
+                          // Container(
+                          //
+                          //   margin: EdgeInsets.fromLTRB(150, 50, 150, 0),
+                          //   child: Row(
+                          //     mainAxisAlignment: MainAxisAlignment.center,
+                          //     children: [
+                          //       // Expanded(
+                          //       //   child:
+                          //       skintitle(resultcontroller, descript),
+                          //       // ),
+                          //       // Expanded(
+                          //       //   child:
+                          //       resultData(controller, resultcontroller),
+                          //       // ),
+                          //     ],
+                          //   ),
+                          // ),
+                          LayoutBuilder(
+                            builder: (context, constraints) {
+                              // 예: 너비가 600픽셀 미만이면 Column, 그 이상이면 Row로 표시
+                              if (constraints.maxWidth < 800) {
+                                return Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    skintitle(resultcontroller, descript),
+                                    SizedBox(height: 16),
+                                    resultData(controller, resultcontroller),
+                                  ],
+                                );
+                              } else {
+                                return Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    skintitle(resultcontroller, descript),
+                                    SizedBox(width: 16),
+                                    resultData(controller, resultcontroller),
+                                  ],
+                                );
+                              }
+                            },
                           ),
                           resultContent(resultcontroller),
                           // careRoutine(controller, resultcontroller),
-                          matchIngredient(resultcontroller),
+                LayoutBuilder(
+                    builder: (context, constraints) {
+                      // 예: 너비가 600픽셀 미만이면 Column, 그 이상이면 Row로 표시
+                      if (constraints.maxWidth < 800) {
+                        return matchIngredientColumn(resultcontroller);
+                      } else {
+                        return matchIngredient(resultcontroller);
+                      }
+                    }),
+                          // matchIngredient(resultcontroller),
                           // recommendProduct(resultcontroller),
                         ]),
                       ),
@@ -247,8 +280,7 @@ class _SkinResultState extends State<SkinResult> {
                         'detail': resultcontroller.detail.value,
                         'routinecontent': resultcontroller.routinecontent.value,
                         'routinekeyword': resultcontroller.routinekeyword.value,
-                        'skinResultContent' : resultcontroller
-                            .skinResultContent,
+                        'skinResultContent': resultcontroller.skinResultContent,
                         'skinResultWebContent':
                             resultcontroller.skinResultWebContent,
                         'skinResultWebIngre':
@@ -284,8 +316,7 @@ class _SkinResultState extends State<SkinResult> {
                         'detail': resultcontroller.detail.value,
                         'routinecontent': resultcontroller.routinecontent.value,
                         'routinekeyword': resultcontroller.routinekeyword.value,
-                        'skinResultContent' : resultcontroller
-                            .skinResultContent,
+                        'skinResultContent': resultcontroller.skinResultContent,
                         'skinResultWebContent':
                             resultcontroller.skinResultWebContent,
                         'skinResultWebIngre':
@@ -332,7 +363,8 @@ class _SkinResultState extends State<SkinResult> {
               alignment: Alignment.center, // 컨테이너 내부 텍스트를 중앙 정렬
               child: Text.rich(
                 TextSpan(
-                  text: selectedSurvey.value!.surveyId,
+                  // text: selectedSurvey.value!.surveyId,
+                  text: "",
                   style: TextStyle(
                     color: Color(0xFF49A85E),
                     fontSize: 20,
@@ -522,25 +554,33 @@ Widget skinDescription(descript) {
 Widget resultContent(resultcontroller) {
   print(resultcontroller.skinResultWebContent);
   return Container(
-    margin: EdgeInsets.fromLTRB(150, 50, 150, 0),
+    margin: EdgeInsets.fromLTRB(50, 50, 50, 0),
     child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Container(
-          margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
-          child: Text(
-            "expert_opinion".tr,
-            textAlign: TextAlign.left,
-            style: TextStyle(
-              color: Color(0xFF7D7D7D),
-              fontSize: 18,
-              fontFamily: 'Pretendard',
-              fontWeight: FontWeight.w700,
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: 980, // 부모가 450보다 크면 최대 450으로 제한
+          ),
+          child: Container(
+            // constraints: BoxConstraints(maxWidth: 840),
+            margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
+            child: Text(
+              "expert_opinion".tr,
+              textAlign: TextAlign.left,
+              style: TextStyle(
+                color: Color(0xFF7D7D7D),
+                fontSize: 18,
+                fontFamily: 'Pretendard',
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ),
         Container(
-          height: 450,
+          constraints: BoxConstraints(maxWidth: 980),
+          height: 600,
           child: ListView.builder(
             itemCount: resultcontroller.skinResultWebContent.length,
             itemBuilder: (context, index) {
@@ -569,6 +609,7 @@ Widget resultContent(resultcontroller) {
         ),
         const SizedBox(height: 32),
         Container(
+          constraints: BoxConstraints(maxWidth: 980),
           margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
           child: Text(
             "skin_type_description".tr,
@@ -582,6 +623,7 @@ Widget resultContent(resultcontroller) {
           ),
         ),
         Container(
+          constraints: BoxConstraints(maxWidth: 980),
           child: Text(
             resultcontroller.skinResultContent[0].replaceAll(r"\n", "\n"),
             textAlign: TextAlign.left,
@@ -595,6 +637,7 @@ Widget resultContent(resultcontroller) {
         ),
         const SizedBox(height: 32),
         Container(
+          constraints: BoxConstraints(maxWidth: 980),
           child: Text(
             resultcontroller.skinResultContent[1].replaceAll(r"\n", "\n"),
             textAlign: TextAlign.left,
@@ -609,6 +652,7 @@ Widget resultContent(resultcontroller) {
         const SizedBox(height: 32),
         if (resultcontroller.skinResultContent.length > 2)
           Container(
+            constraints: BoxConstraints(maxWidth: 980),
             child: Text(
               resultcontroller.skinResultContent[2].replaceAll(r"\n", "\n"),
               textAlign: TextAlign.left,
@@ -950,12 +994,14 @@ matchIngredient(resultcontroller) {
     // Make sure not to exceed the detail list's bounds
     if (i + 1 < resultcontroller.detail.length) {
       listWidgets.add(
-        Row(children: [
-          Expanded(
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Container(
+            // Expanded(
             child: matchIngredientComment(
                 resultcontroller.ingredient[i], resultcontroller.detail[i]),
           ),
-          Expanded(
+          // Expanded(
+          Container(
             child: matchIngredientComment(resultcontroller.ingredient[i + 1],
                 resultcontroller.detail[i + 1]),
           ),
@@ -975,8 +1021,69 @@ matchIngredient(resultcontroller) {
 
   // Return the whole structure wrapped in a Container and Column
   return Container(
-    margin: EdgeInsets.fromLTRB(150, 0, 150, 0),
+    margin: EdgeInsets.fromLTRB(30, 0, 30, 0),
     child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: listWidgets,
+    ),
+  );
+}
+
+
+matchIngredientColumn(resultcontroller) {
+  // Initialize an empty list of widgets that will contain all our dynamic widgets
+  List<Widget> listWidgets = [];
+
+  // Start with adding a top spacer and titles
+  listWidgets.addAll([
+    Container(height: 25),
+    ResultTitle("matched_ingredients".tr),
+    careSubtitle(
+        "prescription_ingredients_title".tr,
+        " ",
+        "ingredients_benef"
+            "it"
+            .tr),
+    Container(height: 25),
+  ]);
+
+  // Dynamically add matchIngredientComment widgets based on ingredient list
+  for (int i = 0; i < 6; i++) {
+    // Make sure not to exceed the detail list's bounds
+    if (i + 1 < resultcontroller.detail.length) {
+      listWidgets.add(
+        Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Container(
+            // Expanded(
+            child: matchIngredientComment(
+                resultcontroller.ingredient[i], resultcontroller.detail[i]),
+          ),
+          // Expanded(
+          Container(
+            child: matchIngredientComment(resultcontroller.ingredient[i + 1],
+                resultcontroller.detail[i + 1]),
+          ),
+        ]),
+      );
+      i = i + 1;
+    } else if (i < resultcontroller.detail.length) {
+      listWidgets.add(
+        matchIngredientComment(
+            resultcontroller.ingredient[i], resultcontroller.detail[i]),
+      );
+    }
+  }
+
+  // Add a bottom spacer
+  listWidgets.add(Container(height: 25));
+
+  // Return the whole structure wrapped in a Container and Column
+  return Container(
+    margin: EdgeInsets.fromLTRB(30, 0, 30, 0),
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: listWidgets,
     ),
   );

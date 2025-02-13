@@ -23,14 +23,17 @@ Future<List<Customer>> searchCustomers(String aestheticId) async {
   for (var doc in querySnapshot.docs) {
     var data = doc.data() as Map<String, dynamic>;
     // Create a unique key based on customer identifiers
-    String customerKey = '${data['name']}_${data['age']}_${data['sex']}_${data['aestheticId']}';
+    String customerKey =
+        '${data['name']}_${data['age']}_${data['sex']}_${data['aestheticId']}';
 
     // If this customer group already exists, add the survey to it
     if (customerGroups.containsKey(customerKey)) {
       customerGroups[customerKey]!.surveys.add(
-        SurveyEachItem(date: data['date'], surveyId: data['survey_id'],
-            onlysurvey: data['onlysurvey']),
-      );
+            SurveyEachItem(
+                date: data['date'],
+                surveyId: data['survey_id'],
+                onlysurvey: data['onlysurvey']),
+          );
     } else {
       // Otherwise, create a new customer group with this survey
       customerGroups[customerKey] = Customer(
@@ -38,9 +41,14 @@ Future<List<Customer>> searchCustomers(String aestheticId) async {
         age: data['age'],
         name: data['name'],
         sex: data['sex'],
-        surveys: [SurveyEachItem(date: data['date'], surveyId: data['survey_id'],
-            onlysurvey: data['onlysurvey'])],
-        user_id: data['user_id'], // Assuming 'user_id' is how you identify the customer document
+        surveys: [
+          SurveyEachItem(
+              date: data['date'],
+              surveyId: data['survey_id'],
+              onlysurvey: data['onlysurvey'])
+        ],
+        user_id: data[
+            'user_id'], // Assuming 'user_id' is how you identify the customer document
       );
     }
   }
@@ -48,9 +56,12 @@ Future<List<Customer>> searchCustomers(String aestheticId) async {
   // Convert the map values to a list
   return customerGroups.values.toList();
 }
+
 class CustomersListPage extends StatefulWidget {
   final String aestheticId;
-  const CustomersListPage({Key? key, required this.aestheticId}) : super(key: key);
+
+  const CustomersListPage({Key? key, required this.aestheticId})
+      : super(key: key);
 
   @override
   State<CustomersListPage> createState() => _CustomersListPageState();
@@ -62,21 +73,21 @@ class _CustomersListPageState extends State<CustomersListPage> {
   final localeController = Get.find<LocaleController>();
 
   /// 페이징 관련 변수
-  final int _limit = 10;                // 한 번에 가져올 문서 수
-  DocumentSnapshot? _lastDoc;           // 마지막으로 가져온 문서
-  bool _isLoading = false;             // 현재 로딩 중인지
-  bool _hasMore = true;                // 더 가져올 데이터가 있는지 여부
+  final int _limit = 10; // 한 번에 가져올 문서 수
+  DocumentSnapshot? _lastDoc; // 마지막으로 가져온 문서
+  bool _isLoading = false; // 현재 로딩 중인지
+  bool _hasMore = true; // 더 가져올 데이터가 있는지 여부
 
   /// 실제 표시할 고객 리스트
   List<Customer> _customers = [];
 
   // ----- 검색 기능 추가 -----
-  bool _isSearching = false;  // 검색 모드인지 여부
+  bool _isSearching = false; // 검색 모드인지 여부
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
-    print("aestheticId -> "+ widget.aestheticId);
+    print("aestheticId -> " + widget.aestheticId);
     super.initState();
 
     // 1) 컨트롤러 초기화 (한 번만 실행)
@@ -89,6 +100,7 @@ class _CustomersListPageState extends State<CustomersListPage> {
     // 첫 페이지 로딩
     _loadNextPage();
   }
+
   /// Firestore에서 다음 페이지를 불러와 _customers에 이어붙임
   Future<void> _loadNextPage() async {
     print("_loadNextPage");
@@ -101,7 +113,7 @@ class _CustomersListPageState extends State<CustomersListPage> {
     Query query = FirebaseFirestore.instance
         .collection('users')
         .where('aestheticId', isEqualTo: widget.aestheticId)
-    // 페이징을 위해 반드시 정렬 기준이 있어야 함 (예: 이름으로 정렬)
+        // 페이징을 위해 반드시 정렬 기준이 있어야 함 (예: 이름으로 정렬)
         .orderBy('name', descending: false)
         .limit(_limit);
 
@@ -152,9 +164,11 @@ class _CustomersListPageState extends State<CustomersListPage> {
 
       if (customerGroups.containsKey(customerKey)) {
         customerGroups[customerKey]!.surveys.add(
-          SurveyEachItem(date: data['date'], surveyId: data['survey_id'],
-              onlysurvey: data['onlysurvey']),
-        );
+              SurveyEachItem(
+                  date: data['date'],
+                  surveyId: data['survey_id'],
+                  onlysurvey: data['onlysurvey']),
+            );
       } else {
         customerGroups[customerKey] = Customer(
           aestheticId: data['aestheticId'],
@@ -162,7 +176,9 @@ class _CustomersListPageState extends State<CustomersListPage> {
           name: data['name'],
           sex: data['sex'],
           surveys: [
-            SurveyEachItem(date: data['date'], surveyId: data['survey_id'],
+            SurveyEachItem(
+                date: data['date'],
+                surveyId: data['survey_id'],
                 onlysurvey: data['onlysurvey'])
           ],
           user_id: data['user_id'],
@@ -188,8 +204,7 @@ class _CustomersListPageState extends State<CustomersListPage> {
           .collection('users')
           .where('aestheticId', isEqualTo: widget.aestheticId)
           .orderBy('name')
-          .startAt([searchText])
-          .endAt([searchText + '\uf8ff']);
+          .startAt([searchText]).endAt([searchText + '\uf8ff']);
 
       final snap = await query.get();
       final docs = snap.docs;
@@ -221,7 +236,12 @@ class _CustomersListPageState extends State<CustomersListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('customers_list'.tr),
+        title: Text(
+          'customers_list'.tr,
+          style: TextStyle(
+            color: Colors.white, // 텍스트 흰색 지정
+          ),
+        ),
         backgroundColor: const Color(0xFF49A85E),
         actions: [
           // 검색 TextField
@@ -231,13 +251,22 @@ class _CustomersListPageState extends State<CustomersListPage> {
             child: TextField(
               controller: _searchController,
               textInputAction: TextInputAction.search,
-              style: TextStyle(fontSize: 14),
+              style: TextStyle(fontSize: 14,
+                color: Colors.white, ),
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.symmetric(horizontal: 8),
                 hintText: 'search_keyword'.tr, // 예: "검색어 입력"
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey),
+
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white),
                 ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white),
+                ),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white),
+                ),
+                hintStyle: TextStyle(color: Colors.white),
               ),
               onSubmitted: (value) {
                 final txt = value.trim();
@@ -249,7 +278,9 @@ class _CustomersListPageState extends State<CustomersListPage> {
           ),
           // 검색 버튼
           IconButton(
-            icon: Icon(Icons.search),
+            icon: Icon(Icons.search,
+              color: Colors.white, // 아이콘 흰색 지정
+            ),
             onPressed: () {
               final txt = _searchController.text.trim();
               if (txt.isNotEmpty) {
@@ -259,7 +290,9 @@ class _CustomersListPageState extends State<CustomersListPage> {
           ),
           // 리셋 버튼
           IconButton(
-            icon: Icon(Icons.clear),
+            icon: Icon(Icons.clear,
+              color: Colors.white, // 아이콘 흰색 지정
+            ),
             onPressed: _resetSearch,
           ),
         ],
@@ -269,17 +302,16 @@ class _CustomersListPageState extends State<CustomersListPage> {
         children: [
           // 고객 목록 표시 (고정 높이 or 그냥 Column + Wrap도 가능)
           Expanded(
-            // 대신 스크롤 없애려면 SingleChildScrollView를 안 쓰거나,
-            // 그냥 Expanded + ListView.builder의 physics를 NeverScrollableScrollPhysics()로
-            // 해서 "스크롤 막기" 가능
-            child: ListView.builder(
-              physics: NeverScrollableScrollPhysics(), // 스크롤 막기
-              itemCount: _customers.length,
-              itemBuilder: (context, index) {
-                final customer = _customers[index];
-                return _buildCustomerTile(customer);
-              },
-            ),
+            child: _customers.isNotEmpty
+                ? ListView.builder(
+                    physics: NeverScrollableScrollPhysics(), // 스크롤 막기
+                    itemCount: _customers.length,
+                    itemBuilder: (context, index) {
+                      final customer = _customers[index];
+                      return _buildCustomerTile(customer);
+                    },
+                  )
+                : Container(), // _customers가 없으면 빈 컨테이너 표시 (아래에서 메시지 처리)
           ),
 
           // 추가 로딩 or "더 보기" 버튼
@@ -288,58 +320,65 @@ class _CustomersListPageState extends State<CustomersListPage> {
               padding: EdgeInsets.all(16.0),
               child: CircularProgressIndicator(),
             )
-          else
-            if (!_isSearching && _hasMore && _customers.isNotEmpty)
+          else if (!_isSearching && _hasMore && _customers.isNotEmpty)
             // 검색 중이 아니고(hasMore == true) 고객 목록이 있으면 "더 보기"
-              Padding(
-                padding: EdgeInsets.only(bottom: 16.0),
-                child:
-                ElevatedButton(
-                  onPressed: _loadNextPage,
-                  child: Text(
-                    "load_more".tr,
-                    style: more_button,
-                  ),
-                  style: ButtonStyle(
-                    // Setting the background color
-                    backgroundColor: MaterialStateProperty.all(Color(0xFF49A85E)),
-                    // Setting the foreground color (text color)
-                    foregroundColor: MaterialStateProperty.all(Colors.white),
-                    // Setting padding
-                    padding: MaterialStateProperty.all(
-                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0)),
-                    // Setting the shape
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18.0),
-                        side: BorderSide(color: Color(0xFF49A85E)),
-                      ),
+            Padding(
+              padding: EdgeInsets.only(bottom: 16.0),
+              child: ElevatedButton(
+                onPressed: _loadNextPage,
+                child: Text(
+                  "load_more".tr,
+                  style: more_button,
+                ),
+                style: ButtonStyle(
+                  // Setting the background color
+                  backgroundColor: MaterialStateProperty.all(Color(0xFF49A85E)),
+                  // Setting the foreground color (text color)
+                  foregroundColor: MaterialStateProperty.all(Colors.white),
+                  // Setting padding
+                  padding: MaterialStateProperty.all(
+                      EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0)),
+                  // Setting the shape
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18.0),
+                      side: BorderSide(color: Color(0xFF49A85E)),
                     ),
                   ),
                 ),
-
-              )
-            else if (!_isSearching && !_hasMore && _customers.isNotEmpty)
-              Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text("all_customers_loaded".tr),
-              )
-            else if (_customers.isEmpty && !_isLoading)
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text("no_search_results".tr),
-                ),
+              ),
+            )
+          else if (!_isSearching && !_hasMore && _customers.isNotEmpty)
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text("all_customers_loaded".tr),
+            )
+          else if (_customers.isEmpty && !_isLoading)
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text("no_search_results".tr),
+            ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           await _onFabPressed();
         },
         backgroundColor: const Color(0xFF49A85E),
-        child: const Icon(Icons.plus_one),
+        icon: const Icon(
+          Icons.person_add,
+          color: Colors.white, // 아이콘 흰색 지정
+        ),
+        label: const Text(
+          "신규 회원 추가",
+          style: TextStyle(
+            color: Colors.white, // 텍스트 흰색 지정
+          ),
+        ),
       ),
     );
   }
+
   Widget _buildCustomerList() {
     // 아직 아무것도 로딩되지 않았고 _isLoading 중이면 첫 로딩 화면
     if (_customers.isEmpty) {
@@ -380,8 +419,10 @@ class _CustomersListPageState extends State<CustomersListPage> {
       },
     );
   }
+
   Widget _buildCustomerTile(Customer customer) {
     return ListTile(
+      onTap: () => _onCustomerSelected(customer), // 타일 전체를 클릭하면 이동
       title: Text(customer.name),
       subtitle: Text(
         'age_recent_test'.trParams({
@@ -389,11 +430,21 @@ class _CustomersListPageState extends State<CustomersListPage> {
           'recent_test': customer.getMostRecentSurveyDate().toString()
         }),
       ),
-      trailing: IconButton(
-        icon: const Icon(Icons.arrow_forward),
-        onPressed: () => _onCustomerSelected(customer),
-      ),
+      trailing: const Icon(Icons.arrow_forward),
     );
+    // return ListTile(
+    //   title: Text(customer.name),
+    //   subtitle: Text(
+    //     'age_recent_test'.trParams({
+    //       'age': customer.age.toString(),
+    //       'recent_test': customer.getMostRecentSurveyDate().toString()
+    //     }),
+    //   ),
+    //   trailing: IconButton(
+    //     icon: const Icon(Icons.arrow_forward),
+    //     onPressed: () => _onCustomerSelected(customer),
+    //   ),
+    // );
   }
 
   Future<void> _onCustomerSelected(Customer customer) async {
@@ -401,7 +452,8 @@ class _CustomersListPageState extends State<CustomersListPage> {
     if (mostRecentSurvey != null) {
       resultcontroller.age.value = customer.age;
       resultcontroller.name.value = customer.name;
-      resultcontroller.gender.value = (customer.sex == "M") ? Gender.M : Gender.W;
+      resultcontroller.gender.value =
+          (customer.sex == "M") ? Gender.M : Gender.W;
       resultcontroller.aestheticId.value = customer.aestheticId;
       resultcontroller.survey_id.value = mostRecentSurvey.surveyId;
       resultcontroller.user_id.value = customer.user_id;
@@ -412,7 +464,8 @@ class _CustomersListPageState extends State<CustomersListPage> {
     } else {
       resultcontroller.age.value = customer.age;
       resultcontroller.name.value = customer.name;
-      resultcontroller.gender.value = (customer.sex == "M") ? Gender.M : Gender.W;
+      resultcontroller.gender.value =
+          (customer.sex == "M") ? Gender.M : Gender.W;
       resultcontroller.aestheticId.value = customer.aestheticId;
       resultcontroller.user_id.value = customer.user_id;
 

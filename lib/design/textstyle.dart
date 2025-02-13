@@ -159,7 +159,7 @@ var removeuserconfirm = TextStyle(
 
 var index_button = TextStyle(
   color: Colors.white,
-  fontSize: 25,
+  fontSize: 23,
   fontFamily: 'Pretendard',
   fontWeight: FontWeight.w600,
   letterSpacing: 0.28,

@@ -219,7 +219,8 @@ class AppTranslations extends Translations {
       "enter_cosmetic_info": "화장품 정보를 입력해주세요\n예) 닥터지 - 레드 블레미쉬 수딩 토너",
       "enter_skin_concerns": "피부 고민을 적어주세요\n예) 아침에 화장품을 발라도 점심만 되어도 땡겨요",
       "next": "다음",
-
+      'no_search_results' :
+  "현재 등록된 고객이 없습니다.\n우측 하단에서 신규 회원을 추가해주세요.",
       'skin_analysis_results': '님의 피부 분석 결과',
 
       '288_result' : "288가지의 피부 타입 중\n",
