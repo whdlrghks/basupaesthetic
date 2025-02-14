@@ -51,8 +51,8 @@ Widget BlankBackSubmit(controller){
     Obx(
           () => Container(
         height: figma_hight > controller.present_height.value
-            ? 105 / figma_hight * controller.present_height.value
-            : 105,
+            ? 70 / figma_hight * controller.present_height.value
+            : 70,
       ),
     );
 }

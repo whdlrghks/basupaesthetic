@@ -52,10 +52,8 @@ class _SelectFormState extends State<SelectForm> {
       sizeController.height(MediaQuery.of(context).size.height.toInt());
     });
 
-
-
     return Scaffold(
-      body:  Obx(() {
+      body: Obx(() {
         final currentIndex = surveyController.current_idx;
         final currentItem = surveyController.getSurveyItemList()[currentIndex];
 
@@ -64,53 +62,57 @@ class _SelectFormState extends State<SelectForm> {
           // getUserAnswer()가 예: 1 ~ 4 인덱스를 반환한다고 가정
           answerCheck[currentItem.getUserAnswer()] = true;
         }
-        return Column(
-          children: [
-            BlankTopProGressMulti(sizeController),
-            BlankTopGap(sizeController),
+        return SingleChildScrollView(
+          child: Column(
+            children: [
+              BlankTopProGressMulti(sizeController),
+              BlankTopGap(sizeController),
 
-            // 질문 유형
-            SubMultititle(
-              getQuestionType(currentIndex, currentItem),
-              sizeController,
-              surveyController,
-            ),
-            SizedBox(height: 35),
-            MultiQuestionTitle(currentItem.getQuestionTitle(), sizeController),
+              // 질문 유형
+              SubMultititle(
+                getQuestionType(currentIndex, currentItem),
+                sizeController,
+                surveyController,
+              ),
+              SizedBox(height: 35),
+              MultiQuestionTitle(
+                  currentItem.getQuestionTitle(), sizeController),
 
-            // 반복 문항
-            Column(
-              children: List.generate(4, (index) {
-                final answerIndex = index + 1;
-                if (answerCheck[answerIndex]) {
-                  return SelectedAnswer(
-                    surveyController,
-                    answerIndex,
-                    currentItem,
-                    onPressAnswerReset,
-                    answerCheck,
-                  );
-                } else {
-                  return UnselectedAnswer(
-                    surveyController,
-                    answerIndex,
-                    currentItem,
-                    onPressAnswerReset,
-                    onSubmitAnswer,
-                    answerCheck,
-                  );
-                }
-              }),
-            ),
+              // 반복 문항
+              Column(
+                children: List.generate(4, (index) {
+                  final answerIndex = index + 1;
+                  if (answerCheck[answerIndex]) {
+                    return SelectedAnswer(
+                      surveyController,
+                      answerIndex,
+                      currentItem,
+                      onPressAnswerReset,
+                      answerCheck,
+                    );
+                  } else {
+                    return UnselectedAnswer(
+                      surveyController,
+                      answerIndex,
+                      currentItem,
+                      onPressAnswerReset,
+                      onSubmitAnswer,
+                      answerCheck,
+                    );
+                  }
+                }),
+              ),
 
-            // 뒤로가기 or 제출 버튼
-            BlankBackSubmit(sizeController),
-            if ((surveyController.current_idx + 1).toString() ==
-                (surveyController.questionsize).toString())
-              SubmitButton("submit".tr, sizeController, surveyController, onSurveySubmit)
-            else
-              BackPressButton("previous_question".tr, sizeController, surveyController, onBackPressed),
-          ],
+              SizedBox(height: 35),
+              if ((surveyController.current_idx + 1).toString() ==
+                  (surveyController.questionsize).toString())
+                SubmitButton("submit".tr, sizeController, surveyController,
+                    onSurveySubmit)
+              else
+                BackPressButton("previous_question".tr, sizeController,
+                    surveyController, onBackPressed),
+            ],
+          ),
         );
       }),
     );
@@ -129,21 +131,20 @@ class _SelectFormState extends State<SelectForm> {
       if (result == CODE_OK) {
         var resultController = Get.find<ResultController>(tag: "result");
         // 파라미터로 전달 (Getx 4.x 방식)
-        Get.toNamed("/index", parameters: {
-          "userid": resultController.user_id.value
-        });
+        Get.toNamed("/index",
+            parameters: {"userid": resultController.user_id.value});
       } else {
         // 에러 시 shortform 이동
         GetPage(
           name: '/shortform',
-          page: () =>  ShortForm(), middlewares: [AuthMiddleware()],
+          page: () => ShortForm(),
+          middlewares: [AuthMiddleware()],
         );
       }
     } catch (e) {
       // 네트워크/기타 에러 처리
       print("onSurveySubmit Error: $e");
-    } finally {
-    }
+    } finally {}
   }
 
   // --- 기존 onPressedAnswer() 역할: 선택지 리셋 ---
@@ -160,8 +161,8 @@ class _SelectFormState extends State<SelectForm> {
     // 현재 SurveyController에 있는 인덱스 감소
     surveyController.current_idx = surveyController.current_idx - 1;
     // 새로 바뀐 인덱스 기준으로 아이템 조회
-    SurveyItem currentItem = surveyController
-        .getSurveyItemList()[surveyController.current_idx];
+    SurveyItem currentItem =
+        surveyController.getSurveyItemList()[surveyController.current_idx];
 
     // answerType == 0 이면 현재 페이지에서 answerCheck 리셋
     // 아니면 ShortForm으로 이동
