@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:basup_ver2/component/blankgap.dart';
 import 'package:basup_ver2/component/button.dart';
@@ -10,6 +11,7 @@ import 'package:basup_ver2/controller/sizecontroller.dart';
 import 'package:basup_ver2/design/value.dart';
 import 'package:basup_ver2/pages/surveyshortform.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:basup_ver2/pages/dialog.dart';
@@ -31,9 +33,11 @@ class SkinScope extends StatefulWidget {
 class _SkinScopeState extends State<SkinScope> {
   var controller = Get.find<SizeController>(tag: "size");
   var resultcontroller = Get.find<ResultController>(tag: "result");
+  final RxDouble _uploadProgressRx = 0.0.obs;
 
 
-  html.File? leftLedFile, rightLedFile, headLedFile, leftUvFile, rightUvFile, headUvFile;
+  html.File? leftLedFile, rightLedFile, headLedFile, leftUvFile, rightUvFile,
+      headUvFile;
 
   // 여러 장 저장용: LED, UV 각각 Left/Right
   RxList<html.File> headLedFiles = <html.File>[].obs;
@@ -60,9 +64,15 @@ class _SkinScopeState extends State<SkinScope> {
     final survey_id = Get.parameters['survey_id'] ?? '';
     resultcontroller.survey_id.value = survey_id;
 
+    final name = Get.parameters['name'] ?? '';
+    resultcontroller.name.value = name;
+
+    _uploadProgressRx.value = 0.0;
+
     // 비동기 작업 실행
     await _fetchSurveyData(survey_id);
   }
+
   // // Function to open the camera and set the file
   // void openCamera(void Function(html.File) setFile, _flag) {
   //   var input = html.FileUploadInputElement()
@@ -81,7 +91,6 @@ class _SkinScopeState extends State<SkinScope> {
 
   /// (1) 공통: 열어서 여러 장 파일을 리스트에 추가
   void openCameraAndAppend(RxList<html.File> fileList, RxBool flag) {
-
     final input = html.FileUploadInputElement()
       ..accept = 'image/*'
       ..multiple = true
@@ -140,7 +149,10 @@ class _SkinScopeState extends State<SkinScope> {
       child: Wrap(
         spacing: 10,
         runSpacing: 10,
-        children: files.asMap().entries.map((entry) {
+        children: files
+            .asMap()
+            .entries
+            .map((entry) {
           final index = entry.key;
           final file = entry.value;
           return FutureBuilder<String>(
@@ -203,6 +215,7 @@ class _SkinScopeState extends State<SkinScope> {
     reader.readAsDataUrl(file);
     return completer.future;
   }
+
   // Function to handle taking pictures
   // void takePicture() {
   //   html.FileUploadInputElement input = html.FileUploadInputElement()
@@ -222,11 +235,8 @@ class _SkinScopeState extends State<SkinScope> {
   //   });
   // }
 
-  // Function to detect if the user is on a mobile device
-  bool isMobileDevice() {
-    var userAgent = html.window.navigator.userAgent.toString().toLowerCase();
-    return userAgent.contains("iphone") || userAgent.contains("android");
-  }
+
+
   /// Firestore에서 survey_id에 해당하는 데이터를 조회하여
   /// aestheticId, age, name, sex, user_id 값을 resultcontroller에 저장하는 함수
   Future<void> _fetchSurveyData(String surveyId) async {
@@ -260,10 +270,8 @@ class _SkinScopeState extends State<SkinScope> {
   }
 
 
-
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: SingleChildScrollView(
           child: Column(
@@ -271,27 +279,33 @@ class _SkinScopeState extends State<SkinScope> {
 
               SizedBox(height: 40),
               Subtitle("skin_microscope".tr, controller),
-              QuestionTitle("open_camera".tr,controller),
+              QuestionTitle("open_camera".tr, controller),
 
-              scopeButton(abletitle : "capture_head_led".tr,disabletitle: "re"
-                  "capture_head_led"
-                  .tr,
+              scopeButton(
+                abletitle: "capture_head_led".tr,
+                disabletitle: "re"
+                    "capture_head_led"
+                    .tr,
                 flag: resultcontroller.head_led_flag,
                 fileList: headLedFiles,
                 onPressedButton: (files, flag) {
                   openCameraAndAppend(files, flag);
                 },
               ),
-              scopeButton(abletitle : "capture_left_led".tr,disabletitle: "recapture_left_led"
-                  .tr,
+              scopeButton(
+                abletitle: "capture_left_led".tr,
+                disabletitle: "recapture_left_led"
+                    .tr,
                 flag: resultcontroller.left_led_flag,
                 fileList: leftLedFiles,
                 onPressedButton: (files, flag) {
                   openCameraAndAppend(files, flag);
                 },
               ),
-              scopeButton(abletitle :"capture_right_led".tr, disabletitle:"recapture_right_led".tr,
-                flag:  resultcontroller
+              scopeButton(
+                abletitle: "capture_right_led".tr,
+                disabletitle: "recapture_right_led".tr,
+                flag: resultcontroller
                     .right_led_flag,
                 fileList: rightLedFiles,
                 onPressedButton: (files, flag) {
@@ -301,22 +315,28 @@ class _SkinScopeState extends State<SkinScope> {
               //     resultcontroller
               //     .head_led_flag,resultcontroller.head_led,
               //     openCamera, (file) => setState(() => headLedFile = file)),
-              scopeButton(abletitle : "capture_head_uv".tr,disabletitle: "recapture_head_uv"
-                  .tr,
+              scopeButton(
+                abletitle: "capture_head_uv".tr,
+                disabletitle: "recapture_head_uv"
+                    .tr,
                 flag: resultcontroller.head_uv_flag,
                 fileList: headUvFiles,
                 onPressedButton: (files, flag) {
                   openCameraAndAppend(files, flag);
                 },
               ),
-              scopeButton(abletitle :"capture_left_uv".tr, disabletitle:"recapture_left_uv".tr,
+              scopeButton(
+                abletitle: "capture_left_uv".tr,
+                disabletitle: "recapture_left_uv".tr,
                 flag: resultcontroller
                     .left_uv_flag,
                 fileList: leftUvFiles,
                 onPressedButton: (files, flag) {
                   openCameraAndAppend(files, flag);
                 },),
-              scopeButton(abletitle :"capture_right_uv".tr,disabletitle: "recapture_right_uv".tr,
+              scopeButton(
+                abletitle: "capture_right_uv".tr,
+                disabletitle: "recapture_right_uv".tr,
                 flag: resultcontroller
                     .right_uv_flag,
                 fileList: rightUvFiles,
@@ -332,36 +352,80 @@ class _SkinScopeState extends State<SkinScope> {
           )),
     );
   }
-  Future<String> uploadFileAndRetrieveURL(html.File file, String uploadPath,
-      ) {
-    var completer = Completer<String>();
 
-    js.context.callMethod('uploadFileToStorage', [
-      uploadPath,
-      file,
-      js.allowInterop( (result,error) {
-        if (result != null) {
-          completer.complete(result);
-        } else {
-          completer.completeError("Failed to upload file and retrieve URL "
-              "${error}");
-        }
-      }),
-    ]);
+  // Future<String> uploadFileAndRetrieveURL(html.File file, String uploadPath,
+  //     {Function(double)? onProgress}) {
+  //   var completer = Completer<String>();
+  //
+  //   // JS 메서드가 progress 인자를 제공한다고 가정
+  //   js.context.callMethod('uploadFileToStorage', [
+  //     uploadPath,
+  //     file,
+  //     js.allowInterop((result, error, progress) {
+  //       if (progress != null && onProgress != null) {
+  //         onProgress(progress); // 진행률 업데이트
+  //       }
+  //       if (result != null) {
+  //         completer.complete(result);
+  //       } else {
+  //         completer.completeError("Failed to upload file: ${error}");
+  //       }
+  //     }),
+  //   ]);
+  //   return completer.future;
+  // }
 
-    return completer.future;
+
+  /// Firebase Storage를 사용하여 파일 업로드하는 함수
+  Future<String> uploadFileAndRetrieveURL(html.File file,
+      String uploadPath, {
+        Function(double)? onProgress,
+      }) async {
+    // html.File을 Uint8List로 변환
+    final reader = html.FileReader();
+    final completer = Completer<Uint8List>();
+
+    reader.onLoadEnd.listen((event) {
+      if (reader.result != null) {
+        completer.complete(reader.result as Uint8List);
+      } else {
+        completer.completeError("File reading error");
+      }
+    });
+    reader.readAsArrayBuffer(file);
+    Uint8List fileBytes = await completer.future;
+
+    // Firebase Storage 참조 생성 및 업로드 시작
+    Reference storageRef = FirebaseStorage.instance.ref().child(uploadPath);
+    UploadTask uploadTask = storageRef.putData(fileBytes);
+
+    // 진행률 업데이트
+    uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
+      double progress = snapshot.bytesTransferred / snapshot.totalBytes;
+      if (onProgress != null) {
+        onProgress(progress);
+      }
+    });
+
+    TaskSnapshot taskSnapshot = await uploadTask;
+    String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+    return downloadUrl;
   }
 
   onPressedButton() async {
-
-    _showLoadingDialog(context); // Show the loading dialog
+    _showLoadingDialog(); // Show the loading dialog
     var user_id = resultcontroller.user_id.value;
     var survey_id = resultcontroller.survey_id.value;
-    var now = DateTime.now().millisecondsSinceEpoch;
+    var now = DateTime
+        .now()
+        .millisecondsSinceEpoch;
 
     // Keep track of which uploads correspond to which properties in resultcontroller
     List<String> uploadTypes = [];
     List<Future<String>> uploadTasks = [];
+
+    // 각 태스크의 진행률을 저장할 리스트
+    List<double> taskProgress = [];
 
     // 로그: 각 파일 리스트의 길이 출력
     print("=== 업로드 시작 ===");
@@ -375,11 +439,19 @@ class _SkinScopeState extends State<SkinScope> {
     // 업로드 태스크 추가 함수
     void addUploadTask(html.File? file, String type, String basePath, int idx) {
       if (file != null) {
-        // 각 파일의 이름도 로그로 출력 (dart:html의 File 객체는 .name 프로퍼티가 있음)
-        print("Adding upload task - type: $type, file name: ${file.name}");
-        String uploadPath = "images/$user_id/$basePath/${user_id}_${now}_${idx}"
-            ".jpg";
-        uploadTasks.add(uploadFileAndRetrieveURL(file, uploadPath));
+        print("Adding task - type: $type, file: ${file.name}");
+        String uploadPath = "images/$user_id/$basePath/${user_id}_${now}_${idx}.jpg";
+        int currentIndex = taskProgress.length;
+        taskProgress.add(0.0);
+        uploadTasks.add(
+            uploadFileAndRetrieveURL(
+                file, uploadPath, onProgress: (progressValue) {
+              taskProgress[currentIndex] = progressValue;
+              double overallProgress = taskProgress.reduce((a, b) => a + b) /
+                  taskProgress.length;
+              _uploadProgressRx.value = overallProgress; // 여기서 reactive 변수 업데이트
+            })
+        );
         uploadTypes.add(type);
       }
     }
@@ -388,42 +460,42 @@ class _SkinScopeState extends State<SkinScope> {
     for (int i = 0; i < leftLedFiles.length; i++) {
       final file = leftLedFiles[i];
       print("leftLedFiles[$i]: ${file.name}");
-      addUploadTask(file, 'left_led_$i', 'leftLed',i);
+      addUploadTask(file, 'left_led_$i', 'leftLed', i);
     }
 
     // (2) Right LED (다중)
     for (int i = 0; i < rightLedFiles.length; i++) {
       final file = rightLedFiles[i];
       print("rightLedFiles[$i]: ${file.name}");
-      addUploadTask(file, 'right_led_$i', 'rightLed',i);
+      addUploadTask(file, 'right_led_$i', 'rightLed', i);
     }
 
     // (3) Head LED (다중)
     for (int i = 0; i < headLedFiles.length; i++) {
       final file = headLedFiles[i];
       print("headLedFiles[$i]: ${file.name}");
-      addUploadTask(file, 'head_led_$i', 'headLed',i);
+      addUploadTask(file, 'head_led_$i', 'headLed', i);
     }
 
     // (4) Left UV (다중)
     for (int i = 0; i < leftUvFiles.length; i++) {
       final file = leftUvFiles[i];
       print("leftUvFiles[$i]: ${file.name}");
-      addUploadTask(file, 'left_uv_$i', 'leftUv',i);
+      addUploadTask(file, 'left_uv_$i', 'leftUv', i);
     }
 
     // (5) Right UV (다중)
     for (int i = 0; i < rightUvFiles.length; i++) {
       final file = rightUvFiles[i];
       print("rightUvFiles[$i]: ${file.name}");
-      addUploadTask(file, 'right_uv_$i', 'rightUv',i);
+      addUploadTask(file, 'right_uv_$i', 'rightUv', i);
     }
 
     // (6) Head UV (다중)
     for (int i = 0; i < headUvFiles.length; i++) {
       final file = headUvFiles[i];
       print("headUvFiles[$i]: ${file.name}");
-      addUploadTask(file, 'head_uv_$i', 'headUv',i);
+      addUploadTask(file, 'head_uv_$i', 'headUv', i);
     }
 
     // 전체 업로드 태스크 개수 로그 출력
@@ -475,11 +547,14 @@ class _SkinScopeState extends State<SkinScope> {
       resultcontroller.right_uv_list = rightUvUrls;
       resultcontroller.head_uv_list = headUvUrls;
 
-      resultcontroller.scope_id = user_id + "_" + survey_id + "_" + now.toString();
+      resultcontroller.scope_id =
+          user_id + "_" + survey_id + "_" + now.toString();
       print("생성된 scope_id: ${resultcontroller.scope_id}");
 
+      _uploadProgressRx.value = 1.0;
 
       print("resultcontroller.scope_id");
+      Get.back(); // Dismiss the loading dialog
       await createSkinScope(resultcontroller);
       // At this point, all URLs have been assigned to their respective variables in resultcontroller.
       // Proceed with any additional logic, now that all uploads are complete and URLs are saved.
@@ -487,21 +562,19 @@ class _SkinScopeState extends State<SkinScope> {
       print("An error occurred during file uploads: $e");
       Get.dialog(Test("An error occurred during file uploads: $e"));
       // Handle any errors that occurred during the uploads
-    }finally {
+    } finally {
       Get.back(); // Dismiss the loading dialog
 
       return Get.dialog(showResultdialog(user_id));
     }
-
   }
-}
 
-void _showLoadingDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    barrierDismissible: false, // Prevent dialog from being dismissed
-    builder: (BuildContext context) {
-      return Dialog(
+  void _showLoadingDialog() {
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.0),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Row(
@@ -509,14 +582,24 @@ void _showLoadingDialog(BuildContext context) {
             children: [
               CircularProgressIndicator(),
               SizedBox(width: 20),
-              Text('uploading_data'.tr),
+              Flexible(
+                child: Obx(() =>
+                    Text(
+                      'uploading_data'.tr +
+                          '  ${(_uploadProgressRx.value * 100).toStringAsFixed(
+                              0)}%',
+                      style: TextStyle(fontSize: 16),
+                    )),
+              ),
             ],
           ),
         ),
-      );
-    },
-  );
+      ),
+      barrierDismissible: false,
+    );
+  }
 }
+
 
 
 Test(index) {

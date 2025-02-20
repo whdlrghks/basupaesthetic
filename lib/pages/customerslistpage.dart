@@ -73,7 +73,7 @@ class _CustomersListPageState extends State<CustomersListPage> {
   final localeController = Get.find<LocaleController>();
 
   /// 페이징 관련 변수
-  final int _limit = 10; // 한 번에 가져올 문서 수
+  final int _limit = 15; // 한 번에 가져올 문서 수
   DocumentSnapshot? _lastDoc; // 마지막으로 가져온 문서
   bool _isLoading = false; // 현재 로딩 중인지
   bool _hasMore = true; // 더 가져올 데이터가 있는지 여부

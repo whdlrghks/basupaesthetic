@@ -1,8 +1,83 @@
 
+
 import 'package:basup_ver2/controller/resultcontroller.dart';
 import 'package:basup_ver2/data/customer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+
+// In your firebase.dart file (create this file if you don't have it):
+import 'package:js/js.dart';
+import 'package:js/js_util.dart';
+import 'dart:js' as js;
+
+@JS()
+external bool get firebaseInitialized;
+
+@JS()
+@anonymous
+class FirebaseApp {
+  external static dynamic get app; // Add this line
+}
+
+@JS()
+@anonymous
+class AuthWeb {
+  external dynamic currentUser;
+  external dynamic onAuthStateChanged(Function(dynamic) observer);
+  external dynamic signInAnonymously();
+// ... other auth methods as needed
+}
+
+@JS()
+@anonymous
+class UserCredentialWeb {
+  external dynamic user;
+}
+
+@JS()
+@anonymous
+class UserWeb {
+  external dynamic uid;
+// ... other user properties as needed
+}
+void logGlobalFirebaseVars() {
+  print("Global firebase: ${js.context['firebase']}");
+  print("Global firebaseInitialized: ${js.context['firebaseInitialized']}");
+  print("Global firebaseauth: ${js.context['firebaseauth']}");
+  print("Global signInAnonymouslyJS: ${js.context['signInAnonymouslyJS']}");
+}
+
+Future<void> initializeFirebaseInDart() async {
+  while (!firebaseInitialized) {
+    await Future.delayed(Duration(milliseconds: 100));
+    print("Waiting for Firebase initialization...");
+  }
+  print("Firebase initialized!");
+}
+
+Future<dynamic> signInAnonymously() async {
+  await initializeFirebaseInDart();
+  // js.context['firebaseauth'] 대신, 전역에 정의된 signInAnonymouslyJS 함수를 호출합니다.
+  try {
+    final result = await promiseToFuture(js.context.callMethod('signInAnonymouslyJS'));
+    return result;
+  } catch (e) {
+    print("Error signing in anonymously: $e");
+    return null;
+  }
+}
+Future<UserCredential?> signInAnonymouslyApp() async {
+  try {
+    UserCredential userCredential =
+    await FirebaseAuth.instance.signInAnonymously();
+    return userCredential;
+  } catch (e) {
+    print("익명 로그인 에러: $e");
+    return null;
+  }
+}
+
 
 Future<Map<String, dynamic>?> getLatestSurveyFromUsers(ResultController
 resultcontroller,
@@ -169,8 +244,6 @@ Future<List<Map<String, dynamic>>> getMicroscopeList(String surveyId) async {
       .where('survey_id', isEqualTo: surveyId)
       .get();
   final docs = query.docs.map((doc) => doc.data()).toList();
-  print("microscope docs");
-  print(docs);
 
   // date 필드가 "yyyy-MM-dd HH:mm:ss" 식으로 저장돼 있다고 가정
   docs.sort((a, b) {

@@ -11,6 +11,7 @@ import 'package:get/get.dart';
 import '../controller/resultcontroller.dart';
 import '../pages/dialog.dart'; // 예시: NetworkErrorDialog 등이 있다면
 
+import 'dart:html' as html;
 /// 이 파일에서는 refreshSurvey 내부의 다양한 단계별 로직 + 헬퍼 메서드를 담당
 
 class ResultService {
@@ -119,6 +120,7 @@ class ResultService {
     required Map<String, dynamic> oldSkinDoc,
     required Map<String, dynamic> latestMicroscopeDoc,
   }) async {
+    print("handleMicroscopeIsNewer");
     // (1) 기존 측정값
     final oilOld = oldSkinDoc['oil'];
     final pigOld = oldSkinDoc['pig'];
@@ -164,6 +166,8 @@ class ResultService {
       finalOil.toInt(),
       finalPig.toInt(),
     );
+    print("resultController.data_loading.value = false;");
+    resultController.data_loading.value = false;
 
     // (6) skintype 계산 & Firestore 저장
     final newSkinType = computeSkinType(
@@ -192,6 +196,7 @@ class ResultService {
     required String surveyId,
     required Map<String, dynamic> latestMicroscopeDoc,
   }) async {
+    print("handleMicroscopeIsNewerNoSkinData");
     // (1) old(구) 측정은 Controller에서
     final oilOld = resultController.oilper;
     final pigOld = resultController.pigper;
@@ -234,6 +239,8 @@ class ResultService {
       finalOil.toInt(),
       finalPig.toInt(),
     );
+    print("resultController.data_loading.value = false;");
+    resultController.data_loading.value = false;
 
     // (6) skintype 계산 & Firestore 저장
     final newSkinType = computeSkinType(
@@ -258,6 +265,8 @@ class ResultService {
   }
 
   Future<void> handleSkinDataIsNewer(Map<String, dynamic> latestSkinDataDoc) async {
+
+    print("handleSkinDataIsNewer");
     final oilOld = latestSkinDataDoc['oil'];
     final pigOld = latestSkinDataDoc['pig'];
     final sensOld = latestSkinDataDoc['sens'];
@@ -275,6 +284,12 @@ class ResultService {
     );
     resultController.type.value = finalSkintype;
 
+    print("resultController.title_loading.value = false;");
+    resultController.title_loading.value = false;
+
+    print("resultController.data_loading.value = false;");
+    resultController.data_loading.value = false;
+
     // 바로 웹 결과 호출
     print("[DEBUG]`before  fetchWebSkinTypeResult");
     await fetchWebSkinTypeResult(finalSkintype);
@@ -284,6 +299,8 @@ class ResultService {
 
   /// Firestore에 새 데이터 저장 후, 다시 조회 → skintype으로 웹 결과까지 호출
   Future<void> handleFetchWebResult(String surveyId) async {
+
+    print("handleFetchWebResult");
     final newDocs = await getSkinDataList(surveyId);
     if (newDocs.isEmpty) {
       print("No new skinData found for $surveyId");
@@ -292,6 +309,9 @@ class ResultService {
     final latestDoc = newDocs[0];
     final finalSkintype = latestDoc['skintype'];
     resultController.type.value = finalSkintype;
+
+    print("resultController.title_loading.value = false;");
+    resultController.title_loading.value = false;
     await Future.delayed(Duration(milliseconds: 500));
 
     await createUserDocument(resultController: resultController, onlysurvey: false);
@@ -377,6 +397,12 @@ String computeSkinType({
   }
 
   return sensType + pigType + wrinkleType + oilType + waterType;
+}
+
+// Function to detect if the user is on a mobile device
+bool isMobileDevice() {
+  var userAgent = html.window.navigator.userAgent.toString().toLowerCase();
+  return userAgent.contains("iphone") || userAgent.contains("android");
 }
 
 // ──────────────────────────────────────────────────────────────────────────

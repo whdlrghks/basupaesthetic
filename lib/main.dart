@@ -15,6 +15,8 @@ import 'package:basup_ver2/pages/skinscope.dart';
 import 'package:basup_ver2/pages/surveyselectform.dart';
 import 'package:basup_ver2/pages/surveyshortform.dart';
 import 'package:basup_ver2/service/authmiddleware.dart';
+import 'package:basup_ver2/service/firebase.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -22,12 +24,27 @@ import 'package:firebase_core/firebase_core.dart';
 import 'pages/userinfo.dart';
 import 'firebase_options.dart';
 
+import 'package:firebase_core/firebase_core.dart';
+
+
 Future<void> main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+
+  await initializeFirebaseInDart(); // Wait for Firebase to initialize
+
+  // 익명 인증 시도 (JavaScript를 통해 호출해야 함)
+  UserCredential? credential = await signInAnonymouslyApp(); // Call the function
+
+  if (credential != null) {
+    // print("Anonymous sign-in successful: ${credential}");
+  } else {
+    print("Anonymous sign-in failed.");
+  }
+
 
   var localeController = Get.put(LocaleController());
   // 시스템 로케일을 기반으로 초기 로케일 설정
@@ -69,7 +86,8 @@ class MyApp extends StatelessWidget {
         getPages: [
           GetPage(name: '/', page: () =>  LoginScreen()),
           GetPage(name: '/index', page: () => Index(), middlewares: [AuthMiddleware()]),
-          GetPage(name: '/survey', page: () =>  UserInfo(), middlewares: [AuthMiddleware()]),
+          GetPage(name: '/survey', page: () => UserInfoPage(), middlewares:
+          [AuthMiddleware()]),
           GetPage(name: '/machine', page: () => SkinMachine
             (), middlewares: [AuthMiddleware()]),
           GetPage(name: '/scope', page: () => SkinScope()),

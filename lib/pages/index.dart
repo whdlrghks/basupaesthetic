@@ -9,6 +9,7 @@ import 'package:basup_ver2/design/color.dart';
 import 'package:basup_ver2/design/textstyle.dart';
 import 'package:basup_ver2/pages/customerslistpage.dart';
 import 'package:basup_ver2/pages/dialog.dart';
+import 'package:basup_ver2/design/skeleton.dart';
 import 'package:basup_ver2/pages/skinmachine.dart';
 import 'package:basup_ver2/pages/skinscope.dart';
 import 'package:basup_ver2/pages/userinfo.dart';
@@ -37,6 +38,23 @@ class _IndexState extends State<Index> {
 
   late ResultService _resultService; // 우리가 만든 서비스 클래스
 
+
+  Widget skeletonUI() {
+    return ListView(
+      padding: EdgeInsets.all(100),
+      children: [
+        SizedBox(height: 66),
+        SkeletonWidget(width: double.infinity, height: 50), // 타이틀
+        SizedBox(height: 15),
+        SkeletonWidget(width: double.infinity, height: 500), // 메인 콘텐츠 영역
+        SizedBox(height: 60),
+        SkeletonWidget(width: double.infinity, height: 50), // 추가 텍스트
+        SizedBox(height: 10),
+        SkeletonWidget(width: double.infinity, height: 400), // 그래프나 결과 영역
+      ],
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -55,6 +73,14 @@ class _IndexState extends State<Index> {
   Future<void> _buttonPressed(int buttonNumber) async {
     var nextroute = "";
 
+    if (resultcontroller.user_id.value == "BASUPTEST") {
+      // 네트워크 에러 다이얼로그 띄우기 (여기서는 AlertDialog 예시 사용)
+      Get.dialog(
+        NetworkErrorCustomerDialog(resultcontroller),
+        barrierDismissible: false, // 다이얼로그 외부 터치 시 닫히지 않도록 설정
+      );
+      return;
+    }
     switch (buttonNumber) {
       case 1:
         nextroute =
@@ -69,11 +95,13 @@ class _IndexState extends State<Index> {
           await refreshSurvey(
               resultcontroller.name.value, resultcontroller.aestheticId.value);
           nextroute =
-              "/scope?userid=${resultcontroller.user_id.value}&survey_id=${resultcontroller.survey_id.value}";
+              "/scope?userid=${resultcontroller.user_id
+                  .value}&survey_id=${resultcontroller.survey_id
+                  .value}&name=${resultcontroller.name.value}";
           LoadingDialog.hide();
         } else {
           nextroute =
-              "/scope?userid=${resultcontroller.user_id.value}&survey_id=${resultcontroller.survey_id.value}";
+              "/scope?userid=${resultcontroller.user_id.value}&survey_id=${resultcontroller.survey_id.value}&name=${resultcontroller.name.value}";
         }
 
         var url = getCurrentUrl();
@@ -90,6 +118,7 @@ class _IndexState extends State<Index> {
           return;
         } else {
           Get.to(AnalyzeLoading());
+          // Get.to(skeletonUI());
           await refreshSurvey(
               resultcontroller.name.value, resultcontroller.aestheticId.value);
           // await fetchSurveyResult(resultcontroller.survey_id.value);
@@ -145,6 +174,18 @@ class _IndexState extends State<Index> {
       resultcontroller.user_id.value = userid!;
     }
     print(resultcontroller.user_id.value);
+    // BASUPTEST인 경우, 로딩 인디케이터를 보여주고 CustomersListPage로 리다이렉트
+    if (resultcontroller.user_id.value == "BASUPTEST") {
+      // 프레임이 끝난 후 리다이렉션
+      Future.microtask(() {
+        Get.offAll(CustomersListPage(aestheticId: resultcontroller.aestheticId.value));
+      });
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
 
     return Scaffold(
       body: SingleChildScrollView(

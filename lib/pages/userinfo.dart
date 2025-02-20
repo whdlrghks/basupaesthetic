@@ -12,7 +12,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class UserInfo extends StatefulWidget {
+class UserInfoPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
@@ -20,7 +20,7 @@ class UserInfo extends StatefulWidget {
   }
 }
 
-class _UserInfoState extends State<UserInfo> {
+class _UserInfoState extends State<UserInfoPage> {
   var controller = Get.find<SizeController>(tag: "size");
   var resultcontroller = Get.find<ResultController>(tag: "result");
 

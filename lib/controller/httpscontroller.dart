@@ -76,7 +76,7 @@ Future<String> fetchGetSurvey(type) async {
   final parsed = json.decode(decodeData).cast<String, dynamic>();
 
   var result_status = parsed["resCode"];
-  print(decodeData);
+  // print(decodeData);
 
   if (result_status == CODE_OK) {
     return decodeData;
@@ -180,6 +180,8 @@ Future<void> fetchPost_Cosmetic(type) async {
 }
 
 Future<String> fetchSurveySubmit() async {
+
+  print("fetchSurveySubmit");
   String url = (dev_hidden_tap ? Dev_URL : URL) + '/survey/answer';
   var surveyController = Get.find<SurveyController>(tag: "survey");
   var resultController = Get.find<ResultController>(tag: "result");
@@ -295,12 +297,17 @@ fetchOnlySurveyResult(surveyCode) async {
     resultController.survey_id.value = surveyCode;
     // 점수
     resultController.type.value = parsed["result"]["skinType"];
+    print("resultController.title_loading.value = false;");
+    resultController.title_loading.value = false;
     resultController.setData(
         parsed["result"]["scores"]["sens"].toInt(),
         parsed["result"]["scores"]["wrinkle"].toInt(),
         parsed["result"]["scores"]["moist"].toInt(),
         parsed["result"]["scores"]["oil"].toInt(),
         parsed["result"]["scores"]["pig"].toInt());
+
+    print("resultController.data_loading.value = false;");
+    resultController.data_loading.value = false;
     // 화장품 성분
     if (resultController.ingredient.length == 0) {
       resultController.ingredient.clear();
@@ -455,12 +462,16 @@ fetchSurveyResult(surveyCode) async {
     resultController.survey_id.value = surveyCode;
     // 점수
     resultController.type.value = parsed["result"]["skinType"];
+    print("resultController.title_loading.value = false;");
+    resultController.title_loading.value = false;
     resultController.setData(
         parsed["result"]["scores"]["sens"].toInt(),
         parsed["result"]["scores"]["wrinkle"].toInt(),
         parsed["result"]["scores"]["moist"].toInt(),
         parsed["result"]["scores"]["oil"].toInt(),
         parsed["result"]["scores"]["pig"].toInt());
+    print("resultController.data_loading.value = false;");
+    resultController.data_loading.value = false;
     // 화장품 성분
     if (resultController.ingredient.length == 0) {
       resultController.ingredient.clear();
@@ -570,12 +581,16 @@ fetchSurveyResultNo() async {
     resultController.survey_id.value = surveyCode;
     // 점수
     resultController.type.value = parsed["result"]["skinType"];
+    print("resultController.title_loading.value = false;");
+    resultController.title_loading.value = false;
     resultController.setData(
         parsed["result"]["scores"]["sens"].toInt(),
         parsed["result"]["scores"]["wrinkle"].toInt(),
         parsed["result"]["scores"]["moist"].toInt(),
         parsed["result"]["scores"]["oil"].toInt(),
         parsed["result"]["scores"]["pig"].toInt());
+    print("resultController.data_loading.value = false;");
+    resultController.data_loading.value = false;
     // 화장품 성분
     if (resultController.ingredient.length == 0) {
       resultController.ingredient.clear();
@@ -816,12 +831,15 @@ fetchWebSkinResult(skincode) async {
     // 'comment'와 'ingre' 데이터 저장
     resultController.skinResultWebContent =
         List<String>.from(parsed["comment"]);
+
+    print("resultController.opinion_loading.value = false;");
+    resultController.opinion_loading.value = false;
     resultController.skinResultWebIngre = List<List<String>>.from(
         parsed["ingre"].map((ingre) => List<String>.from(ingre)));
 
-    print('Skin Result Web Content: ${resultController.skinResultWebContent}');
-    print(
-        'Skin Result Web Ingredients: ${resultController.skinResultWebIngre}');
+    print("resultController.match.value = false;");
+    resultController.match_loading.value = false;
+
 
 
     return CODE_OK;
@@ -1058,12 +1076,16 @@ fetchSetSurveyResult(surveyCode) async {
     resultController.survey_id.value = surveyCode;
     // 점수
     resultController.type.value = parsed["result"]["skinType"];
+    print("resultController.title_loading.value = false;");
+    resultController.title_loading.value = false;
     resultController.setData(
         parsed["result"]["scores"]["sens"].toInt(),
         parsed["result"]["scores"]["wrinkle"].toInt(),
         parsed["result"]["scores"]["moist"].toInt(),
         parsed["result"]["scores"]["oil"].toInt(),
         parsed["result"]["scores"]["pig"].toInt());
+    print("resultController.data_loading.value = false;");
+    resultController.data_loading.value = false;
     // 화장품 성분
     if (resultController.ingredient.length == 0) {
       resultController.ingredient.clear();
@@ -1171,7 +1193,6 @@ fetchWebSkinTypeResult(skintype) async {
 
   url = url.replace(queryParameters: _query);
 
-  print(url);
 
   http.Response response = await http.get(
     url,
@@ -1187,7 +1208,6 @@ fetchWebSkinTypeResult(skintype) async {
   final parsed = json.decode(decodeData).cast<String, dynamic>();
 
   var result_status = parsed["resCode"];
-  print("fetchWebSkinTypeResult : $parsed");
   print(result_status);
 
   if (result_status == CODE_OK) {
@@ -1211,7 +1231,6 @@ fetchWebSkinTypeResult(skintype) async {
           }
         }
       }
-      print(_temp_ingredientList);
       resultController.cos_ingredients.value = _temp_ingredientList;
       var randomset = [];
       while (true) {
@@ -1258,8 +1277,10 @@ fetchWebSkinTypeResult(skintype) async {
     // resultController.skinResultWebContent =
     // List<String>.from(parsed["comment"]);
 
-    print('Skin Result Web Content: ${resultController.skinResultWebContent}');
-    print('Skin Result Web Ingredients: ${resultController.skinResultWebIngre}');
+    print("resultController.opinion_loading.value = false;");
+    resultController.opinion_loading.value = false;
+    print("resultController.match.value = false;");
+    resultController.match_loading.value = false;
 
     return CODE_OK;
   } else {

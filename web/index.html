@@ -39,22 +39,150 @@
   </script>
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
+<!--  <script type="module">-->
+
+<!--    import * as firebase from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js";-->
+<!--    import "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth-compat.js";-->
+<!--    import "https://www.gstatic.com/firebasejs/10.0.0/firebase-storage-compat.js";-->
+
+<!--    const firebaseConfig = {-->
+<!--      apiKey: "AIzaSyCCr9Mi4quec3qX65S6T2CA-v-GroMKUeE",-->
+<!--      authDomain: "basupaesthetic.firebaseapp.com",-->
+<!--      databaseURL: "https://basupaesthetic-default-rtdb.firebaseio.com",-->
+<!--      projectId: "basupaesthetic",-->
+<!--      storageBucket: "basupaesthetic.appspot.com",-->
+<!--      messagingSenderId: "709001858412",-->
+<!--      appId: "1:709001858412:web:c0b0eb6d1c535e02a97749",-->
+<!--      measurementId: "G-QDT4N8QZCX"-->
+<!--    };-->
+
+<!--    const app = firebase.initializeApp(firebaseConfig);-->
+<!--    // compat API 사용: getAuth 대신 firebase.auth()를 사용합니다.-->
+<!--    const auth = firebase.auth();-->
+<!--    // Storage도 compat API 사용-->
+<!--    const storage = firebase.storage();-->
+
+<!--    globalThis.firebase = firebase;-->
+<!--    globalThis.firebaseInitialized = true;-->
+<!--    globalThis.firebaseauth = auth;-->
+
+
+<!--    // 파일 업로드 함수 (수정됨)-->
+<!--    globalThis.uploadFileToStorage = async function(path, file) {-->
+<!--      try {-->
+<!--        const storageRef = storage().ref(path);-->
+<!--        const uploadTask = storageRef.put(file);-->
+<!--        const snapshot = await uploadTask;-->
+<!--        const downloadURL = await snapshot.ref.getDownloadURL();-->
+<!--        return downloadURL;-->
+<!--      } catch (error) {-->
+<!--        console.error("Upload error:", error);-->
+<!--        return null;-->
+<!--      }-->
+<!--    };-->
+
+<!--  // 익명 로그인 함수를 정의 (compat API에 맞게)-->
+<!--  async function signInAnonymouslyJS() {-->
+<!--    try {-->
+<!--      const result = await auth.signInAnonymously();-->
+<!--      return result;-->
+<!--    } catch (error) {-->
+<!--      console.error("Anonymous sign-in error:", error);-->
+<!--      return null;-->
+<!--    }-->
+<!--  }-->
+
+
+<!--    globalThis.addEventListener('load', function(ev) {-->
+<!--      _flutter.loader.loadEntrypoint({-->
+<!--        serviceWorker: {-->
+<!--          serviceWorkerVersion: serviceWorkerVersion,-->
+<!--        }-->
+<!--      }).then(function(engineInitializer) {-->
+<!--        return engineInitializer.initializeEngine();-->
+<!--      }).then(function(appRunner) {-->
+<!--        return appRunner.runApp();-->
+<!--      });-->
+<!--    });-->
+
+<!--    // 매우 중요한 부분: 전역에 노출합니다.-->
+<!--    globalThis.signInAnonymouslyJS = signInAnonymouslyJS;-->
+<!--    // 혹은 명시적으로 window 객체에 할당 (모듈 스크립트에서는 전역 노출이 자동되지 않음)-->
+<!--    window.signInAnonymouslyJS = signInAnonymouslyJS;-->
+<!--  </script>-->
 </head>
 <body>
-<script src="https://www.gstatic.com/firebasejs/8.2.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.2.0/firebase-storage.js"></script>
-<script>
-  var firebaseConfig = {
-    apiKey: "AIzaSyCCr9Mi4quec3qX65S6T2CA-v-GroMKUeE",
-    authDomain: "basupaesthetic.firebaseapp.com",
-    projectId: "basupaesthetic",
-    storageBucket: "basupaesthetic.appspot.com",
-    messagingSenderId: "709001858412",
-    appId: "1:709001858412:web:c0b0eb6d1c535e02a97749"
-  };
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-</script>
+<script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-storage-compat.js"></script>
+<script >
+
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCCr9Mi4quec3qX65S6T2CA-v-GroMKUeE",
+      authDomain: "basupaesthetic.firebaseapp.com",
+      databaseURL: "https://basupaesthetic-default-rtdb.firebaseio.com",
+      projectId: "basupaesthetic",
+      storageBucket: "basupaesthetic.appspot.com",
+      messagingSenderId: "709001858412",
+      appId: "1:709001858412:web:c0b0eb6d1c535e02a97749",
+      measurementId: "G-QDT4N8QZCX"
+    };
+
+    const app = firebase.initializeApp(firebaseConfig);
+    // compat API 사용: getAuth 대신 firebase.auth()를 사용합니다.
+    const auth = firebase.auth();
+    // Storage도 compat API 사용
+    const storage = firebase.storage();
+
+    globalThis.firebase = firebase;
+    globalThis.firebaseInitialized = true;
+    globalThis.firebaseauth = auth;
+
+
+    // 파일 업로드 함수 (수정됨)
+    globalThis.uploadFileToStorage = async function(path, file) {
+      try {
+        const storageRef = storage().ref(path);
+        const uploadTask = storageRef.put(file);
+        const snapshot = await uploadTask;
+        const downloadURL = await snapshot.ref.getDownloadURL();
+        return downloadURL;
+      } catch (error) {
+        console.error("Upload error:", error);
+        return Promise.reject(error);
+      }
+    };
+
+  // 익명 로그인 함수를 정의 (compat API에 맞게)
+  async function signInAnonymouslyJS() {
+    try {
+      const result = await auth.signInAnonymously();
+      return result;
+    } catch (error) {
+      console.error("Anonymous sign-in error:", error);
+        return Promise.reject(error);
+    }
+  }
+
+
+    globalThis.addEventListener('load', function(ev) {
+      _flutter.loader.loadEntrypoint({
+        serviceWorker: {
+          serviceWorkerVersion: serviceWorkerVersion,
+        }
+      }).then(function(engineInitializer) {
+        return engineInitializer.initializeEngine();
+      }).then(function(appRunner) {
+        return appRunner.runApp();
+      });
+    });
+
+    // 매우 중요한 부분: 전역에 노출합니다.
+    globalThis.signInAnonymouslyJS = signInAnonymouslyJS;
+    // 혹은 명시적으로 window 객체에 할당 (모듈 스크립트에서는 전역 노출이 자동되지 않음)
+    window.signInAnonymouslyJS = signInAnonymouslyJS;
+  </script>
 <script>
   window.uploadFileToStorage = function(path, file, callback) {
     const storageRef = firebase.storage().ref(path);
@@ -86,40 +214,5 @@
     );
   }
 </script>
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyBRpXCeIzmtfgpWhlMrDau5grO9oES_tUk",
-    authDomain: "basup-skin-test.firebaseapp.com",
-    projectId: "basup-skin-test",
-    storageBucket: "basup-skin-test.appspot.com",
-    messagingSenderId: "1000782920292",
-    appId: "1:1000782920292:web:72bb3769b808de8dcc7d71",
-    measurementId: "G-V3D89YG9KZ"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-    window.addEventListener('load', function(ev) {
-      // Download main.dart.js
-      _flutter.loader.loadEntrypoint({
-        serviceWorker: {
-          serviceWorkerVersion: serviceWorkerVersion,
-        }
-      }).then(function(engineInitializer) {
-        return engineInitializer.initializeEngine();
-      }).then(function(appRunner) {
-        return appRunner.runApp();
-      });
-    });
-  </script>
 </body>
 </html>

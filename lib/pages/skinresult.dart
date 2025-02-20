@@ -11,10 +11,15 @@ import 'package:basup_ver2/data/customer.dart';
 import 'package:basup_ver2/design/analyzeloading.dart';
 import 'package:basup_ver2/design/textstyle.dart';
 import 'package:basup_ver2/design/value.dart';
+import 'package:basup_ver2/pages/customerslistpage.dart';
+import 'package:basup_ver2/pages/dialog.dart';
+import 'package:basup_ver2/design/skeleton.dart';
+import 'package:basup_ver2/pages/skeletonui.dart';
 import 'package:basup_ver2/pages/skinresultprintpage.dart';
 import 'package:basup_ver2/service/firebase.dart';
 import 'package:basup_ver2/service/result_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:printing/printing.dart';
@@ -53,6 +58,8 @@ class _SkinResultState extends State<SkinResult> {
   @override
   void initState() {
     super.initState();
+
+    resultcontroller.initloading();
 
     _resultService = ResultService(resultController: resultcontroller);
     if (resultcontroller.surveylist.isNotEmpty) {
@@ -121,6 +128,18 @@ class _SkinResultState extends State<SkinResult> {
 
   @override
   Widget build(BuildContext context) {
+    // user_id가 BASUPTEST인 경우, 로딩 인디케이터를 보여주며 CustomersListPage로 리다이렉트
+    if (resultcontroller.user_id.value == "BASUPTEST") {
+      Future.microtask(() {
+        Get.offAll(
+            CustomersListPage(aestheticId: resultcontroller.aestheticId.value));
+      });
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
     var controller = Get.find<SizeController>(tag: "size");
 
     descript = (resultcontroller.decodeSkinType(resultcontroller.type.value));
@@ -129,80 +148,87 @@ class _SkinResultState extends State<SkinResult> {
         Get.offAllNamed('/index');
         return false; // true를 반환하면 뒤로가기가 동작, false면 막음
       },
-      child: Obx(
-        () => Scaffold(
-            body: isLoading.value
-                ? AnalyzeLoading() // 로딩 중 인디케이터 표시
-                : Stack(
-                    children: [
-                      Positioned(
-                        top: 30,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        child: ListView(children: [
-                          BlankTopGap(controller),
-                          title(resultcontroller),
-                          BlankBetweenTitleContent(controller),
-                          // Container(
-                          //
-                          //   margin: EdgeInsets.fromLTRB(150, 50, 150, 0),
-                          //   child: Row(
-                          //     mainAxisAlignment: MainAxisAlignment.center,
-                          //     children: [
-                          //       // Expanded(
-                          //       //   child:
-                          //       skintitle(resultcontroller, descript),
-                          //       // ),
-                          //       // Expanded(
-                          //       //   child:
-                          //       resultData(controller, resultcontroller),
-                          //       // ),
-                          //     ],
-                          //   ),
-                          // ),
-                          LayoutBuilder(
-                            builder: (context, constraints) {
-                              // 예: 너비가 600픽셀 미만이면 Column, 그 이상이면 Row로 표시
-                              if (constraints.maxWidth < 800) {
-                                return Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    skintitle(resultcontroller, descript),
-                                    SizedBox(height: 16),
-                                    resultData(controller, resultcontroller),
-                                  ],
-                                );
-                              } else {
-                                return Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    skintitle(resultcontroller, descript),
-                                    SizedBox(width: 16),
-                                    resultData(controller, resultcontroller),
-                                  ],
-                                );
-                              }
-                            },
-                          ),
-                          resultContent(resultcontroller),
-                          // careRoutine(controller, resultcontroller),
-                LayoutBuilder(
-                    builder: (context, constraints) {
-                      // 예: 너비가 600픽셀 미만이면 Column, 그 이상이면 Row로 표시
-                      if (constraints.maxWidth < 800) {
-                        return matchIngredientColumn(resultcontroller);
-                      } else {
-                        return matchIngredient(resultcontroller);
-                      }
-                    }),
-                          // matchIngredient(resultcontroller),
-                          // recommendProduct(resultcontroller),
-                        ]),
-                      ),
-                    ],
-                  )),
-      ),
+      child: Scaffold(
+          body:
+              // isLoading.value
+              //     ? skeletonSkinResult() // 로딩 중이면 스켈레톤 UI를 보여줌
+              //     :
+              Stack(
+        children: [
+          Positioned(
+            top: 30,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: ListView(children: [
+              BlankTopGap(controller),
+              title(resultcontroller),
+              BlankBetweenTitleContent(controller),
+              // Container(
+              //
+              //   margin: EdgeInsets.fromLTRB(150, 50, 150, 0),
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.center,
+              //     children: [
+              //       // Expanded(
+              //       //   child:
+              //       skintitle(resultcontroller, descript),
+              //       // ),
+              //       // Expanded(
+              //       //   child:
+              //       resultData(controller, resultcontroller),
+              //       // ),
+              //     ],
+              //   ),
+              // ),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  // 예: 너비가 600픽셀 미만이면 Column, 그 이상이면 Row로 표시
+                  if (constraints.maxWidth < 800) {
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        skintitle(resultcontroller, descript),
+                        SizedBox(height: 16),
+                        resultData(controller, resultcontroller),
+                      ],
+                    );
+                  } else {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        skintitle(resultcontroller, descript),
+                        SizedBox(width: 16),
+                        resultData(controller, resultcontroller),
+                      ],
+                    );
+                  }
+                },
+              ),
+              resultContent(resultcontroller),
+              // careRoutine(controller, resultcontroller),
+              LayoutBuilder(builder: (context, constraints) {
+                // 예: 너비가 600픽셀 미만이면 Column, 그 이상이면 Row로 표시
+                if (constraints.maxWidth < 800) {
+                  return Obx(
+                    () => resultcontroller.match_loading.value
+                        ? skeletonResultMatch()
+                        : matchIngredientColumn(resultcontroller),
+                  );
+                } else {
+                  return Obx(
+                    () => resultcontroller.match_loading.value
+                        ? skeletonResultMatch()
+                        : matchIngredient(resultcontroller),
+                  );
+                }
+              }),
+              // matchIngredient(resultcontroller),
+              // recommendProduct(resultcontroller),
+            ]),
+          ),
+        ],
+      )),
     );
   }
 
@@ -257,6 +283,9 @@ class _SkinResultState extends State<SkinResult> {
                   selectedSurvey.value = newValue;
                   print(
                       "[DEBUG]`selectedSurvey.value : ${selectedSurvey.value}");
+                  resultcontroller.initloading();
+                  resultcontroller.startloading();
+
                   isLoading.value = true; // 로딩 시작
 
                   print("[DEBUG]`isLoading.value : ${isLoading.value}");
@@ -381,7 +410,11 @@ class _SkinResultState extends State<SkinResult> {
             child: IconButton(
               icon: Icon(Icons.print),
               onPressed: () {
-                printDocument(resultcontroller, descript);
+                if (isMobileDevice()) {
+                  Get.dialog(MobileErrorDialog());
+                } else {
+                  printDocument(resultcontroller, descript);
+                }
               },
               tooltip: 'Print Document',
             ),
@@ -457,63 +490,70 @@ Widget _buildImage(String assetName, [double width = 300]) {
 }
 
 Widget skintitle(resultcontroller, descript) {
-  return Column(
-    children: [
-      Container(
-        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
-        child: Text(
-          resultcontroller.name.value + 'your_skin_type_is'.tr,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-            fontFamily: 'Pretendard',
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
-      Container(
-        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-        child: Container(
-          width: 300,
-          height: 33,
-          clipBehavior: Clip.antiAlias,
-          decoration: ShapeDecoration(
-            color: Color(0xFF49A85E),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(17),
-            ),
-          ),
-          child: Center(
-            child: Text(
-              resultcontroller.type.value,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontFamily: 'Pretendard',
-                fontWeight: FontWeight.w600,
+  return Obx(
+    () => resultcontroller.title_loading.value
+        ? skeletonResultTitle()
+        : Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
+                child: Text(
+                  resultcontroller.name.value + 'your_skin_type_is'.tr,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 18,
+                    fontFamily: 'Pretendard',
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
-            ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+                child: Container(
+                  width: 300,
+                  height: 33,
+                  clipBehavior: Clip.antiAlias,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFF49A85E),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(17),
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      resultcontroller.type.value,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontFamily: 'Pretendard',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                width: 450,
+                height: 46,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    tagContainer(
+                        resultcontroller.tag[0], resultcontroller.tag_flag[0]),
+                    tagContainer(
+                        resultcontroller.tag[1], resultcontroller.tag_flag[1]),
+                    if (resultcontroller.tag.length > 2)
+                      tagContainer(resultcontroller.tag[2],
+                          resultcontroller.tag_flag[2]),
+                  ],
+                ),
+              ),
+              skinDescription(descript)
+            ],
           ),
-        ),
-      ),
-      Container(
-        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
-        width: 450,
-        height: 46,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            tagContainer(resultcontroller.tag[0], resultcontroller.tag_flag[0]),
-            tagContainer(resultcontroller.tag[1], resultcontroller.tag_flag[1]),
-            if (resultcontroller.tag.length > 2)
-              tagContainer(
-                  resultcontroller.tag[2], resultcontroller.tag_flag[2]),
-          ],
-        ),
-      ),
-      skinDescription(descript)
-    ],
   );
 }
 
@@ -552,133 +592,143 @@ Widget skinDescription(descript) {
 }
 
 Widget resultContent(resultcontroller) {
-  print(resultcontroller.skinResultWebContent);
-  return Container(
-    margin: EdgeInsets.fromLTRB(50, 50, 50, 0),
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: 980, // 부모가 450보다 크면 최대 450으로 제한
-          ),
-          child: Container(
-            // constraints: BoxConstraints(maxWidth: 840),
-            margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
-            child: Text(
-              "expert_opinion".tr,
-              textAlign: TextAlign.left,
-              style: TextStyle(
-                color: Color(0xFF7D7D7D),
-                fontSize: 18,
-                fontFamily: 'Pretendard',
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ),
-        Container(
-          constraints: BoxConstraints(maxWidth: 980),
-          height: 600,
-          child: ListView.builder(
-            itemCount: resultcontroller.skinResultWebContent.length,
-            itemBuilder: (context, index) {
-              return ListTile(
-                title: Text(
-                  resultcontroller.skinResultWebContent[index]
-                      .replaceAll(r"\n", "\n"),
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                    color: Color(0xFF7D7D7D),
-                    fontSize: 16,
-                    fontFamily: 'Pretendard',
-                    fontWeight: FontWeight.w400,
+  return Obx(
+    () => resultcontroller.opinion_loading.value
+        ? skeletonResultOpinion()
+        : Container(
+            margin: EdgeInsets.fromLTRB(50, 50, 50, 0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: 980, // 부모가 450보다 크면 최대 450으로 제한
+                  ),
+                  child: Container(
+                    // constraints: BoxConstraints(maxWidth: 840),
+                    margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
+                    child: Text(
+                      "expert_opinion".tr,
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        color: Color(0xFF7D7D7D),
+                        fontSize: 18,
+                        fontFamily: 'Pretendard',
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
                 ),
-              );
-            },
-          ),
-          decoration: BoxDecoration(
-            color: Colors.white, // 배경색 설정
-            border: Border.all(
-              color: Colors.black12, // 테두리 색상 설정
-              width: 3, // 테두리 두께 설정
+                Container(
+                  constraints: BoxConstraints(maxWidth: 980),
+                  height: 600,
+                  child: ListView.builder(
+                    itemCount: resultcontroller.skinResultWebContent.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(
+                          resultcontroller.skinResultWebContent[index]
+                              .replaceAll(r"\n", "\n"),
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                            color: Color(0xFF7D7D7D),
+                            fontSize: 16,
+                            fontFamily: 'Pretendard',
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white, // 배경색 설정
+                    border: Border.all(
+                      color: Colors.black12, // 테두리 색상 설정
+                      width: 3, // 테두리 두께 설정
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 32),
+                Container(
+                  constraints: BoxConstraints(maxWidth: 980),
+                  margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
+                  child: Text(
+                    "skin_type_description".tr,
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      color: Color(0xFF7D7D7D),
+                      fontSize: 18,
+                      fontFamily: 'Pretendard',
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                Container(
+                  constraints: BoxConstraints(maxWidth: 980),
+                  child: Text(
+                    resultcontroller.skinResultContent[0]
+                        .replaceAll(r"\n", "\n"),
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      color: Color(0xFF7D7D7D),
+                      fontSize: 16,
+                      fontFamily: 'Pretendard',
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 32),
+                Container(
+                  constraints: BoxConstraints(maxWidth: 980),
+                  child: Text(
+                    resultcontroller.skinResultContent[1]
+                        .replaceAll(r"\n", "\n"),
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      color: Color(0xFF7D7D7D),
+                      fontSize: 16,
+                      fontFamily: 'Pretendard',
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 32),
+                if (resultcontroller.skinResultContent.length > 2)
+                  Container(
+                    constraints: BoxConstraints(maxWidth: 980),
+                    child: Text(
+                      resultcontroller.skinResultContent[2]
+                          .replaceAll(r"\n", "\n"),
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        color: Color(0xFF7D7D7D),
+                        fontSize: 16,
+                        fontFamily: 'Pretendard',
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
-        ),
-        const SizedBox(height: 32),
-        Container(
-          constraints: BoxConstraints(maxWidth: 980),
-          margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
-          child: Text(
-            "skin_type_description".tr,
-            textAlign: TextAlign.left,
-            style: TextStyle(
-              color: Color(0xFF7D7D7D),
-              fontSize: 18,
-              fontFamily: 'Pretendard',
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-        Container(
-          constraints: BoxConstraints(maxWidth: 980),
-          child: Text(
-            resultcontroller.skinResultContent[0].replaceAll(r"\n", "\n"),
-            textAlign: TextAlign.left,
-            style: TextStyle(
-              color: Color(0xFF7D7D7D),
-              fontSize: 16,
-              fontFamily: 'Pretendard',
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ),
-        const SizedBox(height: 32),
-        Container(
-          constraints: BoxConstraints(maxWidth: 980),
-          child: Text(
-            resultcontroller.skinResultContent[1].replaceAll(r"\n", "\n"),
-            textAlign: TextAlign.left,
-            style: TextStyle(
-              color: Color(0xFF7D7D7D),
-              fontSize: 16,
-              fontFamily: 'Pretendard',
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ),
-        const SizedBox(height: 32),
-        if (resultcontroller.skinResultContent.length > 2)
-          Container(
-            constraints: BoxConstraints(maxWidth: 980),
-            child: Text(
-              resultcontroller.skinResultContent[2].replaceAll(r"\n", "\n"),
-              textAlign: TextAlign.left,
-              style: TextStyle(
-                color: Color(0xFF7D7D7D),
-                fontSize: 16,
-                fontFamily: 'Pretendard',
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-          ),
-      ],
-    ),
   );
 }
 
 Widget resultData(controller, resultcontroller) {
-  return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 50),
-    child: Column(
-      children: [
-        ResultTitle("skin_type".tr),
-        resultSubtitle(resultcontroller),
-        resultGraph(resultcontroller),
-      ],
-    ),
+  return Obx(
+    () => resultcontroller.data_loading.value
+        ? skeletonResultGraph()
+        : Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 50),
+            child: Column(
+              children: [
+                ResultTitle("skin_type".tr),
+                resultSubtitle(resultcontroller),
+                resultGraph(resultcontroller),
+              ],
+            ),
+          ),
   );
 }
 
@@ -1030,7 +1080,6 @@ matchIngredient(resultcontroller) {
   );
 }
 
-
 matchIngredientColumn(resultcontroller) {
   // Initialize an empty list of widgets that will contain all our dynamic widgets
   List<Widget> listWidgets = [];
@@ -1043,7 +1092,7 @@ matchIngredientColumn(resultcontroller) {
         "prescription_ingredients_title".tr,
         " ",
         "ingredients_benef"
-            "it"
+                "it"
             .tr),
     Container(height: 25),
   ]);
