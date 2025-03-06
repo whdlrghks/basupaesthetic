@@ -1,7 +1,7 @@
 import 'package:basup_ver2/data/customer.dart';
 import 'package:basup_ver2/design/value.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
+import 'dart:math';
 
 class ResultController extends GetxController {
   var name = "BASUPTEST".obs;
@@ -115,6 +115,62 @@ class ResultController extends GetxController {
   var data_loading = false.obs;
   var opinion_loading = false.obs;
   var match_loading = false.obs;
+
+
+  /// 유분 절대치(oilper >= 55) & 비율상 HighOil
+  final List<String> absoluteHigh_ratioHigh = [
+    "유분이 전반적으로 높은 상황이므로, 피지 조절과 함께 수분 보충을 병행합니다.",
+    "이중 세안 시 저자극 클렌저를 사용하고, 모공 관리 프로그램을 추가로 진행합니다.",
+    "모공 케어용 진정 마스크를 주 1~2회 적용해 과잉 피지를 흡착합니다.",
+    "에센스나 크림은 가벼운 질감 제품을 사용해 번들거림을 줄입니다.",
+    "유분이 많은 부위와 그렇지 않은 부위를 구분 관리하여, 전체적인 유수분 밸런스를 맞춥니다.",
+    "지성 전용 선크림을 사용해 번들거림을 최소화하고 자외선으로 인한 트러블을 예방합니다.",
+    "과다한 각질을 제거하기 위해, 주기적으로 피지 조절 패드를 사용하는 것을 권장합니다.",
+    "클레이팩이나 워시오프팩으로 T존 부위를 집중적으로 케어합니다.",
+    "피부 열감이 올라가면 수분 미스트로 즉각적인 진정을 해줍니다.",
+    "유분이 과도하게 많으나 수분이 상대적으로 부족할 수 있으므로, 가벼운 수분 공급도 소홀히 하지 않습니다.",
+  ];
+
+  /// 유분 절대치(oilper >= 55) & 비율상 LowOil
+  final List<String> absoluteHigh_ratioLow = [
+    "전체적인 유분 양은 많지만, 상대적으로 수분이 더 높으므로 수분/피지 둘 다 균형에 유의합니다.",
+    "피부 온도 관리에 집중해, 토너팩이나 쿨링 마스크로 열감을 낮춰 피지 분비를 안정화합니다.",
+    "모공을 막는 노폐물을 제거한 뒤, 가벼운 보습제로 마무리해 번들거림을 줄입니다.",
+    "과도한 레이어링은 피하고, 필요한 단계만 최소화하여 트러블 발생을 줄입니다.",
+    "T존과 U존을 나누어 관리하고, 번들거림이 큰 부위는 피지 집중 케어를 진행합니다.",
+    "질감이 묽은 에센스나 앰플로 피부결을 정돈한 뒤, 산뜻한 타입 크림을 사용합니다.",
+    "지성/복합성 전용 선크림을 선택해 일상 속 자외선 노출을 줄이고, 피지 산화도 방지합니다.",
+    "주기적으로 피지 컨트롤 스크럽이나 각질 케어를 실시해 모공 막힘을 예방합니다.",
+    "피부가 한쪽으로 치우치지 않도록, 수분 공급과 피지 조절을 균형 있게 진행합니다.",
+  ];
+
+  /// 유분 절대치(oilper < 55) & 비율상 HighOil (실제로는 수분이 훨씬 적은 상황)
+  final List<String> absoluteLow_ratioHigh = [
+    "유분이 실제로 적지만, 수분이 더 부족하여 상대적으로 유분 비율이 높아 보입니다. 수분 공급을 우선합니다.",
+    "보습력이 높은 토너와 에센스를 레이어링해 피부를 충분히 촉촉하게 합니다.",
+    "저자극 각질 케어를 병행해 보습 흡수를 방해하는 묵은 각질을 제거합니다.",
+    "수면팩이나 크림 마스크로 밤사이 집중 보습하여, 유수분 장벽을 개선합니다.",
+    "오일 함유량이 너무 높은 제품은 피하고, 수분 공급이 중점인 라인을 사용합니다.",
+    "피부 열감이 높아질 경우, 미스트나 쿨링 기기를 활용해 진정시킵니다.",
+    "유분이 많아 보인다고 지성 관리만 하면 악영향을 줄 수 있으니, 실제로는 건조함 해소에 집중합니다.",
+    "수분크림 위에 소량의 오일을 얹어 유수분 밸런스를 맞추되, 과하지 않게 조절합니다.",
+    "눈가, 입가 등 쉽게 건조해지는 부위에 아이크림 등으로 세심한 관리가 필요합니다.",
+    "건성 전용 선크림을 사용해 하루 종일 수분 증발을 막고 자외선까지 차단합니다.",
+  ];
+
+  /// 유분 절대치(oilper < 55) & 비율상 LowOil (유분도 낮고 수분도 상대적으로 더 높아 보이는 상태)
+  final List<String> absoluteLow_ratioLow = [
+    "전체적으로 유분이 부족하므로, 영양감 있는 크림이나 오일 밤을 단계적으로 활용합니다.",
+    "오일 클렌저나 크리미한 텍스처를 사용해 세안 시 피부 장벽 손상을 최소화합니다.",
+    "스킨케어 마지막 단계에 오일을 덧발라 주면, 유분 보충에 도움이 됩니다.",
+    "수면팩이나 크림 마스크로 깊은 보습을 채워주고, 당김 현상을 줄입니다.",
+    "눈가와 입가 등 국소 부위는 아이크림, 립밤 등으로 보강해주면 좋습니다.",
+    "건성 전용 선크림으로 외부 자극을 차단하고, 피부 건조를 예방합니다.",
+    "각질 관리도 중요하지만, 너무 잦은 필링은 더 건조해질 수 있으니 주의합니다.",
+    "약간의 필수 지방산이 함유된 보습 앰플이나 세럼을 사용하면 유분 레이어를 형성하는 데 도움이 됩니다.",
+    "데일리 케어 시, 미스트로 수시로 수분 공급하고 적절한 오일 제품으로 마무리합니다.",
+    "슬리핑 팩을 2~3일 간격으로 사용하면 아침에도 당김 없이 촉촉한 피부를 유지합니다.",
+  ];
 
   initloading() {
     title_loading.value = false;
@@ -518,5 +574,140 @@ class ResultController extends GetxController {
     }).toList();
 
     return descriptions;
+  }
+
+  void addingCommentBalance() {
+    if (oilper == 0 && waterper == 0) {
+      return;
+    }
+    var normaloil = oilper / (oilper + waterper) * 10;
+    var normalwater = waterper / (oilper + waterper) * 10;
+    var result = "";
+// 목표 비율: 4 : 6, 즉 oilper 4.0, waterper 6.0 (오차 0.4 허용)
+    if (int.parse(age.value) < 35) {
+      double desiredOil = 4.0;
+      if (normaloil > desiredOil + 0.4) {
+        result = generateSkinResult(ratioResult: 1, normaloil : normaloil,
+            normalwater: normalwater); //
+        // oilper가
+        // 너무 높음
+      } else if (normaloil < desiredOil - 0.4) {
+        result = generateSkinResult(ratioResult: 2, normaloil : normaloil,
+            normalwater: normalwater); // oilper가 너무 높음
+      } else {
+        result = generateSkinResult(ratioResult: 3, normaloil : 4.0,
+            normalwater: 6.0); // oilper가 너무 높음
+      }
+    } else {
+// age >= 35인 경우 목표 비율: 4.5 : 5.5, 즉 oilper 4.5 (오차 0.4 허용)
+      double desiredOil = 4.5;
+      if (oilper > desiredOil + 0.4) {
+        result = generateSkinResult(ratioResult: 4, normaloil : normaloil,
+            normalwater: normalwater); // oilper가 너무 높음
+      } else if (oilper < desiredOil - 0.4) {
+        result = generateSkinResult(ratioResult: 5, normaloil : normaloil,
+            normalwater: normalwater); // oilper가 낮음
+      } else {
+        result = generateSkinResult(ratioResult: 6, normaloil : 4.5,
+            normalwater: 5.5); // 권장
+      }
+    }
+    if (result != "") {
+      skinResultWebContent.insert(2, result);
+    }
+  }
+
+  /// 2번째 메소드: oilper가 55 미만일 경우,
+  /// 첫번째 메소드 결과(ratioResult)에 따라 결과 문자열을 생성한다.
+  String generateSkinResult({
+    required int ratioResult,
+    required double normaloil,
+    required double normalwater
+  }) {
+
+    // 소수점 첫 번째 자리까지만 보이도록 처리
+    String oilStr = normaloil.toStringAsFixed(1);
+    String waterStr = normalwater.toStringAsFixed(1);
+
+    final random = Random();
+    if (oilper >= 55) {
+      String randomHighOilCare = absoluteHigh_ratioHigh[random.nextInt(absoluteHigh_ratioHigh.length)];
+      String randomLowOilCare = absoluteHigh_ratioLow[random.nextInt(absoluteHigh_ratioLow.length)];
+
+      switch (ratioResult) {
+        case 6: //권장
+          return "권장하는 유수분 비율운 수분 5.5 : 유분 4.5 입니다. 현재 유수분 밸런스가 좋습니다. ( 수분 "
+              "${waterStr} : 유분 ${oilStr} ) ";
+        case 5: // 유분 적음
+          return "권장하는 유수분 비율운 수분 5.5 : 유분 4.5 입니다. 현재 유수분 밸런스가 안좋습니다. ( 수분 "
+              "${waterStr} : 유분 ${oilStr} ) 유수분 밸런스 조절에 신경쓰세요. 유분보유력 "
+              "증가를 위해 보습관련 코스를 추천합니다.\n${randomHighOilCare} ";
+        case 4: // 유분 많음
+          return  "권장하는 유수분 비율운 수분 5.5 : 유분 4.5 입니다. 현재 유수분 밸런스가 안좋습니다. ( 수분 "
+              "${waterStr} : 유분 ${oilStr} )  유수분 밸런스 조절에 신경쓰세요. 유분보유력을 "
+              "낮추면서 수분을 높이는 방법을 추천드립니다.\n${randomLowOilCare}";
+        case 3:
+          return "권장하는 유수분 비율운 수분 6 : 유분 4 입니다. 현재 유수분 밸런스가 좋습니다. ( 수분 "
+              "${waterStr} : 유분 ${oilStr} )";
+        case 2:
+          return "권장하는 유수분 비율운 수분 6 : 유분 4 입니다. 현재 유수분 밸런스가 안좋습니다. ( 수분 "
+              "${waterStr} : 유분 ${oilStr} ) 유수분 밸런스 조절에 신경쓰세요. 유분보유력 "
+              "증가를 위해 보습관련 코스를 추천합니다.\n${randomHighOilCare}";
+        case 1:
+          return "권장하는 유수분 비율운 수분 6 : 유분 4 입니다. 현재 유수분 밸런스가 안좋습니다. ( 수분 "
+              "${waterStr} : 유분 ${oilStr} )\n${randomLowOilCare}";
+        default:
+          return "";
+      }
+    } else {
+      String randomHighOilCare = absoluteLow_ratioHigh[random.nextInt(absoluteLow_ratioHigh.length)];
+      String randomLowOilCare = absoluteLow_ratioLow[random.nextInt(absoluteLow_ratioLow.length)];
+      switch (ratioResult) {
+        case 6:
+          return "권장하는 유수분 비율운 수분 5.5 : 유분 4.5 입니다. 현재 유수분 밸런스가 좋습니다. ( 수분 "
+              "${waterStr} : 유분 ${oilStr} )\n그렇지만 "
+              "절대적인 "
+              "유분 "
+              "값이 "
+              "낮기 "
+              "때문에 "
+              "유수분을 "
+              "골고루 "
+              "성장시킬 수 있는 관리나 제품을 사용해주세요.";
+        case 5:
+          return "권장하는 유수분 비율운 수분 5.5 : 유분 4.5 입니다. 현재 유수분 밸런스가 안좋습니다. ( 수분 "
+              "${waterStr} : 유분 ${oilStr} )\n수분 대비 유분보유력이 약합니다.${randomHighOilCare}";
+        case 4:
+          return  "권장하는 유수분 비율운 수분 5.5 : 유분 4.5 입니다. 현재 유수분 밸런스가 안좋습니다. ( 수분 "
+              "${waterStr} : 유분 ${oilStr} )\n그것의 가장 큰 이유는 피부의 수분보유력이 약해서 그렇습니다. "
+              "이 경우 유분감이 많다고 느껴질 수 있으나 이는 상대적으로 느끼는 것입니다. 유수분을 골고루 강화시켜줘야 하지만 수분위주의 관리가 필요합니다. "
+              "${randomLowOilCare}";
+        case 3:
+          return "권장하는 유수분 비율운 수분 6 : 유분 4 입니다. 현재 유수분 밸런스가 좋습니다. ( 수분 "
+              "${waterStr} : 유분 ${oilStr} )\n그렇지만 절대적인 유분 값이 낮기 때문에 유수분을 골고루 "
+              "성장시킬 수 있는 관리나 제품을 사용해주세요.";
+        case 2:
+          return "권장하는 유수분 비율운 수분 6 : 유분 4 입니다. 현재 유수분 밸런스가 안좋습니다. ( 수분 "
+              "${waterStr} : 유분 ${oilStr} )\n수분 대비 유분보유력이 약합니다. ${randomHighOilCare}";
+        case 1:
+          return "권장하는 유수분 비율운 수분 6 : 유분 4 입니다. 현재 유수분 밸런스가 안좋습니다. ( 수분 "
+              "${waterStr} : 유분 ${oilStr} )\n그것의 가장 큰 이유는 피부의 수분보유력이 약해서 그렇습니다. "
+              "이 경우 유분감이 많다고 느껴질 수 있으나 이는 상대적으로 느끼는 것입니다. 유수분을 골고루 강화시켜줘야 하지만 수분위주의 관리가 필요합니다. "
+              "${randomLowOilCare}";
+        default:
+          return "";
+      }
+    }
+  }
+
+  void commentPigmentAdding(){
+    var result = "";
+    if (pigper >= 55) {
+      result= "색소침착에 대한 점수가 높습니다. 육안으로 기미나 색소침착 관련 현상이 보인다면 자외선 차단제를 추천합니다. "
+          "만약 사용하고 계신다면 자외선 차단제를 변경하시는 것도 방법입니다. 또한 미백관련 코스를 추천합니다.";
+    } else {
+      result= "색소침착에 대한 점수가 낮으므로 자외선 차단제를 필수적으로 추천드립니다.";
+    }
+    skinResultWebContent.add(result);
   }
 }

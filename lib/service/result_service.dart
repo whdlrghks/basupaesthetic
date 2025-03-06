@@ -226,10 +226,10 @@ class ResultService {
 
     // (4) 혼합 계산
     final finalOil = oilOld * 0.6 + newlyCalculated['oil'] * 0.4;
-    final finalPig = pigOld * 0.6 + newlyCalculated['pig'] * 0.4;
+    final finalPig = pigOld * 0.9 + newlyCalculated['pig'] * 0.1;
     final finalSens = getFinalSens(sensOld, newlyCalculated['sens']);
     final finalWater = waterOld * 0.6 + newlyCalculated['water'] * 0.4;
-    final finalWrinkle = wrinkleOld * 0.6 + newlyCalculated['wrinkle'] * 0.4;
+    final finalWrinkle = wrinkleOld * 0.8 + newlyCalculated['wrinkle'] * 0.2;
 
     // (5) resultController에 반영
     resultController.setData(

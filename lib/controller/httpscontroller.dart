@@ -831,6 +831,8 @@ fetchWebSkinResult(skincode) async {
     // 'comment'와 'ingre' 데이터 저장
     resultController.skinResultWebContent =
         List<String>.from(parsed["comment"]);
+    resultController.addingCommentBalance();
+    resultController.commentPigmentAdding();
 
     print("resultController.opinion_loading.value = false;");
     resultController.opinion_loading.value = false;

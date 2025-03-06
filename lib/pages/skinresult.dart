@@ -255,7 +255,7 @@ class _SkinResultState extends State<SkinResult> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            margin: EdgeInsets.fromLTRB(0, 0, 100, 0),
+            margin: EdgeInsets.fromLTRB(0, 0, 30, 0),
             child: backKey(fromResult: true),
           ),
           if (dropdownItems.isNotEmpty) ...[
