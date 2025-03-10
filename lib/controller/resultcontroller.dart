@@ -101,6 +101,8 @@ class ResultController extends GetxController {
   var right_uv_list = [];
   var head_uv_list = [];
 
+  var microscope_image_firebase_list = [];
+
   var a = 0.obs;
   var b = 0.obs;
   var c = 0.obs;
@@ -203,6 +205,7 @@ class ResultController extends GetxController {
 
     surveylist = [];
     surveyItemList = {};
+    microscope_image_firebase_list =[];
   }
 
   initNewuser() {
@@ -219,6 +222,8 @@ class ResultController extends GetxController {
 
     surveylist = [];
     surveyItemList = {};
+    microscope_image_firebase_list=[];
+
   }
 
   initscope() {

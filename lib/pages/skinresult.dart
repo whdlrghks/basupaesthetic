@@ -18,6 +18,7 @@ import 'package:basup_ver2/pages/skeletonui.dart';
 import 'package:basup_ver2/pages/skinresultprintpage.dart';
 import 'package:basup_ver2/service/firebase.dart';
 import 'package:basup_ver2/service/result_service.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -65,6 +66,8 @@ class _SkinResultState extends State<SkinResult> {
     if (resultcontroller.surveylist.isNotEmpty) {
       // 예시: 설문 목록이 이미 날짜 순으로 정렬되어 있다면 첫 번째 항목 선택
       selectedSurvey.value = resultcontroller.surveylist.first;
+      print(":TESTSETSETSE");
+      print(selectedSurvey.value?.microscopeImage.toString());
       _dateTime = DateTime.parse(selectedSurvey.value!.date);
       SkinSurveyResult newskindata = new SkinSurveyResult();
       Map<String, dynamic> resultData1 = {
@@ -126,6 +129,96 @@ class _SkinResultState extends State<SkinResult> {
     }).toList();
   }
 
+  Widget buildMicroscopeSlider(MicroscopeImage? microscopeImage) {
+    if (microscopeImage == null) {
+      return Container();
+    }
+
+    // [label: "이마 Led 사진", url: "https://..."]
+    final entries = getMicroscopeEntries(microscopeImage);
+
+    return CarouselSlider(
+      items: entries.map((entry) {
+        final url = entry['url']!;
+        final label = entry['label']!;
+        return Builder(
+          builder: (BuildContext context) {
+            return Container(
+              margin: EdgeInsets.fromLTRB(8, 10, 8, 25),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                children: [
+                  // 1) 이미지
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        url,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  // 2) 라벨 텍스트
+                  Container(
+                    margin: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      label,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontFamily: 'Pretendard',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      }).toList(),
+      options: CarouselOptions(
+        height: 450,
+        autoPlay: false,
+        enlargeCenterPage: true,
+        aspectRatio: 16 / 9,
+        enableInfiniteScroll: false,
+        initialPage: 0,
+      ),
+    );
+  }
+
+  List<Map<String, String>> getMicroscopeEntries(MicroscopeImage micros) {
+    return [
+      {
+        'label': '이마 Led 사진',  // 라벨
+        'url': micros.headLed,
+      },
+      {
+        'label': '왼쪽 뺨 Led 사진',
+        'url': micros.leftLed,
+      },
+      {
+        'label': '오른쪽 뺨 Led 사진',
+        'url': micros.rightLed,
+      },
+      {
+        'label': '이마 Uv 사진',
+        'url': micros.headUv,
+      },
+      {
+        'label': '왼쪽 뺨 Uv 사진',
+        'url': micros.leftUv,
+      },
+      {
+        'label': '오른쪽 뺨 Uv 사진',
+        'url': micros.rightUv,
+      },
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     // user_id가 BASUPTEST인 경우, 로딩 인디케이터를 보여주며 CustomersListPage로 리다이렉트
@@ -164,23 +257,10 @@ class _SkinResultState extends State<SkinResult> {
               BlankTopGap(controller),
               title(resultcontroller),
               BlankBetweenTitleContent(controller),
-              // Container(
-              //
-              //   margin: EdgeInsets.fromLTRB(150, 50, 150, 0),
-              //   child: Row(
-              //     mainAxisAlignment: MainAxisAlignment.center,
-              //     children: [
-              //       // Expanded(
-              //       //   child:
-              //       skintitle(resultcontroller, descript),
-              //       // ),
-              //       // Expanded(
-              //       //   child:
-              //       resultData(controller, resultcontroller),
-              //       // ),
-              //     ],
-              //   ),
-              // ),
+              Obx(() {
+                final micros = selectedSurvey.value?.microscopeImage;
+                return buildMicroscopeSlider(micros);
+              }),
               LayoutBuilder(
                 builder: (context, constraints) {
                   // 예: 너비가 600픽셀 미만이면 Column, 그 이상이면 Row로 표시
@@ -283,6 +363,9 @@ class _SkinResultState extends State<SkinResult> {
                   selectedSurvey.value = newValue;
                   print(
                       "[DEBUG]`selectedSurvey.value : ${selectedSurvey.value}");
+
+                  print(":TESTSETSETSE");
+                  print(selectedSurvey.value?.microscopeImage.toString());
                   resultcontroller.initloading();
                   resultcontroller.startloading();
 

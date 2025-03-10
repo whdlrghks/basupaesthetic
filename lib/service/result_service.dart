@@ -36,6 +36,9 @@ class ResultService {
       return;
     }
 
+    print("latestSurveyMap");
+    print(latestSurveyMap);
+
     final surveyId = latestSurveyMap['survey_id'] ?? "";
     if (surveyId.isEmpty) {
       print("No survey_id found in users collection");
@@ -315,29 +318,39 @@ class ResultService {
     await Future.delayed(Duration(milliseconds: 500));
 
     await createUserDocument(resultController: resultController, onlysurvey: false);
-    // final newlist =await getLatestSurveyFromUsers(
-    //     resultController,
-    //     resultController.name.value,
-    //     resultController.aestheticId.value);
+    // 피부 현미경 데이터 가져오기
     await fetchWebSkinTypeResult(finalSkintype);
     await fetchWebSkinResult(finalSkintype);
   }
 
   /// AI Job Lookup (30초간격 x 10회 = 최대 5분)
   Future<Map<String, dynamic>?> pollAiJobResult(String jobId) async {
-    const int maxChecks = 10;
+    // 1. 최초 1분 대기
+    await Future.delayed(const Duration(minutes: 1));
 
-    await Future.delayed(const Duration(seconds: 20));
-    for (int i = 0; i < maxChecks; i++) {
-      final newlyCalculated = await fetchCalculateAILookup(job_id: jobId);
-      if (newlyCalculated["status"] == "DONE") {
-        print("AI job DONE => $newlyCalculated");
-        return newlyCalculated;
+    // 2. 1분 후에 최초 호출
+    final initialResult = await fetchCalculateAILookup(job_id: jobId);
+    if (initialResult["status"] == "DONE") {
+      print("AI job DONE at initial call => $initialResult");
+      return initialResult;
+    } else {
+      print("AI IN_PROGRESS at initial call");
+    }
+
+    // 3. 이후 30초마다 5회 호출
+    const int maxRetries = 5;
+    for (int i = 0; i < maxRetries; i++) {
+      await Future.delayed(const Duration(seconds: 30));
+      final result = await fetchCalculateAILookup(job_id: jobId);
+      if (result["status"] == "DONE") {
+        print("AI job DONE at retry ${i + 1} => $result");
+        return result;
       } else {
-        print("AI IN_PROGRESS => retry after 20 seconds (i=$i)");
-        await Future.delayed(const Duration(seconds: 20));
+        print("AI IN_PROGRESS => retry after 30 seconds (attempt ${i + 1})");
       }
     }
+
+    // 4. 6회 모두 완료되지 않으면 null 반환
     return null;
   }
 }

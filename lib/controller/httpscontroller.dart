@@ -770,6 +770,7 @@ Future<void> createSkinScope(resultController) async {
     'headUv': headUvListString,
     'date': date,
     'survey_id': survey_id,
+    'scope_id' : scope_id,
   });
   // await createUserDocument(
   //     resultController: resultController, onlysurvey: false);
@@ -847,6 +848,70 @@ fetchWebSkinResult(skincode) async {
     return CODE_OK;
   } else {
     return "FAIL";
+  }
+}
+
+Future<Map<String, dynamic>> fetchCalculateStepFunctionAI({
+  required String survey_id,
+  required List<String> uvList, // ["s3://...uv_1.jpg", ...]
+  required List<String> ledList, // ["s3://...led_1.jpg", ...]
+}) async {
+  final lambdaUrl = aws_step_function; // 실제 URL
+
+  // 1) 요청 JSON
+  final requestData = {
+    "survey_id": survey_id,
+    "uv_list": uvList,
+    "led_list": ledList
+  };
+  print("requestData");
+
+  try {
+    // 2) POST
+    print(requestData);
+    final response = await http.post(
+      Uri.parse(lambdaUrl),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(requestData),
+    );
+
+    final outerJson = jsonDecode(response.body);
+    print(outerJson);
+
+    if (response.statusCode == 202) {
+      // 3) 람다 응답 파싱
+      final outerJson = jsonDecode(response.body);
+      print(outerJson);
+      // if (outerJson["statusCode"] != 202) {
+      //   throw Exception("Lambda error: ${outerJson['statusCode']}");
+      // }
+
+      var job_id = outerJson["job_id"];
+      print(job_id);
+
+      return {
+        "job_id": job_id
+        // "oil": newOil,
+        // "pig": newPig,
+        // "sens": newSens,
+        // "water": newWater,
+        // "wrinkle": newWrinkle,
+        // "oil_label": oilLabel,
+        // "pig_label": pigLabel,
+        // "sens_label": sensLabel,
+        // "water_label": waterLabel,
+        // "wrinkle_label": wrinkleLabel,
+      };
+    } else {
+      throw Exception("HTTP error: ${response.statusCode}");
+    }
+  } catch (e) {
+    print("fetchCalculateAI error: $e");
+
+    Get.dialog(NetworkErrorDialog());
+    rethrow; // or return {}
   }
 }
 

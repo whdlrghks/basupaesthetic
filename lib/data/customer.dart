@@ -2,17 +2,34 @@ class SurveyEachItem{
   String date;
   String surveyId;
   bool onlysurvey;
+  String userIdunique;
+  MicroscopeImage? microscopeImage; // 추가된 속성
   SurveyEachItem({
     required this.date,
     required this.surveyId,
     required this.onlysurvey,
+    required this.userIdunique,
+    this.microscopeImage,
   });
   factory SurveyEachItem.fromMap(Map<String, dynamic> map) {
     return SurveyEachItem(
       date: map['date'] as String,
       surveyId: map['survey_id'] as String,
       onlysurvey: map['onlysurvey'] as bool,
+        userIdunique: map['user_id'] as String,
     );
+  }
+  SurveyEachItem copyWith({MicroscopeImage? microscopeImage}) {
+    return SurveyEachItem(
+      date: this.date,
+      surveyId: this.surveyId,
+      onlysurvey: this.onlysurvey,
+      userIdunique: this.userIdunique,
+      microscopeImage: microscopeImage ?? this.microscopeImage,
+    );
+  }
+  setMicroscope(microscope_id){
+    microscope_id = microscope_id;
   }
   @override
   bool operator ==(Object other) =>
@@ -25,6 +42,53 @@ class SurveyEachItem{
   @override
   int get hashCode => surveyId.hashCode ^ date.hashCode;
 }
+
+class MicroscopeImage {
+  final String headLed;
+  final String leftUv;
+  final String headUv;
+  final String rightUv;
+  final String leftLed;
+  final String rightLed;
+  final String date;
+  final String userId;
+  final String surveyId;
+  final String docId;
+
+  MicroscopeImage({
+    required this.headLed,
+    required this.leftUv,
+    required this.headUv,
+    required this.rightUv,
+    required this.leftLed,
+    required this.rightLed,
+    required this.date,
+    required this.userId,
+    required this.surveyId,
+    required this.docId,
+  });
+
+  factory MicroscopeImage.fromMap(Map<String, dynamic> map) {
+    return MicroscopeImage(
+      headLed: map['headLed'] as String,
+      leftUv: map['leftUv'] as String,
+      headUv: map['headUv'] as String,
+      rightUv: map['rightUv'] as String,
+      leftLed: map['leftLed'] as String,
+      rightLed: map['rightLed'] as String,
+      date: map['date'] as String,
+      userId: map['user_id'] as String,
+      surveyId: map['survey_id'] as String,
+      docId: map['docId'] as String,
+    );
+  }
+
+  @override
+  String toString() {
+    return '{headLed: $headLed, leftUv: $leftUv, headUv: $headUv, rightUv: $rightUv, leftLed: $leftLed, rightLed: $rightLed, date: $date, userId: $userId, surveyId: $surveyId, docId: $docId}';
+  }
+}
+
 class SkinSurveyResult {
   List<dynamic> cosIngredients;
   List<dynamic> ingredient;
@@ -228,7 +292,6 @@ class Customer {
     if (surveys.isEmpty) {
       return null; // Or handle accordingly if no surveys exist
     }
-
     // Sort the surveys by date in descending order to get the most recent one first
     surveys.sort((a, b) => DateTime.parse(b.date).compareTo(DateTime.parse(a.date)));
 

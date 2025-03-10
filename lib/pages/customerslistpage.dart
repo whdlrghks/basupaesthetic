@@ -32,7 +32,8 @@ Future<List<Customer>> searchCustomers(String aestheticId) async {
             SurveyEachItem(
                 date: data['date'],
                 surveyId: data['survey_id'],
-                onlysurvey: data['onlysurvey']),
+                onlysurvey: data['onlysurvey'],
+            userIdunique: data['user_id']),
           );
     } else {
       // Otherwise, create a new customer group with this survey
@@ -45,7 +46,8 @@ Future<List<Customer>> searchCustomers(String aestheticId) async {
           SurveyEachItem(
               date: data['date'],
               surveyId: data['survey_id'],
-              onlysurvey: data['onlysurvey'])
+              onlysurvey: data['onlysurvey'],
+              userIdunique: data['user_id'])
         ],
         user_id: data[
             'user_id'], // Assuming 'user_id' is how you identify the customer document
@@ -167,7 +169,8 @@ class _CustomersListPageState extends State<CustomersListPage> {
               SurveyEachItem(
                   date: data['date'],
                   surveyId: data['survey_id'],
-                  onlysurvey: data['onlysurvey']),
+                  onlysurvey: data['onlysurvey'],
+                  userIdunique: data['user_id']),
             );
       } else {
         customerGroups[customerKey] = Customer(
@@ -179,7 +182,8 @@ class _CustomersListPageState extends State<CustomersListPage> {
             SurveyEachItem(
                 date: data['date'],
                 surveyId: data['survey_id'],
-                onlysurvey: data['onlysurvey'])
+                onlysurvey: data['onlysurvey'],
+                userIdunique: data['user_id'])
           ],
           user_id: data['user_id'],
         );
@@ -456,7 +460,7 @@ class _CustomersListPageState extends State<CustomersListPage> {
           (customer.sex == "M") ? Gender.M : Gender.W;
       resultcontroller.aestheticId.value = customer.aestheticId;
       resultcontroller.survey_id.value = mostRecentSurvey.surveyId;
-      resultcontroller.user_id.value = customer.user_id;
+      resultcontroller.user_id.value = mostRecentSurvey.userIdunique;
       resultcontroller.survey_date.value = mostRecentSurvey.date;
       resultcontroller.surveylist = customer.surveys;
 
