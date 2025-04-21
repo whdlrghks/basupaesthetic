@@ -449,7 +449,10 @@ class _SkinScopeState extends State<SkinScope> {
               taskProgress[currentIndex] = progressValue;
               double overallProgress = taskProgress.reduce((a, b) => a + b) /
                   taskProgress.length;
-              _uploadProgressRx.value = overallProgress; // 여기서 reactive 변수 업데이트
+              _uploadProgressRx.value = overallProgress ; // 여기서
+              // reactive
+              // 변수
+              // 업데이트
             })
         );
         uploadTypes.add(type);
@@ -551,13 +554,14 @@ class _SkinScopeState extends State<SkinScope> {
           user_id + "_" + survey_id + "_" + now.toString();
       print("생성된 scope_id: ${resultcontroller.scope_id}");
 
+      await createSkinScope(resultcontroller);
+      // At this point, all URLs have been assigned to their respective variables in resultcontroller.
+      // Proceed with any additional logic, now that all uploads are complete and URLs are saved.
+
       _uploadProgressRx.value = 1.0;
 
       print("resultcontroller.scope_id");
       Get.back(); // Dismiss the loading dialog
-      await createSkinScope(resultcontroller);
-      // At this point, all URLs have been assigned to their respective variables in resultcontroller.
-      // Proceed with any additional logic, now that all uploads are complete and URLs are saved.
     } catch (e) {
       print("An error occurred during file uploads: $e");
       Get.dialog(Test("An error occurred during file uploads: $e"));

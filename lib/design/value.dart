@@ -15,6 +15,13 @@ var web_calculate_url = "https://47ypsfx6a0.execute-api.ap-northeast-2.amazonaws
 var web_calculate_lookup= "https://1upjrsxfi0.execute-api.ap-northeast-2"
     ".amazonaws.com/default/basup-ai-model-lookup";
 
+
+
+var web_calcualte_url_ver2 = "https://w20fin7ur2.execute-api.ap-northeast-2"
+    ".amazonaws.com/default/invokeSageMakerLambda";
+var web_calculate_lookup_ver2= "https://1upjrsxfi0.execute-api.ap-northeast-2"
+    ".amazonaws.com/default/basup-ai-model-lookup";
+
 var aws_step_function = "https://jzn2gqn9yi.execute-api.ap-northeast-2"
     ".amazonaws.com/test1/execution";
 

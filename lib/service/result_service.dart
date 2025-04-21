@@ -139,20 +139,29 @@ class ResultService {
     final leftUv = latestMicroscopeDoc['leftUv'];
     final rightUv = latestMicroscopeDoc['rightUv'];
 
+
+    //old version
+    // // (3) AI request + poll
+    // final requestJobId = await fetchCalculateAI(
+    //   survey_id: surveyId,
+    //   uvList: [headUv, leftUv, rightUv],
+    //   ledList: [headLed, leftLed, rightLed],
+    // );
+    //
+    // final newlyCalculated = await pollAiJobResult(requestJobId["job_id"]);
+    // if (newlyCalculated == null) {
+    //   print("AI polling timed out => No DONE");
+    //   // 네트워크 에러 다이얼로그
+    //   Get.dialog(NetworkErrorDialog());
+    //   return;
+    // }
+
     // (3) AI request + poll
-    final requestJobId = await fetchCalculateAI(
+    final newlyCalculated = await fetchCalculateAI(
       survey_id: surveyId,
       uvList: [headUv, leftUv, rightUv],
       ledList: [headLed, leftLed, rightLed],
     );
-
-    final newlyCalculated = await pollAiJobResult(requestJobId["job_id"]);
-    if (newlyCalculated == null) {
-      print("AI polling timed out => No DONE");
-      // 네트워크 에러 다이얼로그
-      Get.dialog(NetworkErrorDialog());
-      return;
-    }
 
     // (4) 혼합 계산
     final finalOil = oilOld * 0.6 + newlyCalculated['oil'] * 0.4;
@@ -215,17 +224,30 @@ class ResultService {
     final leftUv = latestMicroscopeDoc['leftUv'];
     final rightUv = latestMicroscopeDoc['rightUv'];
 
+
+
+    //old version
+    // // (3) AI request + poll
+    // final requestJobId = await fetchCalculateAI(
+    //   survey_id: surveyId,
+    //   uvList: [headUv, leftUv, rightUv],
+    //   ledList: [headLed, leftLed, rightLed],
+    // );
+    //
+    // final newlyCalculated = await pollAiJobResult(requestJobId["job_id"]);
+    // if (newlyCalculated == null) {
+    //   print("AI polling timed out => No DONE");
+    //   // 네트워크 에러 다이얼로그
+    //   Get.dialog(NetworkErrorDialog());
+    //   return;
+    // }
+
     // (3) AI request + poll
-    final requestJobId = await fetchCalculateAI(
+    final newlyCalculated = await fetchCalculateAI(
       survey_id: surveyId,
       uvList: [headUv, leftUv, rightUv],
       ledList: [headLed, leftLed, rightLed],
     );
-    final newlyCalculated = await pollAiJobResult(requestJobId["job_id"]);
-    if (newlyCalculated == null) {
-      print("AI polling timed out => No DONE");
-      return;
-    }
 
     // (4) 혼합 계산
     final finalOil = oilOld * 0.6 + newlyCalculated['oil'] * 0.4;

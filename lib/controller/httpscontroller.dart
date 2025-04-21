@@ -922,6 +922,71 @@ Future<Map<String, dynamic>> fetchCalculateAI({
   required List<String> uvList, // ["s3://...uv_1.jpg", ...]
   required List<String> ledList, // ["s3://...led_1.jpg", ...]
 }) async {
+  final lambdaUrl = web_calcualte_url_ver2; // 실제 URL
+
+  // 1) 요청 JSON
+  final requestData = {
+    "survey_id": survey_id,
+    "uv_list": uvList,
+    "led_list": ledList
+  };
+  print("requestData");
+
+  try {
+    // 2) POST
+    print(requestData);
+    final response = await http.post(
+      Uri.parse(lambdaUrl),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(requestData),
+    );
+    print(response.statusCode);
+    print(response.body.toString());
+    print(DateTime.now());
+
+    // 3) 응답 HTTP 코드 확인
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> result = jsonDecode(response.body);
+
+      // 예측값 추출 (LightGBM 기준)
+      final Map<String, dynamic> predictions = result["predictions"]["LightGBM"];
+      // 타이밍 정보 추출
+      final Map<String, dynamic> timing = result["timing"];
+
+      print("Predictions: $predictions");
+      print("Timing: $timing");
+
+      // 5) 원하는 데이터들을 반환 (예시)
+      return {
+        "sens": predictions["sens"],
+        "oil": predictions["oil"],
+        "water": predictions["water"],
+        "wrinkle": predictions["wrinkle"],
+        "pig": predictions["pig"],
+        "data_collection": timing["data_collection"],
+        "model_prediction": timing["model_prediction"],
+        "total_time": timing["total_time"],
+        "feature_combination": timing["feature_combination"],
+      };
+    } else {
+      throw Exception("HTTP error: ${response.statusCode}");
+    }
+  } catch (e) {
+    print("fetchCalculateAI error: $e");
+
+    Get.dialog(NetworkErrorDialog());
+    rethrow; // or return {}
+  }
+}
+/// 예시: 람다에 old & new(uv_list, led_list) 값 전달
+/// Lambda 응답에서 conf_result, label 등을 받아 Map 형태로 반환
+Future<Map<String, dynamic>> fetchCalculateAI_old({
+  required String survey_id,
+  required List<String> uvList, // ["s3://...uv_1.jpg", ...]
+  required List<String> ledList, // ["s3://...led_1.jpg", ...]
+}) async {
   final lambdaUrl = web_calculate_url; // 실제 URL
 
   // 1) 요청 JSON
